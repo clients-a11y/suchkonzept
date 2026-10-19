@@ -50,7 +50,7 @@ So bekommen auch neue Mandanten automatisch passende Bilder.
 `--t-primary`, `--t-on-primary`, `--t-primary-tint`, `--t-accent`, `--t-on-accent`, `--t-surface`,
 `--t-heading`, `--t-body`, `--t-radius`. Alle Mandanten-Komponenten nutzen nur diese Variablen.
 
-## Was schon da ist
+## Grundgerüst (vorab vorhanden)
 
 - `src/lib/types.ts` Typen (Tenant, Tokens, Service, NewsItem, ContentPage)
 - `src/lib/color.ts` WCAG-Kontrast, `onColor`, `tint`, `formatRatio`
@@ -63,7 +63,9 @@ So bekommen auch neue Mandanten automatisch passende Bilder.
 - `src/components/TenantContext.tsx` (`useCurrentTenant()` liefert `{ tenant, base }`)
 - `src/components/Emblem.tsx` fiktives Wappen aus Tokens
 
-## Was noch fehlt
+## Umgesetzt
+
+Alle folgenden Teile sind gebaut (Stand 19.10.2026) und auf Desktop und 390 px geprüft.
 
 ### Komponenten (`src/components/`)
 - `TenantShell.tsx` (client): löst Mandanten über `useTenant(id)` auf („loading“ → kurzer Ladezustand,
@@ -124,3 +126,19 @@ Kontraste AA, Skip-Link funktioniert, Tastaturbedienung für Menü, Tabs, Filter
 
 `npm run dev`, dann `/`, `/musterland`, `/beispielstadt`, eine Leistung, Suche, Aktuelles, Inhaltsseite
 und den Assistenten durchklicken, auf Desktop und 390 px Breite. `npm run build` muss ohne Fehler laufen.
+
+## Technische Hinweise
+
+- Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`
+  würde mit Partial Prefetching die App-Shell blockieren, und eigene Mandanten kennt der Server ohnehin nicht.
+- `TenantShell` rendert das Seitensegment in jedem Zustand. `TenantGate` in den Routen hält es leer,
+  solange ein Mandant aus dem `localStorage` noch nicht gelesen ist. So bleibt das Segment für Next.js gültig.
+- Mit Cache Components bleiben besuchte Routen versteckt im DOM (Activity). Der Sprunglink fokussiert deshalb
+  das `<main>` der eigenen Shell statt der ersten ID, Menüs schließen sich beim Verstecken.
+- Die Kopfnavigation liest `useSearchParams` in einer eigenen Suspense-Grenze, damit der Rest statisch bleibt.
+
+## Offen
+
+- Backend (Payload) und echte Redaktionsabläufe
+- Designbasis klären (KERN, Lizenzfrage)
+- Echte Inhalte für Gebärdensprache, Leichte und Einfache Sprache sowie Fremdsprachen (jetzt Platzhalter)
