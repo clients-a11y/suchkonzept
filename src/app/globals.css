@@ -2803,6 +2803,11 @@ button.pf-steps__link:hover .pf-steps__label {
   aspect-ratio: 5 / 6;
 }
 
+/* Keep heads in frame when a portrait photo is cropped to a wide card */
+.t-figure--portrait .t-figure__photo {
+  object-position: 50% 18%;
+}
+
 .t-orghead {
   position: relative;
   display: grid;

@@ -160,10 +160,10 @@ misst nur die Änderung. Beispielmandanten bleiben Konfiguration in `src/data/te
 - Verknüpft mit Navigation („Landesregierung“, „Ämter“, Vorlage „Verwaltung“), Suche (Stellen als Treffer) und
   Leistungsseiten („Mehr zur Stelle“, im Land „Im Land zuständig“).
 
-## KI-generierte Beispielfotos (vorbereitet, Bilder folgen)
+## KI-generierte Beispielfotos (eingebaut 19.10.2026)
 
 Auf Wunsch sollen Musterland und Beispielstadt echte Fotos statt Illustrationen zeigen, erzeugt mit Higgsfield:
-13 Bilder zu Meldungen und 18 Porträts der Leitungen. Der Code ist vorbereitet: `NewsImage.photo` und
+13 Bilder zu Meldungen und 18 Porträts der Leitungen, alle eingebaut. Technik: `NewsImage.photo` und
 `OrgUnit.photo` sind optionale Pfade unter `public/images/`. Ist ein Foto gesetzt, zeigt das Portal es mit der
 Bildunterschrift „Beispielbild, KI-generiert“, sonst bleibt die Token-Illustration. Mandanten aus dem Assistenten
 behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für alle Bilder stehen in `docs/BILDER.md`.

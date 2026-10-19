@@ -4,6 +4,12 @@ Die Beispielmandanten Musterland und Beispielstadt zeigen KI-generierte Fotos (e
 Jedes Bild ist im Portal als „Beispielbild, KI-generiert“ gekennzeichnet. Alle abgebildeten Personen sind
 fiktiv. Mandanten aus dem Assistenten haben keine Fotos und zeigen die Token-Illustrationen (`NewsArt`, `Portrait`).
 
+Stand 19.10.2026: alle 31 Bilder erzeugt mit Higgsfield, Modell GPT Image 2.5 (Variante „flare“), Qualität
+„medium“, Auflösung 1k, 0,5 Credits je Bild. Meldungen im Format 3:2 (1024 × 688), Porträts 4:5, auf
+800 × 1000 verkleinert. Umgewandelt in WebP (Qualität 80), zusammen etwa 2,3 MB. Jedes Bild wurde vor dem
+Einbau auf Schrift, Logos und Wappen geprüft. Die Beschreibungen unten sind die Grundlage, die tatsächlich
+verwendeten Prompts sind leicht ausführlicher (zusätzlich „not a real or famous person“ bei Porträts).
+
 Regeln für alle Bilder:
 - keine lesbare Schrift, keine Logos, keine Wappen, keine Hoheitszeichen, keine realen Orte oder Gebäude
 - keine bekannten oder realen Personen, Gesichter frei erfunden

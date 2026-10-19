@@ -374,8 +374,8 @@ export function NewsFigure({
         <Image
           src={image.photo}
           alt={image.alt}
-          width={1600}
-          height={1000}
+          width={1024}
+          height={688}
           sizes={sizes[size]}
           className="t-figure__img t-figure__photo"
         />

@@ -48,6 +48,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 45 00",
         email: "poststelle@stk.musterland.example",
         portrait: 0,
+        photo: "/images/portraits/musterland-staatskanzlei.webp",
       },
       {
         id: "bildung",
@@ -61,6 +62,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 46 00",
         email: "poststelle@mb.musterland.example",
         portrait: 1,
+        photo: "/images/portraits/musterland-bildung.webp",
       },
       {
         id: "umwelt",
@@ -74,6 +76,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 47 00",
         email: "poststelle@mu.musterland.example",
         portrait: 2,
+        photo: "/images/portraits/musterland-umwelt.webp",
       },
       {
         id: "gesundheit",
@@ -87,6 +90,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 48 00",
         email: "poststelle@mg.musterland.example",
         portrait: 3,
+        photo: "/images/portraits/musterland-gesundheit.webp",
       },
       {
         id: "wirtschaft",
@@ -100,6 +104,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 49 00",
         email: "poststelle@mw.musterland.example",
         portrait: 4,
+        photo: "/images/portraits/musterland-wirtschaft.webp",
       },
       {
         id: "digitales",
@@ -113,6 +118,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 50 00",
         email: "poststelle@md.musterland.example",
         portrait: 5,
+        photo: "/images/portraits/musterland-digitales.webp",
       },
       {
         id: "inneres",
@@ -125,6 +131,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 51 00",
         email: "poststelle@mi.musterland.example",
         portrait: 6,
+        photo: "/images/portraits/musterland-inneres.webp",
       },
       {
         id: "finanzen",
@@ -137,6 +144,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0100 123 52 00",
         email: "poststelle@mf.musterland.example",
         portrait: 7,
+        photo: "/images/portraits/musterland-finanzen.webp",
       },
     ],
   },
@@ -157,6 +165,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 76 00",
         email: "ob@beispielstadt.example",
         portrait: 1,
+        photo: "/images/portraits/beispielstadt-oberbuergermeisterin.webp",
       },
       {
         id: "buergeramt",
@@ -170,6 +179,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 76 54",
         email: "buergeramt@beispielstadt.example",
         portrait: 6,
+        photo: "/images/portraits/beispielstadt-buergeramt.webp",
       },
       {
         id: "jugendamt",
@@ -183,6 +193,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 10",
         email: "jugendamt@beispielstadt.example",
         portrait: 3,
+        photo: "/images/portraits/beispielstadt-jugendamt.webp",
       },
       {
         id: "sozialamt",
@@ -196,6 +207,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 20",
         email: "sozialamt@beispielstadt.example",
         portrait: 4,
+        photo: "/images/portraits/beispielstadt-sozialamt.webp",
       },
       {
         id: "bauordnungsamt",
@@ -208,6 +220,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 30",
         email: "bauordnung@beispielstadt.example",
         portrait: 5,
+        photo: "/images/portraits/beispielstadt-bauordnungsamt.webp",
       },
       {
         id: "tiefbauamt",
@@ -221,6 +234,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 40",
         email: "tiefbau@beispielstadt.example",
         portrait: 2,
+        photo: "/images/portraits/beispielstadt-tiefbauamt.webp",
       },
       {
         id: "steueramt",
@@ -233,6 +247,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 50",
         email: "steueramt@beispielstadt.example",
         portrait: 7,
+        photo: "/images/portraits/beispielstadt-steueramt.webp",
       },
       {
         id: "ordnungsamt",
@@ -246,6 +261,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 60",
         email: "ordnungsamt@beispielstadt.example",
         portrait: 0,
+        photo: "/images/portraits/beispielstadt-ordnungsamt.webp",
       },
       {
         id: "gruenflaechenamt",
@@ -259,6 +275,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 70",
         email: "gruen@beispielstadt.example",
         portrait: 3,
+        photo: "/images/portraits/beispielstadt-gruenflaechenamt.webp",
       },
       {
         id: "strassenverkehrsamt",
@@ -271,6 +288,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         phone: "0200 98 77 80",
         email: "zulassung@beispielstadt.example",
         portrait: 6,
+        photo: "/images/portraits/beispielstadt-strassenverkehrsamt.webp",
       },
     ],
   },
