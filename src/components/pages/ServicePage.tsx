@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
 import { PLACES } from "@/data/content";
+import { unitForService } from "@/data/organisation";
 import { findService } from "@/data/services";
 import type { Service, Tenant } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
@@ -12,10 +14,15 @@ import { useDocumentTitle } from "@/lib/use-document-title";
 type Office = { office: string; address: string; phone: string; hours?: string };
 
 function Responsible({ tenant, service, placeId }: { tenant: Tenant; service: Service; placeId: string }) {
+  const { base } = useCurrentTenant();
+  const unit = unitForService(tenant, service.slug);
+  const unitOffice = unit && { office: unit.name, address: unit.address, phone: unit.phone, hours: tenant.contact.hours };
   let office: Office | undefined;
   let note: string;
-  if (service.level === "land" || tenant.type === "service") {
-    office = tenant.contact;
+  // In a city portal or for services of the Land itself the office is known: no choice needed.
+  const fixed = service.level === "land" || tenant.type === "service";
+  if (fixed) {
+    office = unitOffice ?? tenant.contact;
     note = service.level === "land" ? "Diese Leistung bietet das Land selbst an." : `Voreingestellt für ${tenant.name}.`;
   } else {
     const place = PLACES.find((p) => p.id === placeId);
@@ -43,6 +50,12 @@ function Responsible({ tenant, service, placeId }: { tenant: Tenant; service: Se
         </p>
       )}
       <p className="t-box__note">{note}</p>
+      {unit && (
+        <p className="t-box__link">
+          {fixed ? "Mehr zur Stelle: " : "Im Land zuständig: "}
+          <Link href={`${base}/organisation/${unit.id}`}>{unit.name}</Link>
+        </p>
+      )}
     </section>
   );
 }

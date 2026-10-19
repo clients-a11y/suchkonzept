@@ -47,6 +47,9 @@ export type Service = {
   sections: ServiceSection[];
 };
 
+// Pictures are token-coloured illustrations (see NewsArt), never photos.
+export type NewsImage = { scene: string; alt: string; credit: string };
+
 export type NewsItem = {
   id: string;
   tenant: string;
@@ -55,6 +58,7 @@ export type NewsItem = {
   date: string;
   topic: string;
   source: string;
+  image?: NewsImage;
 };
 
 export type ContentPage = {

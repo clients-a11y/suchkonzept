@@ -5,6 +5,7 @@ import { useCurrentTenant } from "@/components/TenantContext";
 import { BlocksArt, HillsBand } from "@/components/Art";
 import { IconArrow } from "@/components/Icons";
 import { SmartSearch } from "@/components/SmartSearch";
+import { NewsFigure } from "@/components/NewsArt";
 import { FEATURED_SERVICES, LIFE_SITUATIONS, THEMES, newsFor, pageFor } from "@/data/content";
 import { findService } from "@/data/services";
 import { formatDate } from "@/lib/format";
@@ -89,29 +90,33 @@ function InfoStart() {
             Alle Meldungen <IconArrow size={18} />
           </Link>
         </div>
-        <div className="t-news-grid">
-          <article className="t-feature">
-            <div className="t-feature__body">
-              <NewsMeta item={lead} />
-              <h3 className="t-feature__title">
-                <Link href={`${base}/aktuelles#meldung-${lead.id}`} className="t-cardlink">
-                  {lead.title}
-                </Link>
-              </h3>
-              <p className="t-feature__text">{lead.teaser}</p>
-            </div>
-          </article>
-          <ul className="t-news-list t-news-list--compact">
-            {more.map((item) => (
-              <li key={item.id} className="t-news-item">
+        <article className="t-feature">
+          <NewsFigure image={lead.image} type={tenant.type} size="wide" />
+          <div className="t-feature__body">
+            <NewsMeta item={lead} />
+            <h3 className="t-feature__title">
+              <Link href={`${base}/aktuelles#meldung-${lead.id}`} className="t-cardlink">
+                {lead.title}
+              </Link>
+            </h3>
+            <p className="t-feature__text">{lead.teaser}</p>
+          </div>
+        </article>
+        <ul className="t-newscards">
+          {more.map((item) => (
+            <li key={item.id} className="t-newscard">
+              <NewsFigure image={item.image} type={tenant.type} />
+              <div className="t-newscard__body">
                 <NewsMeta item={item} />
-                <h3 className="t-news-item__title">
-                  <Link href={`${base}/aktuelles#meldung-${item.id}`}>{item.title}</Link>
+                <h3 className="t-newscard__title">
+                  <Link href={`${base}/aktuelles#meldung-${item.id}`} className="t-cardlink">
+                    {item.title}
+                  </Link>
                 </h3>
-              </li>
-            ))}
-          </ul>
-        </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="t-container t-section">
@@ -210,6 +215,9 @@ function ServiceStart() {
           <Link href={`${base}/seite/${pageFor(tenant, "rathaus") ? "rathaus" : "ueber-uns"}`} className="t-more">
             Mehr zum Rathaus <IconArrow size={18} />
           </Link>
+          <Link href={`${base}/organisation`} className="t-more">
+            Ämter und Ansprechpersonen <IconArrow size={18} />
+          </Link>
         </section>
         <section>
           <div className="t-section__head">
@@ -220,11 +228,14 @@ function ServiceStart() {
           </div>
           <ul className="t-news-list t-news-list--compact">
             {news.map((item) => (
-              <li key={item.id} className="t-news-item">
-                <NewsMeta item={item} />
-                <h3 className="t-news-item__title">
-                  <Link href={`${base}/aktuelles#meldung-${item.id}`}>{item.title}</Link>
-                </h3>
+              <li key={item.id} className="t-news-item t-news-item--thumb">
+                <NewsFigure image={item.image} type={tenant.type} size="thumb" />
+                <div>
+                  <NewsMeta item={item} />
+                  <h3 className="t-news-item__title">
+                    <Link href={`${base}/aktuelles#meldung-${item.id}`}>{item.title}</Link>
+                  </h3>
+                </div>
               </li>
             ))}
           </ul>

@@ -1,5 +1,6 @@
 import { SERVICES } from "@/data/services";
 import { newsFor, pagesFor } from "@/data/content";
+import { organisationFor } from "@/data/organisation";
 import type { Service, Tenant } from "@/lib/types";
 
 // Result rows of the search page. Matching with a query lives in smart-search.ts.
@@ -20,7 +21,15 @@ export function allInformation(tenant: Tenant): Hit[] {
     text: n.teaser,
     href: `/aktuelles#meldung-${n.id}`,
   }));
-  return [...pages, ...news];
+  const org = organisationFor(tenant);
+  const units: Hit[] = org.units.map((u) => ({
+    key: `stelle-${u.id}`,
+    kind: `${org.unitLabel} · ${u.head.role} ${u.head.name}`,
+    title: u.name,
+    text: u.lead,
+    href: `/organisation/${u.id}`,
+  }));
+  return [...units, ...pages, ...news];
 }
 
 export function serviceHit(s: Service): Hit {

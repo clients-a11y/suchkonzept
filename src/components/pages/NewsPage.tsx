@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { newsFor } from "@/data/content";
+import { NewsFigure } from "@/components/NewsArt";
 import { formatDate, pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
 
@@ -88,14 +89,17 @@ export function NewsPage() {
       {list.length > 0 ? (
         <ul className="t-news-list">
           {list.map((item) => (
-            <li key={item.id} id={`meldung-${item.id}`} className="t-news-item" tabIndex={-1}>
-              <p className="t-meta">
-                <time dateTime={item.date}>{formatDate(item.date)}</time>
-                <span>{item.topic}</span>
-                <span>Quelle: {item.source}</span>
-              </p>
-              <h2 className="t-news-item__title">{item.title}</h2>
-              <p className="t-news-item__text">{item.teaser}</p>
+            <li key={item.id} id={`meldung-${item.id}`} className="t-news-item t-news-item--media" tabIndex={-1}>
+              <NewsFigure image={item.image} type={tenant.type} />
+              <div className="t-news-item__body">
+                <p className="t-meta">
+                  <time dateTime={item.date}>{formatDate(item.date)}</time>
+                  <span>{item.topic}</span>
+                  <span>Quelle: {item.source}</span>
+                </p>
+                <h2 className="t-news-item__title">{item.title}</h2>
+                <p className="t-news-item__text">{item.teaser}</p>
+              </div>
             </li>
           ))}
         </ul>

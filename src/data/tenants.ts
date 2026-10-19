@@ -20,7 +20,7 @@ export const TENANTS: Tenant[] = [
     },
     nav: [
       { label: "Land und Leute", href: "/seite/land-und-leute" },
-      { label: "Regierung", href: "/seite/regierung" },
+      { label: "Landesregierung", href: "/organisation" },
       { label: "Aktuelles", href: "/aktuelles" },
       { label: "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
     ],
@@ -29,7 +29,7 @@ export const TENANTS: Tenant[] = [
         title: "Landesportal",
         links: [
           { label: "Land und Leute", href: "/seite/land-und-leute" },
-          { label: "Regierung", href: "/seite/regierung" },
+          { label: "Landesregierung", href: "/organisation" },
           { label: "Aktuelles", href: "/aktuelles" },
         ],
       },
@@ -77,6 +77,7 @@ export const TENANTS: Tenant[] = [
       { label: "Leistungen A bis Z", href: "/suche?tab=leistungen" },
       { label: "Lebenslagen", href: "/seite/lebenslagen" },
       { label: "Rathaus", href: "/seite/rathaus" },
+      { label: "Ämter", href: "/organisation" },
       { label: "Aktuelles", href: "/aktuelles" },
     ],
     footer: [
@@ -123,11 +124,13 @@ export function defaultNav(type: Tenant["type"]): Tenant["nav"] {
   return type === "service"
     ? [
         { label: "Leistungen A bis Z", href: "/suche?tab=leistungen" },
+        { label: "Ämter", href: "/organisation" },
         { label: "Aktuelles", href: "/aktuelles" },
         { label: "Über uns", href: "/seite/ueber-uns" },
       ]
     : [
         { label: "Aktuelles", href: "/aktuelles" },
+        { label: "Verwaltung", href: "/organisation" },
         { label: "Über uns", href: "/seite/ueber-uns" },
         { label: "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
       ];

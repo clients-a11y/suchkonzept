@@ -1,6 +1,7 @@
 import { SERVICES, findService } from "@/data/services";
 import { newsFor, pagesFor } from "@/data/content";
 import { INTENTS, STOPWORDS } from "@/data/intents";
+import { organisationFor } from "@/data/organisation";
 import type { Service, Tenant } from "@/lib/types";
 
 // Local stand-in for an AI-assisted search: understands phrases in plain words,
@@ -90,12 +91,15 @@ function phraseMatches(phrase: string, query: string, queryTokens: string[], typ
   return parts.length > 1 && parts.every((p) => queryTokens.some((t) => compare(t, p, false) !== null));
 }
 
+// Exact words in the title count most, similar words less, words in the text least.
 function scoreText(queryTokens: string[], title: string, text: string): number {
   const titleWords = tokens(title);
   const textWords = tokens(text);
   let score = 0;
   for (const t of queryTokens) {
-    if (titleWords.some((w) => compare(t, w, false))) score += 3;
+    const inTitle = titleWords.map((w) => compare(t, w, false));
+    if (inTitle.includes("exact")) score += 4;
+    else if (inTitle.some(Boolean)) score += 2;
     else if (textWords.some((w) => compare(t, w, false))) score += 1;
   }
   return score;
@@ -168,7 +172,16 @@ export function smartSearch(tenant: Tenant, input: string, typing = false): Smar
     .filter((s): s is Service => Boolean(s))
     .slice(0, 3);
 
+  const org = organisationFor(tenant);
   const info: InfoHit[] = [
+    ...org.units.map((u) => ({
+      key: `stelle-${u.id}`,
+      kind: `${org.unitLabel} · ${u.head.role} ${u.head.name}`,
+      title: u.name,
+      text: u.lead,
+      href: `/organisation/${u.id}`,
+      score: scoreText(queryTokens, `${u.name} ${u.head.name}`, [u.lead, u.head.role, ...u.tasks].join(" ")),
+    })),
     ...pagesFor(tenant).map((p) => ({
       key: `seite-${p.slug}`,
       kind: "Seite",

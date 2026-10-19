@@ -146,6 +146,20 @@ bearbeiten“ in der Demo-Leiste öffnen `/bearbeiten?mandant=<id>`. Der Assiste
 alle Schritte sind direkt anwählbar, die Adresse bleibt gleich, die ursprüngliche Anlagezeit auch. Die Stoppuhr
 misst nur die Änderung. Beispielmandanten bleiben Konfiguration in `src/data/tenants.ts`.
 
+## Bilder und Organisation (Nachtrag 19.10.2026)
+
+- **Bilder zu Meldungen:** Jede Meldung hat ein Motiv (`image.scene`), einen Alternativtext und eine fiktive
+  Bildquelle. `NewsArt` zeichnet 13 Szenen (Dorfladen, Schule, Deich, Rathaus, Spielplatz …) nur aus den Tokens,
+  ohne Motiv springt die Landschaft des Portaltyps ein. Auf der Startseite: Aufmacher groß, drei Bildkarten mit
+  Bildunterschrift; im Serviceportal Vorschaubilder; in Aktuelles Bild neben jeder Meldung.
+- **Organisation** (`src/data/organisation.ts`, Seiten `/organisation` und `/organisation/[id]`): Musterland mit
+  Ministerpräsidentin und sieben Ministerien, Beispielstadt mit Oberbürgermeisterin und neun Ämtern, neue Mandanten
+  mit einer Vorlage („N. N.“). Je Stelle: Leitung mit Porträt-Illustration, Aufgaben, Leistungen, eigene Meldungen
+  (über Quelle oder Thema), Kontakt, weitere Stellen. Namen sind erkennbare Platzhalter (Mustermann, Beispiel,
+  Vorlage …), Adressen und E-Mails fiktiv (`.example`).
+- Verknüpft mit Navigation („Landesregierung“, „Ämter“, Vorlage „Verwaltung“), Suche (Stellen als Treffer) und
+  Leistungsseiten („Mehr zur Stelle“, im Land „Im Land zuständig“).
+
 ## Technische Hinweise
 
 - Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`

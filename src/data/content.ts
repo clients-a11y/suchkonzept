@@ -1,19 +1,19 @@
 import type { ContentPage, NewsItem, Tenant } from "@/lib/types";
 
 const NEWS: NewsItem[] = [
-  { id: "m1", tenant: "musterland", title: "Landesregierung beschließt Programm für Dorfläden", teaser: "Bis 2028 fließen Mittel in Nahversorgung auf dem Land. Anträge sind ab Januar möglich.", date: "2026-10-14", topic: "Wirtschaft", source: "Staatskanzlei" },
-  { id: "m2", tenant: "musterland", title: "Neue Schulsozialarbeit an 40 Standorten", teaser: "Das Bildungsministerium stockt die Stellen auf. Schulen können sich bis Ende November melden.", date: "2026-10-09", topic: "Bildung", source: "Ministerium für Bildung" },
-  { id: "m3", tenant: "musterland", title: "Hochwasserschutz an der Musterau fertig", teaser: "Der neue Deich schützt rund 3.000 Haushalte. Der Radweg auf der Deichkrone ist wieder offen.", date: "2026-10-02", topic: "Umwelt", source: "Ministerium für Umwelt" },
-  { id: "m4", tenant: "musterland", title: "Vereinsförderung: zweiter Stichtag naht", teaser: "Vereine können Projekte für das kommende Jahr bis zum 30. September einreichen.", date: "2026-09-18", topic: "Ehrenamt", source: "Staatskanzlei" },
-  { id: "m5", tenant: "musterland", title: "Landarztquote zeigt erste Wirkung", teaser: "Zwölf Ärztinnen und Ärzte haben sich in unterversorgten Regionen niedergelassen.", date: "2026-08-27", topic: "Gesundheit", source: "Ministerium für Gesundheit" },
-  { id: "m6", tenant: "musterland", title: "Digitale Bauanträge in allen Landkreisen", teaser: "Ab sofort lassen sich Bauanträge im ganzen Land vollständig online stellen.", date: "2026-07-15", topic: "Digitales", source: "Ministerium für Digitales" },
-  { id: "m7", tenant: "musterland", title: "Sommerferien: Badestellen mit bester Wasserqualität", teaser: "41 von 44 Badestellen erhalten die Bestnote. Die Karte zeigt alle Messwerte.", date: "2025-07-01", topic: "Umwelt", source: "Ministerium für Umwelt" },
-  { id: "b1", tenant: "beispielstadt", title: "Bürgeramt jetzt auch samstags geöffnet", teaser: "Ab November öffnet das Bürgeramt jeden ersten Samstag im Monat von 9 bis 13 Uhr.", date: "2026-10-15", topic: "Rathaus", source: "Bürgeramt" },
-  { id: "b2", tenant: "beispielstadt", title: "Kitaplätze: Anmeldung für 2027 startet", teaser: "Eltern können ab sofort ihre Wunsch-Kitas im Serviceportal angeben.", date: "2026-10-06", topic: "Familie", source: "Jugendamt" },
-  { id: "b3", tenant: "beispielstadt", title: "Baustelle Marktplatz: Umleitung für Busse", teaser: "Die Linien 2 und 5 fahren bis Dezember über die Hafenstraße.", date: "2026-09-29", topic: "Verkehr", source: "Tiefbauamt" },
-  { id: "b4", tenant: "beispielstadt", title: "Neue Hundewiese im Stadtpark", teaser: "Die eingezäunte Fläche ist rund um die Uhr geöffnet.", date: "2026-09-12", topic: "Umwelt", source: "Grünflächenamt" },
-  { id: "b5", tenant: "beispielstadt", title: "Wohngeld: Beratung in den Stadtteilen", teaser: "Die Wohngeldstelle berät im Oktober in drei Stadtteilbüros ohne Termin.", date: "2026-08-30", topic: "Soziales", source: "Sozialamt" },
-  { id: "b6", tenant: "beispielstadt", title: "Stadtfest: Straßensperrungen am Wochenende", teaser: "Die Altstadt ist von Freitag bis Sonntag für Autos gesperrt.", date: "2025-08-20", topic: "Verkehr", source: "Ordnungsamt" },
+  { id: "m1", tenant: "musterland", title: "Landesregierung beschließt Programm für Dorfläden", teaser: "Bis 2028 fließen Mittel in Nahversorgung auf dem Land. Anträge sind ab Januar möglich.", date: "2026-10-14", topic: "Wirtschaft", source: "Staatskanzlei", image: { scene: "laden", alt: "Dorfladen mit gestreifter Markise und Obstkisten vor dem Eingang", credit: "Staatskanzlei/Bildstelle" } },
+  { id: "m2", tenant: "musterland", title: "Neue Schulsozialarbeit an 40 Standorten", teaser: "Das Bildungsministerium stockt die Stellen auf. Schulen können sich bis Ende November melden.", date: "2026-10-09", topic: "Bildung", source: "Ministerium für Bildung", image: { scene: "schule", alt: "Schulgebäude mit Uhr über dem Eingang und einem Stapel Bücher", credit: "Ministerium für Bildung" } },
+  { id: "m3", tenant: "musterland", title: "Hochwasserschutz an der Musterau fertig", teaser: "Der neue Deich schützt rund 3.000 Haushalte. Der Radweg auf der Deichkrone ist wieder offen.", date: "2026-10-02", topic: "Umwelt", source: "Ministerium für Umwelt", image: { scene: "deich", alt: "Neuer Deich am Fluss, auf der Krone ein Radweg, dahinter Häuser", credit: "Ministerium für Umwelt/Luftbild" } },
+  { id: "m4", tenant: "musterland", title: "Vereinsförderung: zweiter Stichtag naht", teaser: "Vereine können Projekte für das kommende Jahr bis zum 30. September einreichen.", date: "2026-09-18", topic: "Ehrenamt", source: "Staatskanzlei", image: { scene: "verein", alt: "Drei Menschen unter einem Vereinsbanner", credit: "Staatskanzlei/Bildstelle" } },
+  { id: "m5", tenant: "musterland", title: "Landarztquote zeigt erste Wirkung", teaser: "Zwölf Ärztinnen und Ärzte haben sich in unterversorgten Regionen niedergelassen.", date: "2026-08-27", topic: "Gesundheit", source: "Ministerium für Gesundheit", image: { scene: "praxis", alt: "Arztpraxis in einem Dorf mit Baum vor dem Haus", credit: "Ministerium für Gesundheit" } },
+  { id: "m6", tenant: "musterland", title: "Digitale Bauanträge in allen Landkreisen", teaser: "Ab sofort lassen sich Bauanträge im ganzen Land vollständig online stellen.", date: "2026-07-15", topic: "Digitales", source: "Ministerium für Digitales", image: { scene: "digital", alt: "Laptop mit einem Bauplan und einem Haken auf dem Bildschirm", credit: "Ministerium für Digitales" } },
+  { id: "m7", tenant: "musterland", title: "Sommerferien: Badestellen mit bester Wasserqualität", teaser: "41 von 44 Badestellen erhalten die Bestnote. Die Karte zeigt alle Messwerte.", date: "2025-07-01", topic: "Umwelt", source: "Ministerium für Umwelt", image: { scene: "see", alt: "Badesteg an einem See mit Bojen im Wasser", credit: "Ministerium für Umwelt" } },
+  { id: "b1", tenant: "beispielstadt", title: "Bürgeramt jetzt auch samstags geöffnet", teaser: "Ab November öffnet das Bürgeramt jeden ersten Samstag im Monat von 9 bis 13 Uhr.", date: "2026-10-15", topic: "Rathaus", source: "Bürgeramt", image: { scene: "rathaus", alt: "Rathaus mit Uhrturm und Säulen am Eingang", credit: "Stadt Beispielstadt/Presseamt" } },
+  { id: "b2", tenant: "beispielstadt", title: "Kitaplätze: Anmeldung für 2027 startet", teaser: "Eltern können ab sofort ihre Wunsch-Kitas im Serviceportal angeben.", date: "2026-10-06", topic: "Familie", source: "Jugendamt", image: { scene: "spielplatz", alt: "Spielplatz mit Rutsche, Schaukel und Sandkasten", credit: "Jugendamt Beispielstadt" } },
+  { id: "b3", tenant: "beispielstadt", title: "Baustelle Marktplatz: Umleitung für Busse", teaser: "Die Linien 2 und 5 fahren bis Dezember über die Hafenstraße.", date: "2026-09-29", topic: "Verkehr", source: "Tiefbauamt", image: { scene: "bus", alt: "Linienbus vor einer Baustellenabsperrung", credit: "Tiefbauamt Beispielstadt" } },
+  { id: "b4", tenant: "beispielstadt", title: "Neue Hundewiese im Stadtpark", teaser: "Die eingezäunte Fläche ist rund um die Uhr geöffnet.", date: "2026-09-12", topic: "Umwelt", source: "Grünflächenamt", image: { scene: "park", alt: "Eingezäunte Wiese mit Bäumen und einem Hund", credit: "Grünflächenamt Beispielstadt" } },
+  { id: "b5", tenant: "beispielstadt", title: "Wohngeld: Beratung in den Stadtteilen", teaser: "Die Wohngeldstelle berät im Oktober in drei Stadtteilbüros ohne Termin.", date: "2026-08-30", topic: "Soziales", source: "Sozialamt", image: { scene: "haeuser", alt: "Reihe von Wohnhäusern in verschiedenen Farben", credit: "Sozialamt Beispielstadt" } },
+  { id: "b6", tenant: "beispielstadt", title: "Stadtfest: Straßensperrungen am Wochenende", teaser: "Die Altstadt ist von Freitag bis Sonntag für Autos gesperrt.", date: "2025-08-20", topic: "Verkehr", source: "Ordnungsamt", image: { scene: "fest", alt: "Altstadtgasse mit Wimpelketten und einem Marktstand", credit: "Ordnungsamt Beispielstadt" } },
 ];
 
 export function newsFor(tenant: Tenant): NewsItem[] {
@@ -21,9 +21,9 @@ export function newsFor(tenant: Tenant): NewsItem[] {
   if (own.length) return own;
   // Placeholder news for tenants created in the wizard.
   return [
-    { id: `${tenant.id}-1`, tenant: tenant.id, title: `${tenant.name} hat ein neues Portal`, teaser: "Die neue Website ist online. Inhalte werden in den nächsten Wochen ergänzt.", date: "2026-10-19", topic: "Allgemeines", source: "Redaktion" },
-    { id: `${tenant.id}-2`, tenant: tenant.id, title: "Beispielmeldung: Termine online buchen", teaser: "Termine für Behördengänge lassen sich jetzt über das Portal buchen.", date: "2026-10-12", topic: "Service", source: "Redaktion" },
-    { id: `${tenant.id}-3`, tenant: tenant.id, title: "Beispielmeldung: Sprechstunde vor Ort", teaser: "Diese Meldung ist ein Platzhalter aus der Vorlage.", date: "2026-09-30", topic: "Allgemeines", source: "Redaktion" },
+    { id: `${tenant.id}-1`, tenant: tenant.id, title: `${tenant.name} hat ein neues Portal`, teaser: "Die neue Website ist online. Inhalte werden in den nächsten Wochen ergänzt.", date: "2026-10-19", topic: "Allgemeines", source: "Redaktion", image: { scene: "portal", alt: `Landschaft in den Farben von ${tenant.name}`, credit: `${tenant.name}/Redaktion` } },
+    { id: `${tenant.id}-2`, tenant: tenant.id, title: "Beispielmeldung: Termine online buchen", teaser: "Termine für Behördengänge lassen sich jetzt über das Portal buchen.", date: "2026-10-12", topic: "Service", source: "Redaktion", image: { scene: "digital", alt: "Laptop mit einem Formular und einem Haken auf dem Bildschirm", credit: `${tenant.name}/Redaktion` } },
+    { id: `${tenant.id}-3`, tenant: tenant.id, title: "Beispielmeldung: Sprechstunde vor Ort", teaser: "Diese Meldung ist ein Platzhalter aus der Vorlage.", date: "2026-09-30", topic: "Allgemeines", source: "Redaktion", image: { scene: "rathaus", alt: "Verwaltungsgebäude mit Uhrturm", credit: `${tenant.name}/Redaktion` } },
   ];
 }
 
@@ -42,10 +42,10 @@ const PAGES: ContentPage[] = [
   {
     tenant: "musterland",
     slug: "regierung",
-    title: "Regierung",
-    lead: "Die Landesregierung besteht aus der Ministerpräsidentin und sieben Ministerien.",
+    title: "Kontakt und Rechtliches",
+    lead: "Kontakt zur Landesregierung sowie Impressum, Datenschutz und Erklärung zur Barrierefreiheit.",
     sections: [
-      { id: "ministerien", title: "Ministerien", body: ["Staatskanzlei, Bildung, Umwelt, Gesundheit, Wirtschaft, Digitales, Inneres, Finanzen."] },
+      { id: "ministerien", title: "Ministerien", body: ["Alle Ministerien mit Aufgaben, Leitung und Kontakt stehen auf der Seite Landesregierung."] },
       { id: "kontakt", title: "Kontakt", body: ["Bürgerservice der Landesregierung, Schlossplatz 1, 10000 Musterstadt.", "Telefon 0100 123 45 67, Montag bis Freitag 8 bis 18 Uhr."] },
       { id: "impressum", title: "Impressum", body: ["Platzhalter: Hier steht das Impressum des Mandanten."] },
       { id: "datenschutz", title: "Datenschutz", body: ["Platzhalter: Hier steht die Datenschutzerklärung des Mandanten."] },
