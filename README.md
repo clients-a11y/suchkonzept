@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portalbaukasten · Klick-Dummy
 
-## Getting Started
+Klick-Dummy für eine mandantenfähige Portalplattform ohne Backend. Zwei fiktive Mandanten zeigen,
+wie verschieden Portale aus demselben System aussehen können:
 
-First, run the development server:
+- **Musterland** (`/musterland`): Land, Informationsportal
+- **Beispielstadt** (`/beispielstadt`): Stadt, Serviceportal
+
+Unter `/neu` legt ein Assistent in vier Schritten einen dritten Mandanten an und misst die Zeit.
+Neue Mandanten liegen nur im `localStorage` des Browsers. Alle Inhalte sind Beispieldaten.
+
+## Starten
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Danach `http://localhost:3000` öffnen. `npm run build` prüft Typen und rendert die Beispielmandanten vor.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Aufbau
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/data/` Mandanten, Leistungskatalog, Meldungen und Inhaltsseiten (Konfiguration, kein Code pro Mandant)
+- `src/lib/` Typen, Kontrastberechnung, localStorage-Store mit `themeStyle()`, Suche
+- `src/components/` Shell, Demo-Leiste, Kopf, Fuß, Brotkrumen, Illustrationen
+- `src/components/pages/` Seiten als Client-Komponenten, `src/app/` nur dünne Routen
+- `src/app/globals.css` Plattform-Klassen mit `pf-`, Mandanten-Klassen mit `t-`
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Gestaltung, Theme-Mechanik und Abnahmekriterien stehen in [docs/BAUPLAN.md](docs/BAUPLAN.md).

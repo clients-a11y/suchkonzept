@@ -62,5 +62,6 @@ export type ContentPage = {
   slug: string;
   title: string;
   lead: string;
+  lang?: string;
   sections: { id: string; title: string; body: string[] }[];
 };

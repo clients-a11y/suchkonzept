@@ -79,9 +79,52 @@ const PAGES: ContentPage[] = [
   },
 ];
 
+// Languages a tenant can offer besides German. Each gets a placeholder page.
+export const LANGUAGES = [
+  { name: "English", code: "en", title: "English", lead: "This page is a placeholder for the English version of the portal." },
+  { name: "Français", code: "fr", title: "Français", lead: "Cette page remplace la future version française du portail." },
+  { name: "Polski", code: "pl", title: "Polski", lead: "Ta strona jest miejscem na przyszłą polską wersję portalu." },
+  { name: "Türkçe", code: "tr", title: "Türkçe", lead: "Bu sayfa, portalın gelecekteki Türkçe sürümü için bir yer tutucudur." },
+  { name: "Українська", code: "uk", title: "Українська", lead: "Ця сторінка зарезервована для майбутньої української версії порталу." },
+];
+
+export function languageSlug(name: string): string | undefined {
+  const lang = LANGUAGES.find((l) => l.name === name);
+  return lang ? `sprache-${lang.code}` : undefined;
+}
+
+// Placeholder pages behind the header slots for sign language, easy and plain language.
+const META_PAGES: { slug: string; title: string; lead: string; body: string }[] = [
+  { slug: "gebaerdensprache", title: "Gebärdensprache", lead: "Hier stehen später Videos in Deutscher Gebärdensprache.", body: "Platzhalter: Die Redaktion stellt hier Videos mit Untertiteln ein." },
+  { slug: "leichte-sprache", title: "Leichte Sprache", lead: "Hier gibt es bald Texte in Leichter Sprache.", body: "Platzhalter: Die Redaktion stellt hier geprüfte Texte in Leichter Sprache ein." },
+  { slug: "einfache-sprache", title: "Einfache Sprache", lead: "Hier gibt es bald die wichtigsten Inhalte in Einfacher Sprache.", body: "Platzhalter: Die Redaktion stellt hier kurze, klare Fassungen der Inhalte ein." },
+];
+
+export const META_SLUGS = [...META_PAGES.map((p) => p.slug), ...LANGUAGES.map((l) => `sprache-${l.code}`)];
+
+function placeholderPage(tenant: Tenant, slug: string): ContentPage | undefined {
+  const meta = META_PAGES.find((p) => p.slug === slug);
+  if (meta) {
+    return {
+      tenant: tenant.id,
+      slug,
+      title: meta.title,
+      lead: meta.lead,
+      sections: [{ id: "inhalt-folgt", title: "Inhalt folgt", body: [meta.body] }],
+    };
+  }
+  const lang = LANGUAGES.find((l) => `sprache-${l.code}` === slug);
+  if (lang && tenant.languages.includes(lang.name)) {
+    return { tenant: tenant.id, slug, title: lang.title, lead: lang.lead, lang: lang.code, sections: [] };
+  }
+  return undefined;
+}
+
 export function pageFor(tenant: Tenant, slug: string): ContentPage | undefined {
   const own = PAGES.find((p) => p.tenant === tenant.id && p.slug === slug);
   if (own) return own;
+  const placeholder = placeholderPage(tenant, slug);
+  if (placeholder) return placeholder;
   if (slug === "ueber-uns") {
     return {
       tenant: tenant.id,
@@ -112,6 +155,24 @@ export const THEMES = [
   { title: "Umwelt", text: "Natur, Wasser, Klimaschutz", query: "umwelt" },
   { title: "Wirtschaft", text: "Förderung, Arbeit, Ansiedlung", query: "wirtschaft" },
   { title: "Gesundheit", text: "Versorgung, Pflege, Vorsorge", query: "gesundheit" },
+];
+
+// Services shown under "Häufig gesucht", by portal type.
+export const FEATURED_SERVICES: Record<Tenant["type"], string[]> = {
+  info: ["vereinsfoerderung-beantragen", "baugenehmigung-beantragen", "fuehrungszeugnis-beantragen", "fischereischein-beantragen"],
+  service: ["personalausweis-beantragen", "wohnsitz-anmelden", "kitaplatz-beantragen", "hund-anmelden", "wohngeld-beantragen", "fahrzeug-zulassen"],
+};
+
+// Quick searches under the big search field of service portals.
+export const QUICK_SEARCHES = ["Personalausweis", "Umzug", "Kita", "Hund", "Wohngeld"];
+
+// Fictional places for the optional location choice in information portals.
+export const PLACES = [
+  { id: "musterstadt", name: "Musterstadt", office: "Bürgeramt Musterstadt", address: "Rathausplatz 1, 10000 Musterstadt", phone: "0100 200 10 00" },
+  { id: "seehausen", name: "Seehausen", office: "Bürgerbüro Seehausen", address: "Am Ufer 4, 10200 Seehausen", phone: "0102 30 40" },
+  { id: "waldheim", name: "Waldheim", office: "Amt Waldheim", address: "Lindenweg 12, 10300 Waldheim", phone: "0103 55 66" },
+  { id: "neudorf", name: "Neudorf", office: "Gemeindeverwaltung Neudorf", address: "Dorfstraße 2, 10400 Neudorf", phone: "0104 12 34" },
+  { id: "bergtal", name: "Bergtal", office: "Bürgeramt Bergtal", address: "Talstraße 9, 10500 Bergtal", phone: "0105 98 76" },
 ];
 
 // Life situations shown on the start page of service portals.

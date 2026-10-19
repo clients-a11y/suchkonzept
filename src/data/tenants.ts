@@ -132,3 +132,28 @@ export function defaultNav(type: Tenant["type"]): Tenant["nav"] {
         { label: "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
       ];
 }
+
+// Footer for tenants created in the wizard: their menu plus the legal pages from the template.
+export function defaultFooter(tagline: string, nav: Tenant["nav"]): Tenant["footer"] {
+  return [
+    { title: tagline, links: nav },
+    {
+      title: "Rechtliches",
+      links: [
+        { label: "Impressum", href: "/seite/ueber-uns#impressum" },
+        { label: "Datenschutz", href: "/seite/ueber-uns#datenschutz" },
+        { label: "Barrierefreiheit", href: "/seite/ueber-uns#barrierefreiheit" },
+      ],
+    },
+  ];
+}
+
+// Placeholder contact for tenants created in the wizard. The editors replace it in the CMS.
+export function defaultContact(name: string, type: Tenant["type"], region: string): Tenant["contact"] {
+  return {
+    office: type === "service" ? `Bürgeramt ${name}` : `Bürgerservice ${name}`,
+    address: `Platzhalterstraße 1, 00000 ${region || name}`,
+    phone: "0000 00 00 00",
+    hours: "Mo bis Fr, 8 bis 16 Uhr",
+  };
+}
