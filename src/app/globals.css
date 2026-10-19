@@ -1738,6 +1738,11 @@ button.pf-steps__link:hover .pf-steps__label {
   aspect-ratio: 16 / 10;
 }
 
+.t-figure__photo {
+  object-fit: cover;
+  background: var(--t-surface);
+}
+
 .t-figure__fill {
   width: 100%;
   height: 100%;

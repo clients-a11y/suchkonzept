@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { PortalArt } from "@/components/Art";
 import type { NewsImage, PortalType } from "@/lib/types";
@@ -354,6 +355,8 @@ export function NewsArt({
   );
 }
 
+export const AI_CREDIT = "Beispielbild, KI-generiert";
+
 // Picture with credit line, as press photos in portals have.
 export function NewsFigure({
   image,
@@ -364,10 +367,24 @@ export function NewsFigure({
   type: PortalType;
   size?: "card" | "thumb" | "wide";
 }) {
+  const sizes = { card: "(min-width: 64rem) 25rem, (min-width: 40rem) 50vw, 100vw", wide: "(min-width: 56rem) 44rem, 100vw", thumb: "96px" };
   return (
     <figure className={`t-figure t-figure--${size}`}>
-      <NewsArt image={image} type={type} className="t-figure__img" />
-      {image && size !== "thumb" && <figcaption className="t-figure__credit">© {image.credit}</figcaption>}
+      {image?.photo ? (
+        <Image
+          src={image.photo}
+          alt={image.alt}
+          width={1600}
+          height={1000}
+          sizes={sizes[size]}
+          className="t-figure__img t-figure__photo"
+        />
+      ) : (
+        <NewsArt image={image} type={type} className="t-figure__img" />
+      )}
+      {image && size !== "thumb" && (
+        <figcaption className="t-figure__credit">{image.photo ? AI_CREDIT : `© ${image.credit}`}</figcaption>
+      )}
     </figure>
   );
 }

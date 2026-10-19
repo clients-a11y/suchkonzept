@@ -47,8 +47,9 @@ export type Service = {
   sections: ServiceSection[];
 };
 
-// Pictures are token-coloured illustrations (see NewsArt), never photos.
-export type NewsImage = { scene: string; alt: string; credit: string };
+// Every news item has an illustrated scene from the theme tokens (see NewsArt).
+// Seeded tenants can add an AI-generated photo; it is always labelled as such.
+export type NewsImage = { scene: string; alt: string; credit: string; photo?: string };
 
 export type NewsItem = {
   id: string;

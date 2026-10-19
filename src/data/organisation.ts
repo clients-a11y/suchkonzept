@@ -18,6 +18,7 @@ export type OrgUnit = {
   phone: string;
   email: string;
   portrait: number;
+  photo?: string;
 };
 
 export type Organisation = {

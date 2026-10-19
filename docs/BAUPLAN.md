@@ -40,7 +40,7 @@ und dass ein neuer Mandant in Minuten ohne Codeänderung angelegt wird.
    Als `<aside aria-label="Demo-Steuerung">`.
 2. Stoppuhr im Assistenten (Mono, roter Faden), startet bei der ersten Eingabe.
 
-**Illustrationen:** keine Stockfotos. Inline-SVG, das seine Farben aus den Tokens zieht
+**Illustrationen:** keine Stockfotos (Ausnahme seit 19.10.2026: KI-generierte Beispielfotos für die Beispielmandanten, siehe unten und `docs/BILDER.md`). Inline-SVG, das seine Farben aus den Tokens zieht
 (`style={{ fill: "var(--t-primary)" }}`): Hügellandschaft für Informationsportale, Stadtblöcke für Serviceportale.
 So bekommen auch neue Mandanten automatisch passende Bilder.
 
@@ -159,6 +159,14 @@ misst nur die Änderung. Beispielmandanten bleiben Konfiguration in `src/data/te
   Vorlage …), Adressen und E-Mails fiktiv (`.example`).
 - Verknüpft mit Navigation („Landesregierung“, „Ämter“, Vorlage „Verwaltung“), Suche (Stellen als Treffer) und
   Leistungsseiten („Mehr zur Stelle“, im Land „Im Land zuständig“).
+
+## KI-generierte Beispielfotos (vorbereitet, Bilder folgen)
+
+Auf Wunsch sollen Musterland und Beispielstadt echte Fotos statt Illustrationen zeigen, erzeugt mit Higgsfield:
+13 Bilder zu Meldungen und 18 Porträts der Leitungen. Der Code ist vorbereitet: `NewsImage.photo` und
+`OrgUnit.photo` sind optionale Pfade unter `public/images/`. Ist ein Foto gesetzt, zeigt das Portal es mit der
+Bildunterschrift „Beispielbild, KI-generiert“, sonst bleibt die Token-Illustration. Mandanten aus dem Assistenten
+behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für alle Bilder stehen in `docs/BILDER.md`.
 
 ## Technische Hinweise
 

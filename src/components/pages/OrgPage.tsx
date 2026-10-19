@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Portrait } from "@/components/Portrait";
 import { IconArrow } from "@/components/Icons";
+import { AI_CREDIT } from "@/components/NewsArt";
 import { organisationFor } from "@/data/organisation";
 import type { OrgUnit } from "@/data/organisation";
 import { useDocumentTitle } from "@/lib/use-document-title";
@@ -12,8 +14,19 @@ import { useDocumentTitle } from "@/lib/use-document-title";
 export function PortraitFigure({ unit, credit }: { unit: OrgUnit; credit: string }) {
   return (
     <figure className="t-figure t-figure--portrait">
-      <Portrait variant={unit.portrait} label={`Porträt-Illustration: ${unit.head.name}`} className="t-figure__img" />
-      <figcaption className="t-figure__credit">© {credit}</figcaption>
+      {unit.photo ? (
+        <Image
+          src={unit.photo}
+          alt={`Porträt von ${unit.head.name}, fiktive Person`}
+          width={800}
+          height={1000}
+          sizes="(min-width: 64rem) 20rem, (min-width: 40rem) 40vw, 100vw"
+          className="t-figure__img t-figure__photo"
+        />
+      ) : (
+        <Portrait variant={unit.portrait} label={`Porträt-Illustration: ${unit.head.name}`} className="t-figure__img" />
+      )}
+      <figcaption className="t-figure__credit">{unit.photo ? AI_CREDIT : `© ${credit}`}</figcaption>
     </figure>
   );
 }
