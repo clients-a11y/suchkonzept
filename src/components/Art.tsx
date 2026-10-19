@@ -29,6 +29,27 @@ export function HillsArt({ className }: ArtProps) {
   );
 }
 
+// Wide strip of the same landscape, used as the lower edge of the search hero.
+// No sky: the hero's surface colour shows through.
+export function HillsBand({ className }: ArtProps) {
+  return (
+    <svg viewBox="0 0 1600 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false" className={className}>
+      <circle cx="1390" cy="112" r="22" style={accent} />
+      <path d="M0 140C220 100 440 96 660 124S1080 92 1300 116S1520 110 1600 104V200H0Z" style={tintFill} />
+      <path d="M1140 118V96l10-13 10 13v22z" style={primary} />
+      <path d="M0 162C240 130 520 138 760 154S1240 130 1600 146V200H0Z" style={accent} />
+      <path d="M0 184C260 164 560 180 820 188S1320 170 1600 176V200H0Z" style={primary} />
+      <path
+        d="M80 194c180-10 380-8 560 4M900 197c160-12 360-14 560-6"
+        fill="none"
+        strokeWidth="3"
+        strokeLinecap="round"
+        style={{ stroke: "var(--t-on-primary)", opacity: 0.28 }}
+      />
+    </svg>
+  );
+}
+
 const BACK: [number, number, number][] = [
   [16, 70, 150], [96, 60, 196], [166, 92, 128], [266, 52, 214], [326, 82, 162],
   [418, 70, 204], [496, 62, 142], [566, 66, 184],

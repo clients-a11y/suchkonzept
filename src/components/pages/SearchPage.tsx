@@ -7,15 +7,16 @@ import { Suspense, useId, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { IconSearch } from "@/components/Icons";
-import { searchInformation, searchServices } from "@/lib/search";
+import { IconSearch, IconSparkle } from "@/components/Icons";
+import { allInformation, allServices, serviceHit } from "@/lib/search";
+import { smartSearch } from "@/lib/smart-search";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
 
 type TabKey = "informationen" | "leistungen";
 
-function SearchForm({ q, tab }: { q: string; tab: TabKey }) {
+function SearchForm({ q }: { q: string }) {
   const { base } = useCurrentTenant();
   const inputId = useId();
   return (
@@ -23,7 +24,6 @@ function SearchForm({ q, tab }: { q: string; tab: TabKey }) {
       <label htmlFor={inputId}>Suchbegriff</label>
       <div className="t-searchform__row">
         <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
-        <input type="hidden" name="tab" value={tab} />
         <button type="submit" className="t-btn t-btn--primary">
           <IconSearch />
           Suchen
@@ -51,21 +51,25 @@ function HitList({ hits }: { hits: Hit[] }) {
 }
 
 function SearchResults() {
-  const { tenant } = useCurrentTenant();
+  const { tenant, base } = useCurrentTenant();
   const params = useSearchParams();
   const pathname = usePathname();
   const tabsId = useId();
   const tabRefs = useRef<Record<TabKey, HTMLButtonElement | null>>({ informationen: null, leistungen: null });
 
   const q = (params.get("q") ?? "").trim();
-  const requested = params.get("tab");
-  const fallback: TabKey = tenant.type === "service" ? "leistungen" : "informationen";
-  const tab: TabKey = requested === "leistungen" || requested === "informationen" ? requested : fallback;
-
+  const smart = q ? smartSearch(tenant, q) : undefined;
   const results: Record<TabKey, Hit[]> = {
-    informationen: searchInformation(tenant, q),
-    leistungen: searchServices(q),
+    informationen: smart ? smart.info : allInformation(tenant),
+    leistungen: smart ? smart.services.map((h) => serviceHit(h.service)) : allServices(),
   };
+
+  // Without an explicit tab, a clear request for a service opens the services tab.
+  const requested = params.get("tab");
+  const portalDefault: TabKey = tenant.type === "service" ? "leistungen" : "informationen";
+  const smartDefault: TabKey =
+    smart && results.leistungen.length > 0 && (smart.answer || results.informationen.length === 0) ? "leistungen" : portalDefault;
+  const tab: TabKey = requested === "leistungen" || requested === "informationen" ? requested : smartDefault;
   const order: TabKey[] = ["informationen", "leistungen"];
   const labels: Record<TabKey, string> = { informationen: "Informationen", leistungen: "Leistungen" };
   const total = results.informationen.length + results.leistungen.length;
@@ -95,10 +99,46 @@ function SearchResults() {
 
   return (
     <>
-      <SearchForm q={q} tab={tab} />
+      <SearchForm q={q} />
       <p className="t-search__summary" role="status">
         {q ? `${pluralize(total, "Treffer", "Treffer")} für „${q}“` : "Kein Suchbegriff: Sie sehen alle Inhalte."}
       </p>
+      {smart?.correction && smart.correction.toLowerCase() !== q.toLowerCase() && (
+        <p className="t-correction">
+          Meinten Sie: <Link href={`${base}/suche?q=${encodeURIComponent(smart.correction)}`}>{smart.correction}</Link>?
+        </p>
+      )}
+      {smart?.answer && (
+        <div className="t-answer">
+          <p className="t-answer__eyebrow">
+            <IconSparkle size={18} />
+            Das passt am besten zu Ihrer Anfrage
+          </p>
+          <h2 className="t-answer__title">
+            <Link href={`${base}/leistungen/${smart.answer.slug}`}>{smart.answer.title}</Link>
+          </h2>
+          <p>{smart.answer.summary}</p>
+          <ul className="t-answer__facts">
+            <li className={smart.answer.online ? "t-badge t-badge--online" : "t-badge"}>
+              {smart.answer.online ? "Online möglich" : "Termin vor Ort"}
+            </li>
+            <li>Kosten: {smart.answer.costs}</li>
+            <li>Dauer: {smart.answer.duration}</li>
+          </ul>
+          {smart.related.length > 0 && (
+            <p className="t-answer__related">
+              Das brauchen Sie oft auch:{" "}
+              {smart.related.map((s, i) => (
+                <span key={s.slug}>
+                  {i > 0 && ", "}
+                  <Link href={`${base}/leistungen/${s.slug}`}>{s.title}</Link>
+                </span>
+              ))}
+            </p>
+          )}
+          <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Klick-Dummy lokal simuliert, ohne echte KI.</p>
+        </div>
+      )}
       <div role="tablist" aria-label="Ergebnisse nach Art" className="t-tabs">
         {order.map((key) => (
           <button

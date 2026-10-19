@@ -6,6 +6,9 @@ wie verschieden Portale aus demselben System aussehen können:
 - **Musterland** (`/musterland`): Land, Informationsportal
 - **Beispielstadt** (`/beispielstadt`): Stadt, Serviceportal
 
+Beide Startseiten haben eine zentrale Suche, die Anliegen in eigenen Worten versteht und beim Tippen
+Leistungen vorschlägt (im Klick-Dummy lokal simuliert, ohne echte KI).
+
 Unter `/neu` legt ein Assistent in vier Schritten einen dritten Mandanten an und misst die Zeit.
 Neue Mandanten liegen nur im `localStorage` des Browsers. Alle Inhalte sind Beispieldaten.
 

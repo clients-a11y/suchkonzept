@@ -41,6 +41,10 @@ export function TenantPreview({ tenant }: { tenant: Tenant }) {
             <>
               <span className="t-mini__title">{tenant.name || "Name"}</span>
               <span className="t-mini__lead">{tenant.tagline}</span>
+              <span className="t-mini__search">
+                <span />
+                <span className="t-mini__button">Suchen</span>
+              </span>
             </>
           )}
         </div>

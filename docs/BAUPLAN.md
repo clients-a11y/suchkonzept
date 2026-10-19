@@ -127,6 +127,18 @@ Kontraste AA, Skip-Link funktioniert, Tastaturbedienung für Menü, Tabs, Filter
 `npm run dev`, dann `/`, `/musterland`, `/beispielstadt`, eine Leistung, Suche, Aktuelles, Inhaltsseite
 und den Assistenten durchklicken, auf Desktop und 390 px Breite. `npm run build` muss ohne Fehler laufen.
 
+## Zentrale Suche (Nachtrag 19.10.2026)
+
+Bürger kommen meist mit einem Anliegen auf das Portal. Deshalb ist auf beiden Startseiten eine zentrale Suche
+das Hero-Element (`SmartSearch`, Combobox mit Vorschlagsliste):
+- versteht Anliegen in eigenen Worten über `src/data/intents.ts` („Ich möchte eine Garage bauen“ → Baugenehmigung)
+- korrigiert Tippfehler („Baugeminigung“ → „Meinten Sie: Baugenehmigung“) und ergänzt Wörter beim Tippen
+- zeigt eine Kurzantwort „Das passt am besten“ mit Kosten, Dauer und Online-Hinweis sowie „Das brauchen Sie oft auch“
+- Beispielanfragen als Buttons unter dem Feld, Enter führt zur Ergebnisseite mit derselben Logik
+- Tastatur: Pfeiltasten, Enter, Escape; Anzahl der Vorschläge wird angesagt
+- Im Klick-Dummy lokal simuliert (`src/lib/smart-search.ts`), der Hinweis unter dem Feld sagt das. Später ersetzbar
+  durch eine echte KI-Suche im Backend.
+
 ## Technische Hinweise
 
 - Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`

@@ -163,9 +163,6 @@ export const FEATURED_SERVICES: Record<Tenant["type"], string[]> = {
   service: ["personalausweis-beantragen", "wohnsitz-anmelden", "kitaplatz-beantragen", "hund-anmelden", "wohngeld-beantragen", "fahrzeug-zulassen"],
 };
 
-// Quick searches under the big search field of service portals.
-export const QUICK_SEARCHES = ["Personalausweis", "Umzug", "Kita", "Hund", "Wohngeld"];
-
 // Fictional places for the optional location choice in information portals.
 export const PLACES = [
   { id: "musterstadt", name: "Musterstadt", office: "Bürgeramt Musterstadt", address: "Rathausplatz 1, 10000 Musterstadt", phone: "0100 200 10 00" },

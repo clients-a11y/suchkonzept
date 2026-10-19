@@ -163,7 +163,7 @@ export function PlatformStart() {
           <h2 className="pf-h2">Gleich für alle</h2>
           <ul className="pf-ticks">
             <li>Leistungskatalog mit zehn Verwaltungsleistungen</li>
-            <li>Suche über Seiten, Meldungen und Leistungen</li>
+            <li>Zentrale Suche mit Vorschlägen beim Tippen, Tippfehlerkorrektur und Kurzantwort</li>
             <li>Seitentypen: Startseite, Leistung, Suche, Aktuelles, Inhaltsseite</li>
             <li>Barrierefreiheit: Sprunglink, Landmarken, Tastaturbedienung, geprüfte Kontraste</li>
             <li>Kopf- und Fußzeile, Brotkrumen, Kontaktblöcke</li>

@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Form from "next/form";
-import { useId } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
-import { BlocksArt, HillsArt } from "@/components/Art";
-import { IconArrow, IconSearch } from "@/components/Icons";
-import { FEATURED_SERVICES, LIFE_SITUATIONS, QUICK_SEARCHES, THEMES, newsFor, pageFor } from "@/data/content";
+import { BlocksArt, HillsBand } from "@/components/Art";
+import { IconArrow } from "@/components/Icons";
+import { SmartSearch } from "@/components/SmartSearch";
+import { FEATURED_SERVICES, LIFE_SITUATIONS, THEMES, newsFor, pageFor } from "@/data/content";
 import { findService } from "@/data/services";
 import { formatDate } from "@/lib/format";
 import type { NewsItem, Service } from "@/lib/types";
@@ -56,9 +55,31 @@ function InfoStart() {
   const more = rest.slice(0, 3);
   return (
     <>
-      <div className="t-container t-intro">
-        <h1 className="t-h1 t-h1--display">{tenant.name}</h1>
-        <p className="t-intro__tagline">{tenant.tagline}</p>
+      <div className="t-hero t-hero--info">
+        <div className="t-container t-hero__inner t-hero__inner--split">
+          <div>
+            <h1 className="t-h1 t-h1--display">{tenant.name}</h1>
+            <p className="t-intro__tagline">{tenant.tagline}</p>
+            <SmartSearch label="Wie können wir helfen?" />
+          </div>
+          <section className="t-quickcard">
+            <h2 className="t-quickcard__title">Häufig gesucht</h2>
+            <ul className="t-linklist">
+              {featured("info").map((service) => (
+                <li key={service.slug}>
+                  <Link href={`${base}/leistungen/${service.slug}`}>
+                    <span>{service.title}</span>
+                    <IconArrow size={18} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link href={`${base}/suche?tab=leistungen`} className="t-more t-quickcard__more">
+              Alle Verwaltungsleistungen <IconArrow size={18} />
+            </Link>
+          </section>
+        </div>
+        <HillsBand className="t-hero__hills" />
       </div>
 
       <section className="t-container t-section">
@@ -70,7 +91,6 @@ function InfoStart() {
         </div>
         <div className="t-news-grid">
           <article className="t-feature">
-            <HillsArt className="t-feature__art" />
             <div className="t-feature__body">
               <NewsMeta item={lead} />
               <h3 className="t-feature__title">
@@ -110,25 +130,6 @@ function InfoStart() {
         </ul>
       </section>
 
-      <section className="t-container t-section">
-        <div className="t-section__head">
-          <h2 className="t-h2">Häufig gesucht</h2>
-          <Link href={`${base}/suche?tab=leistungen`} className="t-more">
-            Alle Verwaltungsleistungen <IconArrow size={18} />
-          </Link>
-        </div>
-        <ul className="t-linklist">
-          {featured("info").map((service) => (
-            <li key={service.slug}>
-              <Link href={`${base}/leistungen/${service.slug}`}>
-                <span>{service.title}</span>
-                <IconArrow size={18} />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <ContactStrip />
     </>
   );
@@ -136,8 +137,6 @@ function InfoStart() {
 
 function ServiceStart() {
   const { tenant, base } = useCurrentTenant();
-  const inputId = useId();
-  const quickId = useId();
   const news = newsFor(tenant).slice(0, 3);
   return (
     <>
@@ -145,30 +144,7 @@ function ServiceStart() {
         <BlocksArt className="t-hero__art" />
         <div className="t-container t-hero__inner">
           <h1 className="t-h1">Was möchten Sie erledigen?</h1>
-          <Form action={`${base}/suche`} role="search" className="t-bigsearch">
-            <label htmlFor={inputId} className="t-bigsearch__label">
-              Leistung oder Anliegen suchen
-            </label>
-            <div className="t-bigsearch__row">
-              <input id={inputId} className="t-input t-input--large" name="q" type="search" placeholder="zum Beispiel Personalausweis" autoComplete="off" />
-              <button type="submit" className="t-btn t-btn--primary">
-                <IconSearch />
-                Suchen
-              </button>
-            </div>
-          </Form>
-          <p id={quickId} className="t-quick__label">
-            Oft gesucht:
-          </p>
-          <ul className="t-quick" aria-labelledby={quickId}>
-            {QUICK_SEARCHES.map((term) => (
-              <li key={term}>
-                <Link href={`${base}/suche?q=${encodeURIComponent(term)}&tab=leistungen`} className="t-chip">
-                  {term}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SmartSearch label="Leistung oder Anliegen suchen" />
         </div>
       </div>
 
