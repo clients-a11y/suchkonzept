@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
-import { IconArrow, IconSearch, IconSparkle } from "@/components/Icons";
+import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { EXAMPLE_QUERIES } from "@/data/intents";
 import { FEATURED_SERVICES } from "@/data/content";
 import { findService } from "@/data/services";
@@ -17,12 +17,13 @@ type Item = { key: string; group: string; href?: string; fill?: string; label: s
 
 function ServiceFacts({ service }: { service: Service }) {
   return (
-    <span className="t-smart__facts">
-      <span className={service.online ? "t-smart__fact t-smart__fact--online" : "t-smart__fact"}>
+    <span className="t-facts-line">
+      <span className={service.online ? "t-facts-line__online" : undefined}>
+        {service.online && <IconCheck size={14} />}
         {service.online ? "Online möglich" : "Termin vor Ort"}
       </span>
-      <span className="t-smart__fact">{service.costs}</span>
-      <span className="t-smart__fact">{service.duration}</span>
+      <span>Kosten: {service.costs}</span>
+      <span>Dauer: {service.duration}</span>
     </span>
   );
 }
@@ -214,7 +215,7 @@ export function SmartSearch({ label }: { label: string }) {
             {label}
           </label>
           <span className="t-smart__badge">
-            <IconSparkle size={16} />
+            <IconSparkle size={14} />
             KI-Vorschläge
           </span>
         </div>
@@ -299,7 +300,7 @@ export function SmartSearch({ label }: { label: string }) {
             <li key={example}>
               <button
                 type="button"
-                className="t-chip"
+                className="t-smart__example"
                 onClick={() => {
                   setQuery(example);
                   setOpen(true);
@@ -307,7 +308,7 @@ export function SmartSearch({ label }: { label: string }) {
                   inputRef.current?.focus();
                 }}
               >
-                {example}
+                „{example}“
               </button>
             </li>
           ))}

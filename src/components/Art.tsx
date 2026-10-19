@@ -65,7 +65,7 @@ export function BlocksArt({ className }: ArtProps) {
   return (
     <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" className={className}>
       <rect width="640" height="360" style={surface} />
-      <circle cx="548" cy="72" r="34" style={accent} />
+      <circle cx="468" cy="70" r="30" style={accent} />
       {BACK.map(([x, w, h]) => (
         <rect key={`b${x}`} x={x} y={BASE - h} width={w} height={h} rx="6" style={tintFill} />
       ))}

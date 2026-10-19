@@ -7,7 +7,7 @@ import { Suspense, useId, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { IconSearch, IconSparkle } from "@/components/Icons";
+import { IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { smartSearch } from "@/lib/smart-search";
 import type { Hit } from "@/lib/search";
@@ -118,8 +118,9 @@ function SearchResults() {
             <Link href={`${base}/leistungen/${smart.answer.slug}`}>{smart.answer.title}</Link>
           </h2>
           <p>{smart.answer.summary}</p>
-          <ul className="t-answer__facts">
-            <li className={smart.answer.online ? "t-badge t-badge--online" : "t-badge"}>
+          <ul className="t-facts-line t-answer__facts">
+            <li className={smart.answer.online ? "t-facts-line__online" : undefined}>
+              {smart.answer.online && <IconCheck size={16} />}
               {smart.answer.online ? "Online möglich" : "Termin vor Ort"}
             </li>
             <li>Kosten: {smart.answer.costs}</li>
