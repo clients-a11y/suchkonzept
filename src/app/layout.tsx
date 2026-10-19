@@ -8,7 +8,7 @@ const hyper = Atkinson_Hyperlegible({ variable: "--f-hyper", subsets: ["latin"],
 const mono = IBM_Plex_Mono({ variable: "--f-mono", subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
-  title: "Portalbaukasten · Klick-Dummy",
+  title: { default: "Portalbaukasten · Klick-Dummy", template: "%s · Portalbaukasten" },
   description: "Klick-Dummy für eine mandantenfähige Portalplattform mit fiktiven Mandanten.",
 };
 
