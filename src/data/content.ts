@@ -1,0 +1,123 @@
+import type { ContentPage, NewsItem, Tenant } from "@/lib/types";
+
+const NEWS: NewsItem[] = [
+  { id: "m1", tenant: "musterland", title: "Landesregierung beschließt Programm für Dorfläden", teaser: "Bis 2028 fließen Mittel in Nahversorgung auf dem Land. Anträge sind ab Januar möglich.", date: "2026-10-14", topic: "Wirtschaft", source: "Staatskanzlei" },
+  { id: "m2", tenant: "musterland", title: "Neue Schulsozialarbeit an 40 Standorten", teaser: "Das Bildungsministerium stockt die Stellen auf. Schulen können sich bis Ende November melden.", date: "2026-10-09", topic: "Bildung", source: "Ministerium für Bildung" },
+  { id: "m3", tenant: "musterland", title: "Hochwasserschutz an der Musterau fertig", teaser: "Der neue Deich schützt rund 3.000 Haushalte. Der Radweg auf der Deichkrone ist wieder offen.", date: "2026-10-02", topic: "Umwelt", source: "Ministerium für Umwelt" },
+  { id: "m4", tenant: "musterland", title: "Vereinsförderung: zweiter Stichtag naht", teaser: "Vereine können Projekte für das kommende Jahr bis zum 30. September einreichen.", date: "2026-09-18", topic: "Ehrenamt", source: "Staatskanzlei" },
+  { id: "m5", tenant: "musterland", title: "Landarztquote zeigt erste Wirkung", teaser: "Zwölf Ärztinnen und Ärzte haben sich in unterversorgten Regionen niedergelassen.", date: "2026-08-27", topic: "Gesundheit", source: "Ministerium für Gesundheit" },
+  { id: "m6", tenant: "musterland", title: "Digitale Bauanträge in allen Landkreisen", teaser: "Ab sofort lassen sich Bauanträge im ganzen Land vollständig online stellen.", date: "2026-07-15", topic: "Digitales", source: "Ministerium für Digitales" },
+  { id: "m7", tenant: "musterland", title: "Sommerferien: Badestellen mit bester Wasserqualität", teaser: "41 von 44 Badestellen erhalten die Bestnote. Die Karte zeigt alle Messwerte.", date: "2025-07-01", topic: "Umwelt", source: "Ministerium für Umwelt" },
+  { id: "b1", tenant: "beispielstadt", title: "Bürgeramt jetzt auch samstags geöffnet", teaser: "Ab November öffnet das Bürgeramt jeden ersten Samstag im Monat von 9 bis 13 Uhr.", date: "2026-10-15", topic: "Rathaus", source: "Bürgeramt" },
+  { id: "b2", tenant: "beispielstadt", title: "Kitaplätze: Anmeldung für 2027 startet", teaser: "Eltern können ab sofort ihre Wunsch-Kitas im Serviceportal angeben.", date: "2026-10-06", topic: "Familie", source: "Jugendamt" },
+  { id: "b3", tenant: "beispielstadt", title: "Baustelle Marktplatz: Umleitung für Busse", teaser: "Die Linien 2 und 5 fahren bis Dezember über die Hafenstraße.", date: "2026-09-29", topic: "Verkehr", source: "Tiefbauamt" },
+  { id: "b4", tenant: "beispielstadt", title: "Neue Hundewiese im Stadtpark", teaser: "Die eingezäunte Fläche ist rund um die Uhr geöffnet.", date: "2026-09-12", topic: "Umwelt", source: "Grünflächenamt" },
+  { id: "b5", tenant: "beispielstadt", title: "Wohngeld: Beratung in den Stadtteilen", teaser: "Die Wohngeldstelle berät im Oktober in drei Stadtteilbüros ohne Termin.", date: "2026-08-30", topic: "Soziales", source: "Sozialamt" },
+  { id: "b6", tenant: "beispielstadt", title: "Stadtfest: Straßensperrungen am Wochenende", teaser: "Die Altstadt ist von Freitag bis Sonntag für Autos gesperrt.", date: "2025-08-20", topic: "Verkehr", source: "Ordnungsamt" },
+];
+
+export function newsFor(tenant: Tenant): NewsItem[] {
+  const own = NEWS.filter((n) => n.tenant === tenant.id);
+  if (own.length) return own;
+  // Placeholder news for tenants created in the wizard.
+  return [
+    { id: `${tenant.id}-1`, tenant: tenant.id, title: `${tenant.name} hat ein neues Portal`, teaser: "Die neue Website ist online. Inhalte werden in den nächsten Wochen ergänzt.", date: "2026-10-19", topic: "Allgemeines", source: "Redaktion" },
+    { id: `${tenant.id}-2`, tenant: tenant.id, title: "Beispielmeldung: Termine online buchen", teaser: "Termine für Behördengänge lassen sich jetzt über das Portal buchen.", date: "2026-10-12", topic: "Service", source: "Redaktion" },
+    { id: `${tenant.id}-3`, tenant: tenant.id, title: "Beispielmeldung: Sprechstunde vor Ort", teaser: "Diese Meldung ist ein Platzhalter aus der Vorlage.", date: "2026-09-30", topic: "Allgemeines", source: "Redaktion" },
+  ];
+}
+
+const PAGES: ContentPage[] = [
+  {
+    tenant: "musterland",
+    slug: "land-und-leute",
+    title: "Land und Leute",
+    lead: "Musterland liegt zwischen Mittelgebirge und Seenplatte. Hier leben rund 1,9 Millionen Menschen in 214 Gemeinden.",
+    sections: [
+      { id: "geschichte", title: "Geschichte", body: ["Musterland entstand 1947 aus zwei Provinzen. Die Landesverfassung gilt seit 1992.", "Die Landeshauptstadt ist Musterstadt."] },
+      { id: "regionen", title: "Regionen", body: ["Der Norden ist von Seen und Landwirtschaft geprägt, der Süden von Wald und Handwerk.", "Fünf Landkreise und zwei kreisfreie Städte gliedern das Land."] },
+      { id: "zahlen", title: "Zahlen und Fakten", body: ["Fläche: 18.400 Quadratkilometer.", "Größte Arbeitgeber: Gesundheitswesen, Handwerk, Logistik."] },
+    ],
+  },
+  {
+    tenant: "musterland",
+    slug: "regierung",
+    title: "Regierung",
+    lead: "Die Landesregierung besteht aus der Ministerpräsidentin und sieben Ministerien.",
+    sections: [
+      { id: "ministerien", title: "Ministerien", body: ["Staatskanzlei, Bildung, Umwelt, Gesundheit, Wirtschaft, Digitales, Inneres, Finanzen."] },
+      { id: "kontakt", title: "Kontakt", body: ["Bürgerservice der Landesregierung, Schlossplatz 1, 10000 Musterstadt.", "Telefon 0100 123 45 67, Montag bis Freitag 8 bis 18 Uhr."] },
+      { id: "impressum", title: "Impressum", body: ["Platzhalter: Hier steht das Impressum des Mandanten."] },
+      { id: "datenschutz", title: "Datenschutz", body: ["Platzhalter: Hier steht die Datenschutzerklärung des Mandanten."] },
+      { id: "barrierefreiheit", title: "Barrierefreiheit", body: ["Platzhalter: Hier steht die Erklärung zur Barrierefreiheit."] },
+    ],
+  },
+  {
+    tenant: "beispielstadt",
+    slug: "lebenslagen",
+    title: "Lebenslagen",
+    lead: "Finden Sie Leistungen nach dem, was gerade in Ihrem Leben passiert.",
+    sections: [
+      { id: "umzug", title: "Umzug", body: ["Wohnsitz anmelden, Hund ummelden, Fahrzeug umschreiben."] },
+      { id: "familie", title: "Familie und Kinder", body: ["Kitaplatz beantragen, Wohngeld beantragen."] },
+      { id: "bauen", title: "Bauen und Wohnen", body: ["Baugenehmigung beantragen, Wohngeld beantragen."] },
+      { id: "freizeit", title: "Freizeit und Ehrenamt", body: ["Fischereischein beantragen, Führungszeugnis für das Ehrenamt."] },
+    ],
+  },
+  {
+    tenant: "beispielstadt",
+    slug: "rathaus",
+    title: "Rathaus",
+    lead: "Das Bürgeramt am Marktplatz ist Ihre erste Anlaufstelle für fast alle Anliegen.",
+    sections: [
+      { id: "oeffnungszeiten", title: "Öffnungszeiten", body: ["Montag, Dienstag, Donnerstag 8 bis 16 Uhr.", "Mittwoch 8 bis 18 Uhr, Freitag 8 bis 12 Uhr.", "Jeden ersten Samstag im Monat 9 bis 13 Uhr."] },
+      { id: "kontakt", title: "Kontakt", body: ["Bürgeramt Beispielstadt, Marktplatz 1, 20000 Beispielstadt.", "Telefon 0200 98 76 54."] },
+      { id: "impressum", title: "Impressum", body: ["Platzhalter: Hier steht das Impressum des Mandanten."] },
+      { id: "datenschutz", title: "Datenschutz", body: ["Platzhalter: Hier steht die Datenschutzerklärung des Mandanten."] },
+      { id: "barrierefreiheit", title: "Barrierefreiheit", body: ["Platzhalter: Hier steht die Erklärung zur Barrierefreiheit."] },
+    ],
+  },
+];
+
+export function pageFor(tenant: Tenant, slug: string): ContentPage | undefined {
+  const own = PAGES.find((p) => p.tenant === tenant.id && p.slug === slug);
+  if (own) return own;
+  if (slug === "ueber-uns") {
+    return {
+      tenant: tenant.id,
+      slug,
+      title: `Über ${tenant.name}`,
+      lead: "Diese Seite stammt aus der Vorlage für neue Mandanten. Die Redaktion ersetzt die Texte im CMS.",
+      sections: [
+        { id: "kontakt", title: "Kontakt", body: [`${tenant.contact.office}, ${tenant.contact.address}.`, `Telefon ${tenant.contact.phone}.`] },
+        { id: "impressum", title: "Impressum", body: ["Platzhalter aus der Vorlage."] },
+        { id: "datenschutz", title: "Datenschutz", body: ["Platzhalter aus der Vorlage."] },
+        { id: "barrierefreiheit", title: "Barrierefreiheit", body: ["Platzhalter aus der Vorlage."] },
+      ],
+    };
+  }
+  return undefined;
+}
+
+export function pagesFor(tenant: Tenant): ContentPage[] {
+  const own = PAGES.filter((p) => p.tenant === tenant.id);
+  if (own.length) return own;
+  const about = pageFor(tenant, "ueber-uns");
+  return about ? [about] : [];
+}
+
+// Themes shown on the start page of information portals.
+export const THEMES = [
+  { title: "Bildung", text: "Schulen, Kitas, Weiterbildung", query: "bildung" },
+  { title: "Umwelt", text: "Natur, Wasser, Klimaschutz", query: "umwelt" },
+  { title: "Wirtschaft", text: "Förderung, Arbeit, Ansiedlung", query: "wirtschaft" },
+  { title: "Gesundheit", text: "Versorgung, Pflege, Vorsorge", query: "gesundheit" },
+];
+
+// Life situations shown on the start page of service portals.
+export const LIFE_SITUATIONS = [
+  { title: "Umzug", services: ["wohnsitz-anmelden", "hund-anmelden", "fahrzeug-zulassen"] },
+  { title: "Familie und Kinder", services: ["kitaplatz-beantragen", "wohngeld-beantragen"] },
+  { title: "Bauen und Wohnen", services: ["baugenehmigung-beantragen", "wohngeld-beantragen"] },
+  { title: "Freizeit und Ehrenamt", services: ["fischereischein-beantragen", "fuehrungszeugnis-beantragen"] },
+];
