@@ -30,6 +30,7 @@ type Draft = {
 const KINDS = ["Land", "Landkreis", "Stadt", "Gemeinde", "Verband"];
 const TYPE_LABEL: Record<PortalType, string> = { info: "Informationsportal", service: "Serviceportal" };
 const STEPS = ["Steckbrief", "Theme", "Struktur", "Prüfen und anlegen"];
+const EDIT_STEPS = ["Steckbrief", "Theme", "Struktur", "Prüfen und speichern"];
 const PRESETS = [
   { name: "Moor", primary: "#2e5e4e", accent: "#e0b94a", surface: "#f1f5f2" },
   { name: "Ziegel", primary: "#8c3b2e", accent: "#e7b75f", surface: "#f8f1ee" },
@@ -51,6 +52,25 @@ const META_LABEL: { key: keyof Tenant["meta"]; label: string }[] = [
 // Wall clock for the stopwatch. Only called from event handlers and the interval.
 function clock(): number {
   return Date.now();
+}
+
+// A saved tenant back into wizard fields. Defaults stay empty so they follow the portal type.
+function draftFrom(tenant: Tenant): Draft {
+  return {
+    name: tenant.name,
+    kind: tenant.kind,
+    type: tenant.type,
+    tagline: tenant.tagline === TYPE_LABEL[tenant.type] ? "" : tenant.tagline,
+    region: tenant.region === tenant.name ? "" : tenant.region,
+    primary: tenant.tokens.primary,
+    accent: tenant.tokens.accent,
+    surface: tenant.tokens.surface,
+    headingFont: tenant.tokens.headingFont,
+    radius: tenant.tokens.radius,
+    nav: tenant.nav.map((item) => item.href),
+    meta: { ...tenant.meta },
+    languages: tenant.languages.filter((name) => name !== "Deutsch"),
+  };
 }
 
 function initialDraft(): Draft {
@@ -103,7 +123,7 @@ function buildTenant(draft: Draft, id: string, seconds?: number): Tenant {
 
 function uniqueId(name: string, taken: string[]): string {
   const base = slugify(name) || "mandant";
-  const reserved = new Set(["neu", ...taken]);
+  const reserved = new Set(["neu", "bearbeiten", ...taken]);
   let id = base;
   for (let n = 2; reserved.has(id); n++) id = `${base}-${n}`;
   return id;
@@ -191,11 +211,13 @@ function Choice({
   );
 }
 
-export function Wizard() {
+// Without `editing` the wizard creates a tenant, with it the same steps change a saved one.
+export function Wizard({ editing }: { editing?: Tenant }) {
   const all = useAllTenants();
-  const [draft, setDraft] = useState<Draft>(initialDraft);
+  const [draft, setDraft] = useState<Draft>(() => (editing ? draftFrom(editing) : initialDraft()));
   const [step, setStep] = useState(0);
-  const [reached, setReached] = useState(0);
+  const [reached, setReached] = useState(editing ? 3 : 0);
+  const [doneIn, setDoneIn] = useState(0);
   const [nameError, setNameError] = useState("");
   const [navError, setNavError] = useState("");
   const [created, setCreated] = useState<Tenant | null>(null);
@@ -236,10 +258,11 @@ export function Wizard() {
     startedAt === null ? 0 : Math.max(0, Math.floor(((stoppedAt ?? now) - startedAt) / 1000));
 
   const id = useMemo(
-    () => uniqueId(draft.name, all.map((t) => t.id)),
-    [draft.name, all],
+    () => editing?.id ?? uniqueId(draft.name, all.map((t) => t.id)),
+    [editing, draft.name, all],
   );
-  const preview = useMemo(() => buildTenant(draft, id), [draft, id]);
+  const preview = useMemo(() => buildTenant(draft, id, editing?.createdInSeconds), [draft, id, editing]);
+  const steps = editing ? EDIT_STEPS : STEPS;
   const checks = contrastChecks(draft);
   const failing = checks.filter((c) => !c.ok);
   const themeBlocked = failing.length > 0;
@@ -279,7 +302,9 @@ export function Wizard() {
     const stop = clock();
     const seconds = startedAt === null ? 0 : Math.floor((stop - startedAt) / 1000);
     setStoppedAt(stop);
-    const tenant = buildTenant(draft, id, seconds);
+    setDoneIn(seconds);
+    // Editing keeps the original creation time; the stopwatch only measures this change.
+    const tenant = buildTenant(draft, id, editing ? editing.createdInSeconds : seconds);
     saveCustomTenant(tenant);
     moved.current = true;
     setCreated(tenant);
@@ -304,8 +329,12 @@ export function Wizard() {
     <div className="pf-container pf-page">
       <div className="pf-wizard__head">
         <div>
-          <h1 className="pf-h1 pf-h1--page">Neuen Mandanten anlegen</h1>
-          <p className="pf-lead">Vier Schritte, keine Zeile Code. Am Ende steht ein eigenes Portal unter eigener Adresse.</p>
+          <h1 className="pf-h1 pf-h1--page">{editing ? "Mandanten bearbeiten" : "Neuen Mandanten anlegen"}</h1>
+          <p className="pf-lead">
+            {editing
+              ? `Dieselben vier Schritte, mit den gespeicherten Werten von ${editing.name}. Änderungen gelten sofort für das Portal.`
+              : "Vier Schritte, keine Zeile Code. Am Ende steht ein eigenes Portal unter eigener Adresse."}
+          </p>
         </div>
         <div className="pf-clock">
           <span className="pf-clock__label">Zeit</span>
@@ -317,7 +346,7 @@ export function Wizard() {
       </div>
 
       <ol className="pf-steps" aria-label="Fortschritt">
-        {STEPS.map((label, index) => {
+        {steps.map((label, index) => {
           const current = !created && index === step;
           const done = Boolean(created) || (index <= reached && index !== step);
           const content = (
@@ -348,11 +377,11 @@ export function Wizard() {
           {created ? (
             <div className="pf-success">
               <h2 className="pf-h2" ref={successRef} tabIndex={-1}>
-                {created.name} ist live.
+                {editing ? `${created.name} ist aktualisiert.` : `${created.name} ist live.`}
               </h2>
               <p className="pf-success__time">
-                Angelegt in <span className="pf-success__clock">{formatClock(created.createdInSeconds ?? 0)}</span>, ohne
-                Codeänderung.
+                {editing ? "Gespeichert in " : "Angelegt in "}
+                <span className="pf-success__clock">{formatClock(doneIn)}</span>, ohne Codeänderung.
               </p>
               <p className="pf-muted">
                 Adresse <code className="pf-code">/{created.id}</code>. Der Mandant liegt im Speicher dieses Browsers und
@@ -362,9 +391,11 @@ export function Wizard() {
                 <Link href={`/${created.id}`} className="pf-btn pf-btn--primary">
                   Portal öffnen
                 </Link>
-                <button type="button" className="pf-btn" onClick={restart}>
-                  Weiteren Mandanten anlegen
-                </button>
+                {!editing && (
+                  <button type="button" className="pf-btn" onClick={restart}>
+                    Weiteren Mandanten anlegen
+                  </button>
+                )}
                 <Link href="/" className="pf-btn pf-btn--ghost">
                   Zur Übersicht
                 </Link>
@@ -373,7 +404,7 @@ export function Wizard() {
           ) : (
             <form className="pf-form" onSubmit={next} noValidate>
               <h2 className="pf-h2" ref={headingRef} tabIndex={-1}>
-                <span className="pf-h2__step">Schritt {step + 1} von 4</span> {STEPS[step]}
+                <span className="pf-h2__step">Schritt {step + 1} von 4</span> {steps[step]}
               </h2>
 
               {step === 0 && (
@@ -383,7 +414,8 @@ export function Wizard() {
                       Name
                     </label>
                     <p id={ids.nameHint} className="pf-hint">
-                      So heißt das Portal im Kopf. Daraus entsteht die Adresse <code className="pf-code">/{id}</code>.
+                      {editing ? "So heißt das Portal im Kopf. Die Adresse bleibt " : "So heißt das Portal im Kopf. Daraus entsteht die Adresse "}
+                      <code className="pf-code">/{id}</code>.
                     </p>
                     <input
                       ref={nameRef}
@@ -696,7 +728,7 @@ export function Wizard() {
                   aria-disabled={step === 1 && themeBlocked ? true : undefined}
                   aria-describedby={step === 1 && themeBlocked ? ids.gate : undefined}
                 >
-                  {step === 3 ? "Mandanten anlegen" : "Weiter"}
+                  {step === 3 ? (editing ? "Änderungen speichern" : "Mandanten anlegen") : "Weiter"}
                 </button>
               </div>
             </form>

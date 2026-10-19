@@ -139,6 +139,13 @@ das Hero-Element (`SmartSearch`, Combobox mit Vorschlagsliste):
 - Im Klick-Dummy lokal simuliert (`src/lib/smart-search.ts`), der Hinweis unter dem Feld sagt das. Später ersetzbar
   durch eine echte KI-Suche im Backend.
 
+## Mandanten bearbeiten (Nachtrag 19.10.2026)
+
+Eigene Mandanten lassen sich nachträglich ändern: „Bearbeiten“ in der Liste auf `/` und „Diesen Mandanten
+bearbeiten“ in der Demo-Leiste öffnen `/bearbeiten?mandant=<id>`. Der Assistent lädt die gespeicherten Werte,
+alle Schritte sind direkt anwählbar, die Adresse bleibt gleich, die ursprüngliche Anlagezeit auch. Die Stoppuhr
+misst nur die Änderung. Beispielmandanten bleiben Konfiguration in `src/data/tenants.ts`.
+
 ## Technische Hinweise
 
 - Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`

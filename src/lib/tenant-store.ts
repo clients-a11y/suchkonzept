@@ -44,8 +44,10 @@ export function useCustomTenants(): Tenant[] | null {
 }
 
 export function saveCustomTenant(tenant: Tenant) {
-  const list = parse(readRaw()).filter((t) => t.id !== tenant.id);
-  list.push(tenant);
+  const list = parse(readRaw());
+  const index = list.findIndex((t) => t.id === tenant.id);
+  if (index >= 0) list[index] = tenant;
+  else list.push(tenant);
   try {
     window.localStorage.setItem(KEY, JSON.stringify(list));
   } catch {

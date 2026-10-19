@@ -31,6 +31,11 @@ export function DemoBar() {
         <Link href="/neu" className="pf-demobar__cta">
           Neuen Mandanten anlegen
         </Link>
+        {tenant.custom && (
+          <Link href={`/bearbeiten?mandant=${tenant.id}`} className="pf-demobar__home">
+            Diesen Mandanten bearbeiten
+          </Link>
+        )}
         <form
           className="pf-switch"
           onSubmit={(event) => {

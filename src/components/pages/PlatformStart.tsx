@@ -82,6 +82,9 @@ function CustomList() {
               <Link href={`/${tenant.id}`} className="pf-btn pf-btn--small">
                 Portal öffnen<span className="visually-hidden">: {tenant.name}</span>
               </Link>
+              <Link href={`/bearbeiten?mandant=${tenant.id}`} className="pf-btn pf-btn--small">
+                Bearbeiten<span className="visually-hidden">: {tenant.name}</span>
+              </Link>
               <button
                 type="button"
                 className="pf-btn pf-btn--small pf-btn--ghost"
