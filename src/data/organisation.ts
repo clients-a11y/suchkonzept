@@ -97,7 +97,7 @@ const ORGANISATIONS: Record<string, Organisation> = {
         name: "Ministerium für Wirtschaft",
         lead: "Das Ministerium fördert Unternehmen, Handwerk und die Nahversorgung auf dem Land.",
         head: { name: "Tobias Entwurf", role: "Minister für Wirtschaft" },
-        tasks: ["Mittelstand und Handwerk", "Nahversorgung und Dorfläden", "Ansiedlung von Unternehmen", "Tourismus"],
+        tasks: ["Mittelstand und Handwerk", "Nahversorgung und Dorfläden", "Ansiedlung von Unternehmen", "Verkehr, Radwege und Energie"],
         services: [],
         newsTopics: ["Wirtschaft"],
         address: "Marktstraße 20, 10000 Musterstadt",
@@ -345,4 +345,9 @@ export function newsForUnit(tenant: Tenant, unit: OrgUnit): NewsItem[] {
   return newsFor(tenant).filter(
     (n) => n.source === unit.newsSource || Boolean(unit.newsTopics?.includes(n.topic)),
   );
+}
+
+// Name of the office that handles a service in this tenant.
+export function officeNameFor(tenant: Tenant, slug: string): string {
+  return unitForService(tenant, slug)?.name ?? tenant.contact.office;
 }

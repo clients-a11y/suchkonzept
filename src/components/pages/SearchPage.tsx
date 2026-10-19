@@ -13,6 +13,7 @@ import { smartSearch } from "@/lib/smart-search";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { origin } from "@/lib/origin";
 
 type TabKey = "informationen" | "leistungen";
 
@@ -36,7 +37,7 @@ function SearchForm({ q }: { q: string }) {
 function HitList({ hits }: { hits: Hit[] }) {
   const { base } = useCurrentTenant();
   return (
-    <ol className="t-hits">
+    <ol className="t-hits" {...origin("zentral", "Zentral · Plattform: Suche")}>
       {hits.map((hit) => (
         <li key={hit.key} className="t-hit">
           <p className="t-hit__kind">{hit.kind}</p>

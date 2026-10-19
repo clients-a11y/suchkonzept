@@ -168,6 +168,27 @@ Auf Wunsch sollen Musterland und Beispielstadt echte Fotos statt Illustrationen 
 Bildunterschrift „Beispielbild, KI-generiert“, sonst bleibt die Token-Illustration. Mandanten aus dem Assistenten
 behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für alle Bilder stehen in `docs/BILDER.md`.
 
+## Zuständigkeitsfinder, Online-Antrag, Herkunft, Großprojekte (Nachtrag 19.10.2026)
+
+- **Zuständigkeitsfinder** (`PlaceFinder`, `src/lib/place-store.ts`): Postleitzahl oder Ort eingeben, die
+  zuständige Stelle erscheint. Orte mit PLZ-Bereichen in `PLACES`; Beispielstadt ist ein Ort in Musterland mit
+  eigenem Portal. Das Landesportal verweist dann auf die Leistung im Stadtportal, das Stadtportal bei einem Ort
+  außerhalb zurück ins Landesportal. Der Ort wird im Browser für alle Portale gemerkt. Stadt- und
+  Gemeindeportale aus dem Assistenten erscheinen automatisch als Orte.
+- **Online-Antrag** `/[mandant]/antrag/[leistung]` für alle Online-Leistungen: Anmelden (Demo-Konto ohne
+  Passwort), Angaben (Felder je Leistung in `src/data/forms.ts`), Unterlagen, Prüfen und absenden.
+  Fehlerübersicht mit Fokus, Bestätigung mit Vorgangsnummer.
+- **Nutzerkonto und Postfach** `/[mandant]/konto` (`src/lib/account-store.ts`): ein Konto für alle Portale.
+  Anträge mit Status (eingegangen, in Bearbeitung, erledigt), Nachrichten mit Ungelesen-Zahl im Kopf. Ein
+  Demo-Knopf simuliert den nächsten Bearbeitungsschritt und schickt am Ende den Bescheid.
+- **Herkunft anzeigen** (Schalter in der Demo-Leiste, `src/lib/origin.ts`): markiert jeden Block als
+  „Zentral“ (Leistungskatalog, Plattform-Funktionen), „Mandant“ (Einstellung, Redaktion) oder „Vorlage“
+  (Platzhalter neuer Mandanten). Legende in der Demo-Leiste, Zustand wird gemerkt.
+- **Großprojekte** (`src/data/projects.ts`, `/[mandant]/projekte`, `/[mandant]/projekte/[id]`): Musterland
+  mit fünf Landesprojekten, Beispielstadt mit vier Stadtprojekten, Vorlage für neue Mandanten. Kennzahlen,
+  Filter nach Stand, Fortschritt, Steckbrief, Meilensteine, verantwortliche Stelle und Meldungen. Verlinkt aus
+  Menü, Startseite, Stellen-Seiten und Suche. Eigene, frei erfundene Inhalte.
+
 ## Technische Hinweise
 
 - Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`

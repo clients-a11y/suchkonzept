@@ -63,3 +63,17 @@ studio background, soft light, business attire, friendly neutral expression“
 | `beispielstadt-ordnungsamt` | Eva Muster, Leitung Ordnungsamt | woman in her early fifties, chin-length dark hair, black blazer |
 | `beispielstadt-gruenflaechenamt` | Ida Konzept, Leitung Grünflächenamt | woman in her late twenties, braided hair, olive jacket |
 | `beispielstadt-strassenverkehrsamt` | Kai Testfall, Leitung Straßenverkehrsamt | man in his mid forties, glasses, grey suit, no tie |
+
+## Großprojekte (nachträglich, gleiche Einstellungen)
+
+| Datei | Beschreibung |
+| --- | --- |
+| `projects/glasfaser` | fibre optic broadband trench along a country road, orange cable ducts, small excavator |
+| `projects/klinikum` | large hospital construction site with two tower cranes and concrete shell building |
+| `projects/radweg` | wide new cycle highway through open countryside, cyclists in the distance |
+| `projects/energiepark` | solar panels in the foreground, wind turbines on the horizon, small substation |
+| `projects/marktplatz` | market square under construction, new paving, young trees, construction fences |
+| `projects/kita` | new daycare centre in timber construction with garden, harbour cranes far behind |
+| `projects/hallenbad` | 1970s indoor pool during renovation, empty pool, scaffolding |
+
+Hochwasserschutz und Stadtpark verwenden die vorhandenen Meldungsbilder `m3-deich` und `b4-hundewiese`.

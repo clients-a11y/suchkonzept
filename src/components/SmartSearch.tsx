@@ -12,6 +12,7 @@ import { findService } from "@/data/services";
 import { smartSearch } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
+import { origin } from "@/lib/origin";
 
 type Item = { key: string; group: string; href?: string; fill?: string; label: string; node: ReactNode };
 
@@ -208,7 +209,7 @@ export function SmartSearch({ label }: { label: string }) {
   );
 
   return (
-    <div className="t-smart">
+    <div className="t-smart" {...origin("zentral", "Zentral · Plattform: Suche")}>
       <Form action={`${base}/suche`} role="search" className="t-smart__form" onSubmit={() => setOpen(false)}>
         <div className="t-smart__head">
           <label htmlFor={ids.input} className="t-smart__label">

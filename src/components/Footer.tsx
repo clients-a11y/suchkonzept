@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useCurrentTenant } from "@/components/TenantContext";
+import { origin } from "@/lib/origin";
 
 export function Footer() {
   const { tenant, base } = useCurrentTenant();
   return (
-    <footer className="t-footer">
+    <footer className="t-footer" {...origin("mandant", "Mandant · Einstellung: Fußzeile, Kontakt")}>
       <div className="t-container t-footer__grid">
         {tenant.footer.map((column) => (
           <div key={column.title} className="t-footer__col">

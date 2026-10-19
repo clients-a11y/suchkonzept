@@ -3,8 +3,9 @@
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
-import { pageFor } from "@/data/content";
+import { META_SLUGS, pageFor } from "@/data/content";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { editorial, origin } from "@/lib/origin";
 
 export function ContentPageView({ slug }: { slug: string }) {
   const { tenant } = useCurrentTenant();
@@ -15,7 +16,7 @@ export function ContentPageView({ slug }: { slug: string }) {
   return (
     <div className="t-container t-page">
       <Breadcrumb items={[{ label: page.title, href: `/seite/${page.slug}`, lang: page.lang }]} />
-      <div className="t-article" lang={page.lang}>
+      <div className="t-article" lang={page.lang} {...(META_SLUGS.includes(page.slug) ? origin("vorlage", "Vorlage · Platzhalterseite") : editorial(tenant, "Redaktion"))}>
         <h1 className="t-h1">{page.title}</h1>
         <p className="t-lead">{page.lead}</p>
         {page.sections.length > 1 && (

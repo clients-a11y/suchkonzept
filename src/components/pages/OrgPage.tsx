@@ -10,6 +10,7 @@ import { AI_CREDIT } from "@/components/NewsArt";
 import { organisationFor } from "@/data/organisation";
 import type { OrgUnit } from "@/data/organisation";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { editorial } from "@/lib/origin";
 
 export function PortraitFigure({ unit, credit }: { unit: OrgUnit; credit: string }) {
   return (
@@ -44,7 +45,7 @@ export function OrgPage() {
       <h1 className="t-h1">{org.title}</h1>
       <p className="t-lead">{org.lead}</p>
 
-      <article className="t-orghead">
+      <article className="t-orghead" {...editorial(tenant, "Organisation")}>
         <PortraitFigure unit={head} credit={credit} />
         <div className="t-orghead__body">
           <p className="t-orghead__role">{head.head.role}</p>
@@ -60,7 +61,7 @@ export function OrgPage() {
 
       <section className="t-section">
         <h2 className="t-h2">{org.heading}</h2>
-        <ul className="t-orgcards">
+        <ul className="t-orgcards" {...editorial(tenant, "Organisation")}>
           {units.map((unit) => (
             <li key={unit.id} className="t-orgcard">
               <PortraitFigure unit={unit} credit={credit} />

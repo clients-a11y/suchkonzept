@@ -2,6 +2,7 @@ import { SERVICES, findService } from "@/data/services";
 import { newsFor, pagesFor } from "@/data/content";
 import { INTENTS, STOPWORDS } from "@/data/intents";
 import { organisationFor } from "@/data/organisation";
+import { PROJECT_STATUS, projectsFor } from "@/data/projects";
 import type { Service, Tenant } from "@/lib/types";
 
 // Local stand-in for an AI-assisted search: understands phrases in plain words,
@@ -181,6 +182,14 @@ export function smartSearch(tenant: Tenant, input: string, typing = false): Smar
       text: u.lead,
       href: `/organisation/${u.id}`,
       score: scoreText(queryTokens, `${u.name} ${u.head.name}`, [u.lead, u.head.role, ...u.tasks].join(" ")),
+    })),
+    ...projectsFor(tenant).projects.map((p) => ({
+      key: `projekt-${p.id}`,
+      kind: `Projekt · ${PROJECT_STATUS[p.status]}`,
+      title: p.title,
+      text: p.teaser,
+      href: `/projekte/${p.id}`,
+      score: scoreText(queryTokens, p.title, [p.teaser, ...p.description, p.location].join(" ")),
     })),
     ...pagesFor(tenant).map((p) => ({
       key: `seite-${p.slug}`,

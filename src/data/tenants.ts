@@ -21,6 +21,7 @@ export const TENANTS: Tenant[] = [
     nav: [
       { label: "Land und Leute", href: "/seite/land-und-leute" },
       { label: "Landesregierung", href: "/organisation" },
+      { label: "Großprojekte", href: "/projekte" },
       { label: "Aktuelles", href: "/aktuelles" },
       { label: "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
     ],
@@ -30,6 +31,7 @@ export const TENANTS: Tenant[] = [
         links: [
           { label: "Land und Leute", href: "/seite/land-und-leute" },
           { label: "Landesregierung", href: "/organisation" },
+          { label: "Großprojekte", href: "/projekte" },
           { label: "Aktuelles", href: "/aktuelles" },
         ],
       },
@@ -86,6 +88,7 @@ export const TENANTS: Tenant[] = [
         links: [
           { label: "Öffnungszeiten", href: "/seite/rathaus#oeffnungszeiten" },
           { label: "Kontakt", href: "/seite/rathaus#kontakt" },
+          { label: "Stadtprojekte", href: "/projekte" },
         ],
       },
       {

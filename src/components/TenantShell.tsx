@@ -12,6 +12,7 @@ import { Footer } from "@/components/Footer";
 import { themeStyle, useTenant } from "@/lib/tenant-store";
 import type { Tenant } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { useShowOrigin } from "@/lib/origin";
 
 export function TenantLoading() {
   return (
@@ -47,9 +48,15 @@ function TenantMissing({ id, children }: { id: string; children: ReactNode }) {
 
 function ThemedShell({ tenant, children }: { tenant: Tenant; children: ReactNode }) {
   const value = useMemo(() => ({ tenant, base: `/${tenant.id}` }), [tenant]);
+  const showOrigin = useShowOrigin();
   return (
     <TenantContext.Provider value={value}>
-      <div className={`t-root t-shell t-root--${tenant.type}`} style={themeStyle(tenant.tokens)} data-shell>
+      <div
+        className={`t-root t-shell t-root--${tenant.type}`}
+        style={themeStyle(tenant.tokens)}
+        data-shell
+        data-show-origin={showOrigin ? "true" : undefined}
+      >
         <SkipLink className="t-skip" />
         <DemoBar />
         <Header />

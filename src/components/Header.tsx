@@ -6,9 +6,11 @@ import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "r
 import type { ReactNode, RefObject } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Emblem } from "@/components/Emblem";
-import { IconBook, IconBubble, IconClose, IconGlobe, IconHand, IconMenu, IconSearch } from "@/components/Icons";
+import { IconBook, IconBubble, IconClose, IconGlobe, IconHand, IconMenu, IconSearch, IconUser } from "@/components/Icons";
+import { useAccount } from "@/lib/account-store";
 import { languageSlug } from "@/data/content";
 import type { NavItem } from "@/lib/types";
+import { origin } from "@/lib/origin";
 
 // Escape closes, focus goes back to the button. A hidden route resets to closed.
 function useDisclosure(buttonRef: RefObject<HTMLButtonElement | null>) {
@@ -126,6 +128,26 @@ function LanguageSwitch() {
   );
 }
 
+// Account link: "Anmelden" or the mailbox with the number of unread messages.
+function AccountLink() {
+  const { base } = useCurrentTenant();
+  const account = useAccount();
+  const unread = account?.messages.filter((m) => !m.read).length ?? 0;
+  const signedIn = Boolean(account?.signedIn);
+  return (
+    <Link href={`${base}/konto`} className="t-tool">
+      <IconUser />
+      <span className="t-tool__text">{signedIn ? "Postfach" : "Anmelden"}</span>
+      {signedIn && unread > 0 && (
+        <span className="t-tool__badge">
+          {unread}
+          <span className="visually-hidden"> ungelesen</span>
+        </span>
+      )}
+    </Link>
+  );
+}
+
 export function Header() {
   const { tenant, base } = useCurrentTenant();
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -141,7 +163,7 @@ export function Header() {
   const listProps = { items: tenant.nav, base, id: menuId, open, onNavigate: () => setOpen(false) };
 
   return (
-    <header className="t-header">
+    <header className="t-header" {...origin("mandant", "Mandant · Einstellung: Name, Emblem, Menü")}>
       {(meta.length > 0 || multilingual) && (
         <div className="t-topbar">
           <div className="t-container t-topbar__inner">
@@ -174,6 +196,7 @@ export function Header() {
             <IconSearch />
             <span className="t-tool__text">Suche</span>
           </Link>
+          <AccountLink />
           <button
             ref={buttonRef}
             type="button"
@@ -184,7 +207,7 @@ export function Header() {
             onClick={() => setOpen(!open)}
           >
             {open ? <IconClose /> : <IconMenu />}
-            <span aria-hidden="true">Menü</span>
+            <span className="t-tool__text" aria-hidden="true">Menü</span>
           </button>
         </div>
       </div>

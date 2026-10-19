@@ -125,3 +125,12 @@ export function IconSparkle(props: IconProps) {
     </Svg>
   );
 }
+
+export function IconUser(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c1-4.5 4.2-7 8-7s7 2.5 8 7" />
+    </Svg>
+  );
+}

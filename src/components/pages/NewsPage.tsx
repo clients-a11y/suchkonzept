@@ -7,6 +7,7 @@ import { newsFor } from "@/data/content";
 import { NewsFigure } from "@/components/NewsArt";
 import { formatDate, pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { editorial, origin } from "@/lib/origin";
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss");
@@ -41,7 +42,7 @@ export function NewsPage() {
       <h1 className="t-h1">Aktuelles</h1>
       <p className="t-lead">Meldungen aus {tenant.kind === "Land" ? "Landesregierung und Ministerien" : "Verwaltung und Ämtern"}.</p>
 
-      <form className="t-filters" onSubmit={(event) => event.preventDefault()}>
+      <form className="t-filters" onSubmit={(event) => event.preventDefault()} {...origin("zentral", "Zentral · Plattform: Filter")}>
         <div className="t-field">
           <label htmlFor={topicId}>Thema</label>
           <select id={topicId} className="t-select" value={topic} onChange={(event) => setTopic(event.target.value)}>
@@ -87,7 +88,7 @@ export function NewsPage() {
       </p>
 
       {list.length > 0 ? (
-        <ul className="t-news-list">
+        <ul className="t-news-list" {...editorial(tenant, "Meldungen")}>
           {list.map((item) => (
             <li key={item.id} id={`meldung-${item.id}`} className="t-news-item t-news-item--media" tabIndex={-1}>
               <NewsFigure image={item.image} type={tenant.type} />

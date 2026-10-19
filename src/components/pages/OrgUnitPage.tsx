@@ -9,9 +9,11 @@ import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
 import { PortraitFigure } from "@/components/pages/OrgPage";
 import { newsForUnit, organisationFor, unitFor } from "@/data/organisation";
 import { findService } from "@/data/services";
+import { PROJECT_STATUS, projectsFor } from "@/data/projects";
 import { formatDate } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { CATALOGUE, editorial } from "@/lib/origin";
 
 export function OrgUnitPage({ id }: { id: string }) {
   const { tenant, base } = useCurrentTenant();
@@ -23,6 +25,7 @@ export function OrgUnitPage({ id }: { id: string }) {
   const services = unit.services.map(findService).filter((s): s is Service => Boolean(s));
   const news = newsForUnit(tenant, unit).slice(0, 3);
   const others = org.units.filter((u) => u.id !== unit.id);
+  const projects = projectsFor(tenant).projects.filter((p) => p.unitId === unit.id);
 
   return (
     <div className="t-container t-page">
@@ -37,7 +40,7 @@ export function OrgUnitPage({ id }: { id: string }) {
 
       <div className="t-service">
         <div>
-          <section className="t-unit-section">
+          <section className="t-unit-section" {...editorial(tenant, "Organisation")}>
             <h2 className="t-h2">Aufgaben</h2>
             <ul className="t-ticklist">
               {unit.tasks.map((task) => (
@@ -47,13 +50,32 @@ export function OrgUnitPage({ id }: { id: string }) {
           </section>
 
           {services.length > 0 && (
-            <section className="t-unit-section">
+            <section className="t-unit-section" {...CATALOGUE}>
               <h2 className="t-h2">Leistungen</h2>
               <ul className="t-linklist">
                 {services.map((service) => (
                   <li key={service.slug}>
                     <Link href={`${base}/leistungen/${service.slug}`}>
                       <span>{service.title}</span>
+                      <IconArrow size={18} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {projects.length > 0 && (
+            <section className="t-unit-section">
+              <h2 className="t-h2">Projekte</h2>
+              <ul className="t-linklist">
+                {projects.map((p) => (
+                  <li key={p.id}>
+                    <Link href={`${base}/projekte/${p.id}`}>
+                      <span>
+                        {p.title}
+                        <span className="t-linklist__meta"> · {PROJECT_STATUS[p.status]}</span>
+                      </span>
                       <IconArrow size={18} />
                     </Link>
                   </li>

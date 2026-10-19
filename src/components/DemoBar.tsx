@@ -6,6 +6,7 @@ import { useId, useLayoutEffect, useState } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { TENANTS } from "@/data/tenants";
 import { FONT_LABEL, useCustomTenants } from "@/lib/tenant-store";
+import { setShowOrigin, useShowOrigin } from "@/lib/origin";
 
 // Platform controls on every tenant page. Styled like the platform, not like the tenant.
 export function DemoBar() {
@@ -13,6 +14,8 @@ export function DemoBar() {
   const custom = useCustomTenants() ?? [];
   const router = useRouter();
   const selectId = useId();
+  const legendId = useId();
+  const showOrigin = useShowOrigin();
   const [choice, setChoice] = useState(tenant.id);
   const t = tenant.tokens;
 
@@ -36,6 +39,15 @@ export function DemoBar() {
             Diesen Mandanten bearbeiten
           </Link>
         )}
+        <button
+          type="button"
+          className="pf-demobar__toggle"
+          aria-pressed={showOrigin}
+          aria-describedby={showOrigin ? legendId : undefined}
+          onClick={() => setShowOrigin(!showOrigin)}
+        >
+          Herkunft anzeigen
+        </button>
         <form
           className="pf-switch"
           onSubmit={(event) => {
@@ -93,6 +105,13 @@ export function DemoBar() {
             <code>{`${t.radius} px`}</code>
           </li>
         </ul>
+        {showOrigin && (
+          <p id={legendId} className="pf-legend">
+            <span className="pf-legend__item pf-legend__item--zentral">Zentral: für alle Mandanten gleich</span>
+            <span className="pf-legend__item pf-legend__item--mandant">Mandant: eigene Einstellung oder Redaktion</span>
+            <span className="pf-legend__item pf-legend__item--vorlage">Vorlage: Platzhalter für neue Mandanten</span>
+          </p>
+        )}
       </div>
     </aside>
   );

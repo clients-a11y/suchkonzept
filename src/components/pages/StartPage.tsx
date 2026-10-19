@@ -6,11 +6,14 @@ import { BlocksArt, HillsBand } from "@/components/Art";
 import { IconArrow } from "@/components/Icons";
 import { SmartSearch } from "@/components/SmartSearch";
 import { NewsFigure } from "@/components/NewsArt";
+import { ProjectCard } from "@/components/pages/ProjectsPage";
+import { projectsFor } from "@/data/projects";
 import { FEATURED_SERVICES, LIFE_SITUATIONS, THEMES, newsFor, pageFor } from "@/data/content";
 import { findService } from "@/data/services";
 import { formatDate } from "@/lib/format";
 import type { NewsItem, Service } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { CATALOGUE, editorial, origin } from "@/lib/origin";
 
 function featured(type: "info" | "service"): Service[] {
   return FEATURED_SERVICES[type].map(findService).filter((s): s is Service => Boolean(s));
@@ -28,7 +31,7 @@ function NewsMeta({ item }: { item: NewsItem }) {
 function ContactStrip() {
   const { tenant } = useCurrentTenant();
   return (
-    <section className="t-band">
+    <section className="t-band" {...origin("mandant", "Mandant · Einstellung: Kontakt")}>
       <div className="t-container t-band__inner">
         <h2 className="t-band__title">Fragen? Wir helfen weiter.</h2>
         <dl className="t-band__facts">
@@ -50,6 +53,29 @@ function ContactStrip() {
   );
 }
 
+// Running projects first, at most three.
+function ProjectTeaser() {
+  const { tenant, base } = useCurrentTenant();
+  const list = projectsFor(tenant);
+  const rank = { bau: 0, planung: 1, fertig: 2 };
+  const shown = [...list.projects].sort((a, b) => rank[a.status] - rank[b.status]).slice(0, 3);
+  return (
+    <section className="t-container t-section" {...editorial(tenant, "Projekte")}>
+      <div className="t-section__head">
+        <h2 className="t-h2">{list.title}</h2>
+        <Link href={`${base}/projekte`} className="t-more">
+          Alle {list.title} <IconArrow size={18} />
+        </Link>
+      </div>
+      <ul className="t-projectcards">
+        {shown.map((project) => (
+          <ProjectCard key={project.id} project={project} level={3} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function InfoStart() {
   const { tenant, base } = useCurrentTenant();
   const [lead, ...rest] = newsFor(tenant);
@@ -63,7 +89,7 @@ function InfoStart() {
             <p className="t-intro__tagline">{tenant.tagline}</p>
             <SmartSearch label="Wie können wir helfen?" />
           </div>
-          <section className="t-quickcard">
+          <section className="t-quickcard" {...CATALOGUE}>
             <h2 className="t-quickcard__title">Häufig gesucht</h2>
             <ul className="t-linklist">
               {featured("info").map((service) => (
@@ -83,7 +109,7 @@ function InfoStart() {
         <HillsBand className="t-hero__hills" />
       </div>
 
-      <section className="t-container t-section">
+      <section className="t-container t-section" {...editorial(tenant, "Meldungen")}>
         <div className="t-section__head">
           <h2 className="t-h2">Aktuelles</h2>
           <Link href={`${base}/aktuelles`} className="t-more">
@@ -119,7 +145,9 @@ function InfoStart() {
         </ul>
       </section>
 
-      <section className="t-container t-section">
+      <ProjectTeaser />
+
+      <section className="t-container t-section" {...origin("zentral", "Zentral · Themenvorlage")}>
         <h2 className="t-h2">Themen</h2>
         <ul className="t-tiles">
           {THEMES.map((theme) => (
@@ -153,7 +181,7 @@ function ServiceStart() {
         </div>
       </div>
 
-      <section className="t-container t-section">
+      <section className="t-container t-section" {...CATALOGUE}>
         <div className="t-section__head">
           <h2 className="t-h2">Häufig gesucht</h2>
           <Link href={`${base}/suche?tab=leistungen`} className="t-more">
@@ -177,7 +205,7 @@ function ServiceStart() {
         </ul>
       </section>
 
-      <section className="t-container t-section">
+      <section className="t-container t-section" {...origin("zentral", "Zentral · Lebenslagen")}>
         <div className="t-section__head">
           <h2 className="t-h2">Lebenslagen</h2>
           <Link href={`${base}/seite/lebenslagen`} className="t-more">
@@ -205,7 +233,7 @@ function ServiceStart() {
       </section>
 
       <div className="t-container t-section t-split">
-        <section className="t-townhall">
+        <section className="t-townhall" {...origin("mandant", "Mandant · Einstellung: Rathaus")}>
           <h2 className="t-h2">Rathaus</h2>
           <p className="t-townhall__office">{tenant.contact.office}</p>
           <p>{tenant.contact.address}</p>
@@ -218,8 +246,11 @@ function ServiceStart() {
           <Link href={`${base}/organisation`} className="t-more">
             Ämter und Ansprechpersonen <IconArrow size={18} />
           </Link>
+          <Link href={`${base}/projekte`} className="t-more">
+            Stadtprojekte <IconArrow size={18} />
+          </Link>
         </section>
-        <section>
+        <section {...editorial(tenant, "Meldungen")}>
           <div className="t-section__head">
             <h2 className="t-h2">Aktuelles</h2>
             <Link href={`${base}/aktuelles`} className="t-more">

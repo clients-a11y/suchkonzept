@@ -1,71 +1,138 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { IconArrow } from "@/components/Icons";
+import { PlaceFinder } from "@/components/PlaceFinder";
 import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
-import { PLACES } from "@/data/content";
+import type { Place } from "@/data/content";
 import { unitForService } from "@/data/organisation";
 import { findService } from "@/data/services";
+import { allPlaces, usePlaceId } from "@/lib/place-store";
+import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
 import type { Service, Tenant } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
+import { CATALOGUE, origin } from "@/lib/origin";
 
 type Office = { office: string; address: string; phone: string; hours?: string };
 
-function Responsible({ tenant, service, placeId }: { tenant: Tenant; service: Service; placeId: string }) {
-  const { base } = useCurrentTenant();
+function officeOf(tenant: Tenant, service: Service): Office {
   const unit = unitForService(tenant, service.slug);
-  const unitOffice = unit && { office: unit.name, address: unit.address, phone: unit.phone, hours: tenant.contact.hours };
+  return unit ? { office: unit.name, address: unit.address, phone: unit.phone, hours: tenant.contact.hours } : tenant.contact;
+}
+
+// The office for a place: its own portal's office if the place has one on this platform.
+function officeForPlace(place: Place, service: Service, tenants: Tenant[]): Office {
+  const own = place.tenant ? tenants.find((t) => t.id === place.tenant) : undefined;
+  if (!own) return place;
+  const office = officeOf(own, service);
+  // Seen from another portal "Bürgeramt" needs the city's name.
+  return office.office.includes(own.name) ? office : { ...office, office: `${office.office} ${own.name}` };
+}
+
+function OfficeLines({ office }: { office: Office }) {
+  return (
+    <p className="t-box__office">
+      <strong>{office.office}</strong>
+      <br />
+      {office.address}
+      <br />
+      Telefon {office.phone}
+      {office.hours && (
+        <>
+          <br />
+          {office.hours}
+        </>
+      )}
+    </p>
+  );
+}
+
+// Points from one portal to another: a city with its own portal, or the Land portal.
+function Referral({ place, service, tenants, current }: { place: Place; service: Service; tenants: Tenant[]; current: Tenant }) {
+  const target = place.tenant && place.tenant !== current.id ? place.tenant : !place.tenant && current.type === "service" ? place.land : undefined;
+  const other = target ? tenants.find((t) => t.id === target) : undefined;
+  if (!other) return null;
+  const text =
+    other.type === "service"
+      ? `${other.name} hat ein eigenes Serviceportal mit Ansprechpersonen und Online-Antrag.`
+      : `${place.name} gehört nicht zu ${current.name}. Die zuständige Stelle finden Sie im ${other.tagline} ${other.name}.`;
+  return (
+    <div className="t-referral">
+      <p>{text}</p>
+      <Link href={`/${other.id}/leistungen/${service.slug}`} className="t-more">
+        {service.title} bei {other.name} <IconArrow size={18} />
+      </Link>
+    </div>
+  );
+}
+
+function Responsible({ tenant, service }: { tenant: Tenant; service: Service }) {
+  const { base } = useCurrentTenant();
+  const tenants = useAllTenants();
+  const places = allPlaces(useCustomTenants() ?? []);
+  const placeId = usePlaceId();
+  const place = places.find((p) => p.id === placeId);
+  const unit = unitForService(tenant, service.slug);
+
+  // Services of the Land itself have one office; a city portal presets its own.
+  const landService = service.level === "land";
+  const cityPortal = tenant.type === "service";
+  const outside = cityPortal && place && place.tenant !== tenant.id ? place : undefined;
+
   let office: Office | undefined;
   let note: string;
-  // In a city portal or for services of the Land itself the office is known: no choice needed.
-  const fixed = service.level === "land" || tenant.type === "service";
-  if (fixed) {
-    office = unitOffice ?? tenant.contact;
-    note = service.level === "land" ? "Diese Leistung bietet das Land selbst an." : `Voreingestellt für ${tenant.name}.`;
+  if (landService) {
+    office = officeOf(tenant, service);
+    note = "Diese Leistung bietet das Land selbst an.";
+  } else if (cityPortal) {
+    office = officeOf(tenant, service);
+    note = `Voreingestellt für ${tenant.name}.`;
+  } else if (place) {
+    office = officeForPlace(place, service, tenants);
+    note = `Zuständig für ${place.name}.`;
   } else {
-    const place = PLACES.find((p) => p.id === placeId);
-    office = place;
-    note = place
-      ? `Zuständig für ${place.name}.`
-      : "Wählen Sie oben einen Ort, dann sehen Sie hier die zuständige Stelle. Alle Informationen zur Leistung gelten auch ohne Auswahl.";
+    note = "Geben Sie oben Postleitzahl oder Ort ein, dann sehen Sie hier die zuständige Stelle. Alle Informationen zur Leistung gelten auch ohne Angabe.";
   }
+
   return (
-    <section className="t-box">
+    <section className="t-box" {...origin("mandant", "Mandant · Zuständigkeit")}>
       <h2 className="t-box__title">Zuständige Stelle</h2>
-      {office && (
-        <p className="t-box__office">
-          <strong>{office.office}</strong>
-          <br />
-          {office.address}
-          <br />
-          Telefon {office.phone}
-          {office.hours && (
-            <>
-              <br />
-              {office.hours}
-            </>
-          )}
-        </p>
-      )}
+      {office && <OfficeLines office={office} />}
       <p className="t-box__note">{note}</p>
       {unit && (
         <p className="t-box__link">
-          {fixed ? "Mehr zur Stelle: " : "Im Land zuständig: "}
+          {cityPortal || landService ? "Mehr zur Stelle: " : "Im Land zuständig: "}
           <Link href={`${base}/organisation/${unit.id}`}>{unit.name}</Link>
         </p>
+      )}
+      {cityPortal && !landService && (
+        <details className="t-elsewhere" open={Boolean(outside)}>
+          <summary>Wohnen Sie nicht in {tenant.name}?</summary>
+          <PlaceFinder places={places} label="Postleitzahl oder Ort" />
+          {outside && (
+            <>
+              <p className="t-box__note">
+                Für {outside.name} ist zuständig: <strong>{officeForPlace(outside, service, tenants).office}</strong>
+              </p>
+              <Referral place={outside} service={service} tenants={tenants} current={tenant} />
+            </>
+          )}
+        </details>
       )}
     </section>
   );
 }
 
 function ServiceView({ service }: { service: Service }) {
-  const { tenant } = useCurrentTenant();
-  const [placeId, setPlaceId] = useState("");
+  const { tenant, base } = useCurrentTenant();
+  const tenants = useAllTenants();
+  const places = allPlaces(useCustomTenants() ?? []);
+  const placeId = usePlaceId();
+  const place = places.find((p) => p.id === placeId);
   const [notice, setNotice] = useState("");
-  const placeSelectId = useId();
-  const placeHintId = useId();
   const choosePlace = tenant.type === "info" && service.level === "kommune";
   const action = service.online ? "Online beantragen" : "Termin vereinbaren";
   const sections = service.sections.filter((s) => s.body.length > 0);
@@ -82,31 +149,15 @@ function ServiceView({ service }: { service: Service }) {
       <p className="t-lead">{service.summary}</p>
 
       {choosePlace && (
-        <div className="t-place">
-          <label htmlFor={placeSelectId}>Ort wählen (optional)</label>
-          <select
-            id={placeSelectId}
-            className="t-select"
-            value={placeId}
-            aria-describedby={placeHintId}
-            onChange={(event) => setPlaceId(event.target.value)}
-          >
-            <option value="">Kein Ort gewählt</option>
-            {PLACES.map((place) => (
-              <option key={place.id} value={place.id}>
-                {place.name}
-              </option>
-            ))}
-          </select>
-          <p id={placeHintId} className="t-place__hint">
-            Zeigt die zuständige Stelle. Alle Inhalte bleiben ohne Auswahl sichtbar.
-          </p>
+        <div className="t-place" {...origin("zentral", "Zentral · Plattform: Zuständigkeitsfinder")}>
+          <PlaceFinder places={places} label="Zuständige Stelle finden: Postleitzahl oder Ort (optional)" />
+          {place && <Referral place={place} service={service} tenants={tenants} current={tenant} />}
         </div>
       )}
 
       <div className="t-service">
         <div className="t-service__main">
-          <section className="t-facts">
+          <section className="t-facts" {...CATALOGUE}>
             <h2 className="t-facts__title">Das Wichtigste</h2>
             <dl>
               <div>
@@ -133,23 +184,29 @@ function ServiceView({ service }: { service: Service }) {
               </div>
             </dl>
             <div className="t-facts__action">
-              <button
-                type="button"
-                className="t-btn t-btn--primary t-btn--large"
-                onClick={() =>
-                  setNotice(`${action}: Im Klick-Dummy ohne Funktion. Hier startet später der echte Vorgang.`)
-                }
-              >
-                {action}
-              </button>
-              <p role="status" className="t-notice">
-                {notice}
-              </p>
+              {service.online ? (
+                <Link href={`${base}/antrag/${service.slug}`} className="t-btn t-btn--primary t-btn--large">
+                  {action}
+                </Link>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="t-btn t-btn--primary t-btn--large"
+                    onClick={() => setNotice(`${action}: Im Klick-Dummy ohne Funktion. Hier startet später die Terminbuchung.`)}
+                  >
+                    {action}
+                  </button>
+                  <p role="status" className="t-notice">
+                    {notice}
+                  </p>
+                </>
+              )}
             </div>
           </section>
 
           {sections.length > 0 && (
-            <section className="t-details">
+            <section className="t-details" {...CATALOGUE}>
               <h2 className="t-h2">Mehr zur Leistung</h2>
               {sections.map((section) => (
                 <details key={section.title} className="t-detail">
@@ -172,8 +229,8 @@ function ServiceView({ service }: { service: Service }) {
         </div>
 
         <div className="t-service__side">
-          <Responsible tenant={tenant} service={service} placeId={placeId} />
-          <section className="t-box t-box--quiet">
+          <Responsible tenant={tenant} service={service} />
+          <section className="t-box t-box--quiet" {...origin("mandant", "Mandant · Einstellung: Kontakt")}>
             <h2 className="t-box__title">Fragen zur Leistung</h2>
             <p>
               {tenant.contact.office}

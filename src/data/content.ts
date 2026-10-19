@@ -163,13 +163,26 @@ export const FEATURED_SERVICES: Record<Tenant["type"], string[]> = {
   service: ["personalausweis-beantragen", "wohnsitz-anmelden", "kitaplatz-beantragen", "hund-anmelden", "wohngeld-beantragen", "fahrzeug-zulassen"],
 };
 
-// Fictional places for the optional location choice in information portals.
-export const PLACES = [
-  { id: "musterstadt", name: "Musterstadt", office: "Bürgeramt Musterstadt", address: "Rathausplatz 1, 10000 Musterstadt", phone: "0100 200 10 00" },
-  { id: "seehausen", name: "Seehausen", office: "Bürgerbüro Seehausen", address: "Am Ufer 4, 10200 Seehausen", phone: "0102 30 40" },
-  { id: "waldheim", name: "Waldheim", office: "Amt Waldheim", address: "Lindenweg 12, 10300 Waldheim", phone: "0103 55 66" },
-  { id: "neudorf", name: "Neudorf", office: "Gemeindeverwaltung Neudorf", address: "Dorfstraße 2, 10400 Neudorf", phone: "0104 12 34" },
-  { id: "bergtal", name: "Bergtal", office: "Bürgeramt Bergtal", address: "Talstraße 9, 10500 Bergtal", phone: "0105 98 76" },
+// Fictional places in Musterland for the responsibility finder. A place with `tenant` has its own
+// portal on this platform; the Land portal then points there. Postcodes are ranges.
+export type Place = {
+  id: string;
+  name: string;
+  office: string;
+  address: string;
+  phone: string;
+  plz?: [number, number];
+  land?: string;
+  tenant?: string;
+};
+
+export const PLACES: Place[] = [
+  { id: "musterstadt", name: "Musterstadt", office: "Bürgeramt Musterstadt", address: "Rathausplatz 1, 10000 Musterstadt", phone: "0100 200 10 00", plz: [10000, 10199], land: "musterland" },
+  { id: "seehausen", name: "Seehausen", office: "Bürgerbüro Seehausen", address: "Am Ufer 4, 10200 Seehausen", phone: "0102 30 40", plz: [10200, 10299], land: "musterland" },
+  { id: "waldheim", name: "Waldheim", office: "Amt Waldheim", address: "Lindenweg 12, 10300 Waldheim", phone: "0103 55 66", plz: [10300, 10399], land: "musterland" },
+  { id: "neudorf", name: "Neudorf", office: "Gemeindeverwaltung Neudorf", address: "Dorfstraße 2, 10400 Neudorf", phone: "0104 12 34", plz: [10400, 10499], land: "musterland" },
+  { id: "bergtal", name: "Bergtal", office: "Bürgeramt Bergtal", address: "Talstraße 9, 10500 Bergtal", phone: "0105 98 76", plz: [10500, 10599], land: "musterland" },
+  { id: "beispielstadt", name: "Beispielstadt", office: "Bürgeramt Beispielstadt", address: "Marktplatz 1, 20000 Beispielstadt", phone: "0200 98 76 54", plz: [20000, 20999], land: "musterland", tenant: "beispielstadt" },
 ];
 
 // Life situations shown on the start page of service portals.
