@@ -61,6 +61,8 @@ export async function proxy(request: NextRequest) {
   return NextResponse.rewrite(new URL(page, request.url));
 }
 
+// The image optimizer fetches /images/ internally without the cookie, so the sample photos stay outside
+// the gate. Pages stay protected.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|icon.svg|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!_next/static|_next/image|images/|icon.svg|favicon.ico|robots.txt).*)"],
 };

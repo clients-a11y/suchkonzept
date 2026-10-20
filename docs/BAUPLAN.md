@@ -196,6 +196,7 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
 - Die Zugangsseite (`AccessGate`, Routen unter `/zugang`) ist ein einfaches Formular ohne JavaScript. Der
   Proxy prüft das Passwort, setzt ein Cookie für 30 Tage und leitet auf die angefragte Seite zurück.
 - Suchmaschinen bleiben draußen: `robots.txt`, `noindex` in den Metadaten und `X-Robots-Tag`.
+- `/images/` liegt außerhalb des Gates: Die Bildoptimierung holt die Dateien intern ohne Cookie ab.
 - Hosting auf Railway mit `railway up` aus dem Projektordner, ohne GitHub. `.railwayignore` hält `.claude`
   und Build-Reste aus dem Upload.
 
