@@ -209,7 +209,7 @@ class Turn {
           text: [intro, `Ich habe mir ${placeLabel(stored)} gemerkt. Gilt das noch?`],
           choices: [
             { label: `Ja, ${stored.name}`, value: "#ja" },
-            { label: "Anderer Ort", value: "#nein" },
+            { label: "Anderen Ort angeben", value: "#nein" },
           ],
         });
       }
@@ -263,7 +263,7 @@ class Turn {
     this.c.pending = { kind: "place", service: service?.slug };
     this.say({
       text: [`${intro ? `${intro} ` : ""}Wie lautet Ihre Postleitzahl?`, "Sie können auch den Ort schreiben. Die Angabe bleibt nur in diesem Browser."],
-      choices: service ? [{ label: "Ohne Ort weiter", value: "#ohne-ort" }] : [],
+      choices: service ? [{ label: "Ohne Postleitzahl weiter", value: "#ohne-ort" }] : [],
     });
   }
 
@@ -322,11 +322,11 @@ class Turn {
   withoutPlace(service: Service) {
     this.c.pending = { kind: "none" };
     this.say({
-      text: ["Ohne Ort kann ich die zuständige Stelle nicht nennen. Alles andere gilt überall:"],
+      text: ["Ohne Postleitzahl kann ich die zuständige Stelle nicht nennen. Alles andere gilt überall:"],
       facts: factsOf(service),
       links: serviceLinks(this.env, service),
       source: sourceOf(this.env, service),
-      choices: [{ label: "Doch Ort angeben", value: "#ort-aendern" }, ...followUps(service)],
+      choices: [{ label: "Postleitzahl angeben", value: "#ort-aendern" }, ...followUps(service)],
     });
   }
 
@@ -411,7 +411,7 @@ class Turn {
             `Für Orte außerhalb von ${where} ist dieses Portal nicht zuständig. Prüfen Sie die Eingabe oder schreiben Sie den Ortsnamen.`,
           ]
         : [`Einen Ort „${input.trim()}“ kenne ich in ${where} nicht. Prüfen Sie die Schreibweise oder geben Sie die Postleitzahl ein.`],
-      choices: service ? [{ label: "Ohne Ort weiter", value: "#ohne-ort" }] : [],
+      choices: service ? [{ label: "Ohne Postleitzahl weiter", value: "#ohne-ort" }] : [],
     });
   }
 
@@ -502,7 +502,7 @@ class Turn {
   // Like the search: one request goes to one pot. Information only when that is what is asked for.
   information(query: string, service?: Service) {
     const hits = searchInformation(this.env.tenant, query).slice(0, 4);
-    const back = service ? [{ label: `Lieber: ${service.title}`, value: `#leistung:${service.slug}` }] : [];
+    const back = service ? [{ label: `Stattdessen: ${service.title}`, value: `#leistung:${service.slug}` }] : [];
     if (!hits.length) {
       return this.say({ text: [`Zu „${query.trim()}“ finde ich keine Informationen oder Meldungen.`], choices: [...back, TALK_TO_HUMAN] });
     }
@@ -516,10 +516,10 @@ class Turn {
   // Unclear whether the person wants to apply or to read: one question instead of a guess.
   askPot(query: string, service: Service) {
     this.say({
-      text: [`Möchten Sie „${service.title}“ erledigen oder Informationen und Meldungen dazu lesen?`],
+      text: ["Möchten Sie etwas erledigen oder sich informieren?"],
       choices: [
         { label: service.title, value: `#leistung:${service.slug}` },
-        { label: "Informationen und Meldungen", value: `#info:${query.trim()}` },
+        { label: `Informationen zu „${query.trim()}“`, value: `#info:${query.trim()}` },
       ],
     });
   }
@@ -688,7 +688,7 @@ export function startConversation(
       id: conv.next++,
       from: "bot",
       greeting: true,
-      text: [greeting, "Beschreiben Sie Ihr Anliegen in eigenen Worten. Ich frage nach, wenn ich etwas wissen muss, und zeige Ihnen die zuständige Stelle."],
+      text: [greeting, "Schreiben Sie einfach, was Sie vorhaben. Wenn ich etwas wissen muss, etwa Ihre Postleitzahl, frage ich nach."],
       choices: starters(tenant),
     });
     return { conv, effects: {} };

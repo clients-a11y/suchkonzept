@@ -240,7 +240,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
             onChange={(event) => setDraft(event.target.value)}
             autoComplete={askingPlace ? "postal-code" : "off"}
             enterKeyHint="send"
-            placeholder={dock ? (askingPlace ? "Postleitzahl oder Ort" : "Ihre Nachricht") : undefined}
+            placeholder={dock ? (askingPlace ? "Postleitzahl oder Ort" : "Ihr Anliegen in eigenen Worten") : undefined}
             aria-describedby={dock ? undefined : ids.hint}
           />
           <button type="submit" className="t-btn t-btn--primary" disabled={!conv}>

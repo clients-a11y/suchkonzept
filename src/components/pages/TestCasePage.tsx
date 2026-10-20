@@ -52,7 +52,7 @@ const PARTS: Part[] = [
     steps: [
       {
         input: "Kinderg",
-        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“, „Im Chat-Assistenten fragen“ und „In Informationen und Meldungen suchen“.",
+        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“, „… im Chat fragen“ und „… in Informationen und Meldungen suchen“.",
         href: "/musterland",
         action: "Startseite öffnen",
       },
@@ -82,7 +82,7 @@ const PARTS: Part[] = [
     steps: [
       {
         input: "Kindergeld",
-        expect: "Fragt nach: „Kindergeld beantragen“ oder „Informationen und Meldungen“.",
+        expect: "Fragt nach: „Möchten Sie etwas erledigen oder sich informieren?“, mit den Antworten „Kindergeld beantragen“ und „Informationen zu ‚Kindergeld‘“.",
         href: `/musterland/assistent?frage=${q("Kindergeld")}`,
         action: "Im Chat fragen",
       },
@@ -100,7 +100,7 @@ const PARTS: Part[] = [
       },
       {
         input: "Pressemitteilung Kindergeld",
-        expect: "Zeigt nur Informationen und Meldungen, mit dem Angebot „Lieber: Kindergeld beantragen“.",
+        expect: "Zeigt nur Informationen und Meldungen, mit dem Angebot „Stattdessen: Kindergeld beantragen“.",
         href: `/musterland/assistent?frage=${q("Pressemitteilung Kindergeld")}`,
         action: "Im Chat fragen",
       },

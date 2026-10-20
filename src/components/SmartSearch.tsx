@@ -131,11 +131,11 @@ export function SmartSearch({ label }: { label: string }) {
         key: "chat",
         group: "",
         chat: true,
-        label: `„${trimmed}“ im Chat-Assistenten fragen`,
+        label: `„${trimmed}“ im Chat fragen`,
         node: (
           <>
             <span className="t-smart__chatoption">
-              <IconBubble size={16} />„{trimmed}“ im Chat-Assistenten fragen
+              <IconBubble size={16} />„{trimmed}“ im Chat fragen
             </span>
             <IconArrow size={16} />
           </>
@@ -324,8 +324,8 @@ export function SmartSearch({ label }: { label: string }) {
           )}
         </div>
         <p id={ids.hint} className="t-smart__hint">
-          Schreiben Sie, was Sie vorhaben, zum Beispiel „Garage bauen“. „Im Chat fragen“ führt Schritt für Schritt
-          weiter. Im Klick-Dummy lokal simuliert, ohne echte KI.
+          Schreiben Sie in eigenen Worten, was Sie vorhaben, zum Beispiel „Garage bauen“. „Suchen“ zeigt eine
+          Trefferliste. „Im Chat fragen“ klärt Ihr Anliegen im Gespräch. Simuliert, ohne echte KI.
         </p>
       </Form>
 

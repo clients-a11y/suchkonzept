@@ -66,7 +66,7 @@ function AssistantHint({ q }: { q: string }) {
   if (tenant.assistant?.enabled === false) return null;
   return (
     <div className="t-assisthint" {...origin("zentral", "Zentral · Plattform: Assistent")}>
-      <p>Nicht eindeutig? Der Chat-Assistent fragt nach und grenzt Ihr Anliegen Schritt für Schritt ein.</p>
+      <p>Nicht das Richtige dabei? Im Chat fragt der Assistent nach und grenzt Ihr Anliegen ein.</p>
       <Link
         href={`${base}/assistent?frage=${encodeURIComponent(q)}`}
         className="t-more"
@@ -74,7 +74,7 @@ function AssistantHint({ q }: { q: string }) {
           if (openAssistant(q)) event.preventDefault();
         }}
       >
-        Mit dem Assistenten weiterfragen <IconArrow size={18} />
+        „{q}“ im Chat fragen <IconArrow size={18} />
       </Link>
     </div>
   );

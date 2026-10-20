@@ -78,14 +78,14 @@ export function AssistantDock() {
               <h2 id={ids.title} className="t-dock__title">
                 Chat-Assistent
               </h2>
-              <p className="t-dock__notice">Automatische Hilfe, keine Person. Lokal simuliert, ohne echte KI.</p>
+              <p className="t-dock__notice">Automatische Hilfe, keine Person. Simuliert, ohne echte KI.</p>
             </div>
             <button
               type="button"
               className="t-dock__action"
               onClick={() => setRequest((last) => ({ restart: true, nonce: (last?.nonce ?? 0) + 1 }))}
             >
-              Neu beginnen
+              Neues Gespräch
             </button>
             <button type="button" className="t-dock__close" onClick={close} aria-label="Chat schließen">
               <IconClose size={20} />
