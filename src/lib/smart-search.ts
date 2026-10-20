@@ -7,13 +7,14 @@ import type { Service, Tenant } from "@/lib/types";
 
 // Local stand-in for an AI-assisted search: understands phrases in plain words,
 // tolerates typos and picks a best match. No network, no model, only the data in src/data.
+// Like the real backend it has two separate pots that are never searched at once:
+// services from the catalogue, and information (news, pages, projects, offices).
 
 export type InfoHit = { key: string; kind: string; title: string; text: string; href: string; score: number };
 export type ServiceHit = { service: Service; score: number };
-export type SmartResult = {
+export type ServiceResult = {
   query: string;
   services: ServiceHit[];
-  info: InfoHit[];
   answer?: Service;
   related: Service[];
   correction?: string;
@@ -106,10 +107,11 @@ function scoreText(queryTokens: string[], title: string, text: string): number {
   return score;
 }
 
-export function smartSearch(tenant: Tenant, input: string, typing = false): SmartResult {
+// Pot 1: services. Uses only the catalogue, which can ship with the page as a static file.
+export function searchServices(input: string, typing = false): ServiceResult {
   const query = normalize(input);
   const queryTokens = tokens(input);
-  const empty: SmartResult = { query: input.trim(), services: [], info: [], related: [] };
+  const empty: ServiceResult = { query: input.trim(), services: [], related: [] };
   if (!queryTokens.length) return empty;
 
   const scores = new Map<string, number>();
@@ -173,8 +175,15 @@ export function smartSearch(tenant: Tenant, input: string, typing = false): Smar
     .filter((s): s is Service => Boolean(s))
     .slice(0, 3);
 
+  return { query: input.trim(), services, answer, related: relatedServices, correction };
+}
+
+// Pot 2: information. In a real portal this is the editorial database.
+export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
+  const queryTokens = tokens(input);
+  if (!queryTokens.length) return [];
   const org = organisationFor(tenant);
-  const info: InfoHit[] = [
+  return [
     ...org.units.map((u) => ({
       key: `stelle-${u.id}`,
       kind: `${org.unitLabel} · ${u.head.role} ${u.head.name}`,
@@ -210,6 +219,4 @@ export function smartSearch(tenant: Tenant, input: string, typing = false): Smar
   ]
     .filter((h) => h.score > 0)
     .sort((a, b) => b.score - a.score);
-
-  return { query: input.trim(), services, info, answer, related: relatedServices, correction };
 }

@@ -189,6 +189,27 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   Filter nach Stand, Fortschritt, Steckbrief, Meilensteine, verantwortliche Stelle und Meldungen. Verlinkt aus
   Menü, Startseite, Stellen-Seiten und Suche. Eigene, frei erfundene Inhalte.
 
+## Chat-Assistent und Suchweiche (Nachtrag 20.10.2026)
+
+- **Chat-Assistent** `/[mandant]/assistent` (`src/lib/assistant.ts`, `AssistantPage`): geführter Dialog auf
+  Basis der Suche, ohne echte KI. Er fragt nur, was die Antwort braucht:
+  - Landesportal: Anliegen, dann die Postleitzahl, nur bei kommunalen Leistungen. Ein gemerkter Ort wird
+    bestätigt. Mehrere Orte zu einer PLZ (Neudorf und Mühlengrund teilen sich 10480–10499) werden per Knopf
+    gewählt. PLZ außerhalb des Landes: klare Auskunft, dass das Portal nicht zuständig ist.
+  - Ort mit eigenem Portal: Übergabe an dessen Assistenten mit Anliegen und Ort (`?frage=…&von=…&ort=…`).
+  - Stadtportal: fragt „Wohnen Sie in …?“ und gibt Orte außerhalb und Landesleistungen ans Landesportal ab.
+  - Folgefragen zu Kosten, Unterlagen, Dauer, Fristen und Ablauf, „Einfacher erklären“, Weg zum Menschen.
+  - Antragsstand aus dem Demo-Konto, auch per Vorgangsnummer; Anmeldung mit dem Demo-Konto direkt im Chat.
+  - Jede Antwort nennt ihre Quelle. Hinweis, dass ein automatisches System antwortet. Verlauf druckbar.
+  - Einstiege: Startseite unter der Suche, Suchseite bei unklaren Treffern. Mandant: Schalter, Begrüßung und
+    Einstiegsfragen (`assistant` in `tenants.ts`, Schalter im Assistenten zum Anlegen).
+- **Suchweiche** (`src/lib/search-router.ts`): Das Backend kann nur einen Suchtopf je Anfrage durchsuchen,
+  Leistungen oder Informationen. Die Weiche entscheidet vorab ohne Datenbank, nur mit dem Leistungskatalog als
+  statischer Datei und festen Signalwörtern. Eindeutig: Suche in einem Topf, mit Begründung und Knopf
+  „Stattdessen in … suchen“. Unklar (etwa „Kita“, „Hund“, „Hochwasser“): Rückfrage „Was suchen Sie?“ mit
+  zwei Antworten. Vorschläge beim Tippen kommen nur aus dem Leistungskatalog. Der Assistent fragt
+  Informationen nur als zweiten Schritt ab, wenn keine Leistung passt.
+
 ## Vorschau mit Passwort (Nachtrag 20.10.2026)
 
 - `src/proxy.ts` schützt alle Seiten, sobald die Umgebungsvariable `DEMO_PASSWORD` gesetzt ist. Ohne Passwort

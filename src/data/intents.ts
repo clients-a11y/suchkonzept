@@ -16,7 +16,7 @@ export const INTENTS: Intent[] = [
     related: ["wohngeld-beantragen"],
   },
   {
-    phrases: ["umzug", "umziehen", "umgezogen", "neue wohnung", "zugezogen", "ummelden", "neue adresse", "adresse aendern", "wohnort"],
+    phrases: ["umzug", "umziehen", "umgezogen", "ziehe um", "ziehen um", "ziehe nach", "ziehen nach", "neue wohnung", "zugezogen", "ummelden", "neue adresse", "adresse aendern", "wohnort"],
     services: ["wohnsitz-anmelden"],
     related: ["fahrzeug-zulassen", "hund-anmelden"],
   },

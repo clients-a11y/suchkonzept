@@ -1,15 +1,16 @@
 "use client";
 
 import Form from "next/form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
-import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
+import { IconArrow, IconBubble, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { EXAMPLE_QUERIES } from "@/data/intents";
 import { FEATURED_SERVICES } from "@/data/content";
 import { findService } from "@/data/services";
-import { smartSearch } from "@/lib/smart-search";
+import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { origin } from "@/lib/origin";
@@ -30,7 +31,8 @@ function ServiceFacts({ service }: { service: Service }) {
 }
 
 // Central search with suggestions while typing. The "intelligence" is simulated locally
-// (phrases, typo tolerance, best match) and the hint under the field says so.
+// (phrases, typo tolerance, best match) and the hint under the field says so. Suggestions come
+// only from the service catalogue, a static file: information needs a request to its own pot.
 export function SmartSearch({ label }: { label: string }) {
   const { tenant, base } = useCurrentTenant();
   const router = useRouter();
@@ -44,7 +46,7 @@ export function SmartSearch({ label }: { label: string }) {
   // A hidden route keeps its state: close the list when it is hidden.
   useLayoutEffect(() => () => setOpen(false), []);
 
-  const result = useMemo(() => smartSearch(tenant, query, true), [tenant, query]);
+  const result = useMemo(() => searchServices(query, true), [query]);
   const trimmed = query.trim();
 
   const items = useMemo<Item[]>(() => {
@@ -105,17 +107,25 @@ export function SmartSearch({ label }: { label: string }) {
         node: s.title,
       });
     }
-    for (const hit of result.info.slice(0, 3)) {
-      list.push({ key: hit.key, group: "Informationen", href: hit.href, label: hit.title, node: hit.title });
-    }
     list.push({
       key: "all",
       group: "",
       href: `/suche?q=${encodeURIComponent(trimmed)}`,
-      label: `Alle Ergebnisse für „${trimmed}“ anzeigen`,
+      label: `Suchen nach „${trimmed}“`,
       node: (
         <>
-          Alle Ergebnisse für „{trimmed}“ anzeigen <IconArrow size={16} />
+          Suchen nach „{trimmed}“ <IconArrow size={16} />
+        </>
+      ),
+    });
+    list.push({
+      key: "info",
+      group: "",
+      href: `/suche?q=${encodeURIComponent(trimmed)}&in=informationen`,
+      label: `„${trimmed}“ in Informationen und Meldungen suchen`,
+      node: (
+        <>
+          „{trimmed}“ in Informationen und Meldungen suchen <IconArrow size={16} />
         </>
       ),
     });
@@ -197,7 +207,7 @@ export function SmartSearch({ label }: { label: string }) {
         "t-smart__option",
         item.key.startsWith("answer") ? "t-smart__option--answer" : "",
         item.key === "fix" ? "t-smart__option--fix" : "",
-        item.key === "all" ? "t-smart__option--all" : "",
+        item.key === "all" || item.key === "info" ? "t-smart__option--all" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -315,6 +325,15 @@ export function SmartSearch({ label }: { label: string }) {
           ))}
         </ul>
       </div>
+
+      {tenant.assistant?.enabled !== false && (
+        <p className="t-smart__assist">
+          <IconBubble size={18} />
+          <Link href={trimmed ? `${base}/assistent?frage=${encodeURIComponent(trimmed)}` : `${base}/assistent`}>
+            Lieber Schritt für Schritt? Chat-Assistent öffnen
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

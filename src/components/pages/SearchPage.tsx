@@ -2,20 +2,28 @@
 
 import Link from "next/link";
 import Form from "next/form";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useId, useRef } from "react";
-import type { KeyboardEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useId } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
+import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
-import { smartSearch } from "@/lib/smart-search";
+import { searchInformation, searchServices } from "@/lib/smart-search";
+import { POT_LABEL, routeQuery } from "@/lib/search-router";
+import type { Pot } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { origin } from "@/lib/origin";
 
-type TabKey = "informationen" | "leistungen";
+const OTHER: Record<Pot, Pot> = { leistungen: "informationen", informationen: "leistungen" };
+
+function searchHref(base: string, q: string, pot?: Pot): string {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (pot) params.set("in", pot);
+  return `${base}/suche?${params.toString()}`;
+}
 
 function SearchForm({ q }: { q: string }) {
   const { base } = useCurrentTenant();
@@ -51,86 +59,135 @@ function HitList({ hits }: { hits: Hit[] }) {
   );
 }
 
+// When the result is unclear, the guided assistant can narrow it down by asking.
+function AssistantHint({ q }: { q: string }) {
+  const { tenant, base } = useCurrentTenant();
+  if (tenant.assistant?.enabled === false) return null;
+  return (
+    <div className="t-assisthint" {...origin("zentral", "Zentral · Plattform: Assistent")}>
+      <p>Nicht eindeutig? Der Chat-Assistent fragt nach und grenzt Ihr Anliegen Schritt für Schritt ein.</p>
+      <Link href={`${base}/assistent?frage=${encodeURIComponent(q)}`} className="t-more">
+        Mit dem Assistenten weiterfragen <IconArrow size={18} />
+      </Link>
+    </div>
+  );
+}
+
+// The search switch could not decide: one question, two answers.
+function PotQuestion({ q }: { q: string }) {
+  const { base } = useCurrentTenant();
+  const titleId = useId();
+  return (
+    <section className="t-route" aria-labelledby={titleId} {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
+      <h2 id={titleId} className="t-h2">
+        Was suchen Sie?
+      </h2>
+      <p>„{q}“ kann beides sein. Die Suche schaut immer in einem Bereich nach.</p>
+      <ul className="t-route__choices">
+        <li>
+          <Link href={searchHref(base, q, "leistungen")} className="t-route__choice">
+            <span className="t-route__title">Etwas beantragen oder erledigen</span>
+            <span className="t-route__text">Leistungen wie Ausweis, Ummeldung oder Förderung</span>
+          </Link>
+        </li>
+        <li>
+          <Link href={searchHref(base, q, "informationen")} className="t-route__choice">
+            <span className="t-route__title">Informationen und Meldungen</span>
+            <span className="t-route__text">Nachrichten, Projekte, Ansprechpersonen und Seiten</span>
+          </Link>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
 function SearchResults() {
   const { tenant, base } = useCurrentTenant();
   const params = useSearchParams();
-  const pathname = usePathname();
-  const tabsId = useId();
-  const tabRefs = useRef<Record<TabKey, HTMLButtonElement | null>>({ informationen: null, leistungen: null });
 
   const q = (params.get("q") ?? "").trim();
-  const smart = q ? smartSearch(tenant, q) : undefined;
-  const results: Record<TabKey, Hit[]> = {
-    informationen: smart ? smart.info : allInformation(tenant),
-    leistungen: smart ? smart.services.map((h) => serviceHit(h.service)) : allServices(),
-  };
+  // "tab" is the older name and still used by links such as "Leistungen A bis Z".
+  const requested = params.get("in") ?? params.get("tab");
+  const chosen: Pot | undefined = requested === "leistungen" || requested === "informationen" ? requested : undefined;
+  const route = q && !chosen ? routeQuery(q) : undefined;
+  const portalDefault: Pot = tenant.type === "service" ? "leistungen" : "informationen";
+  const pot: Pot | undefined = chosen ?? (q ? route?.pot : portalDefault);
 
-  // Without an explicit tab, a clear request for a service opens the services tab.
-  const requested = params.get("tab");
-  const portalDefault: TabKey = tenant.type === "service" ? "leistungen" : "informationen";
-  const smartDefault: TabKey =
-    smart && results.leistungen.length > 0 && (smart.answer || results.informationen.length === 0) ? "leistungen" : portalDefault;
-  const tab: TabKey = requested === "leistungen" || requested === "informationen" ? requested : smartDefault;
-  const order: TabKey[] = ["informationen", "leistungen"];
-  const labels: Record<TabKey, string> = { informationen: "Informationen", leistungen: "Leistungen" };
-  const total = results.informationen.length + results.leistungen.length;
+  if (!pot) {
+    return (
+      <>
+        <SearchForm q={q} />
+        <p className="t-search__summary" role="status">
+          Für „{q}“ bitte einen Suchbereich wählen.
+        </p>
+        <PotQuestion q={q} />
+        <AssistantHint q={q} />
+      </>
+    );
+  }
 
-  // The query string is the state: tabs update it without a new history entry.
-  const select = (next: TabKey, focus = false) => {
-    const search = new URLSearchParams(params.toString());
-    search.set("tab", next);
-    window.history.replaceState(null, "", `${pathname}?${search.toString()}`);
-    if (focus) tabRefs.current[next]?.focus();
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const index = order.indexOf(tab);
-    let next: TabKey | undefined;
-    if (event.key === "ArrowRight") next = order[(index + 1) % order.length];
-    if (event.key === "ArrowLeft") next = order[(index - 1 + order.length) % order.length];
-    if (event.key === "Home") next = order[0];
-    if (event.key === "End") next = order[order.length - 1];
-    if (!next) return;
-    event.preventDefault();
-    select(next, true);
-  };
-
-  const hits = results[tab];
-  const other = order.find((key) => key !== tab)!;
+  // Exactly one request, to exactly one pot.
+  const services = pot === "leistungen" && q ? searchServices(q) : undefined;
+  const hits: Hit[] =
+    pot === "leistungen"
+      ? services
+        ? services.services.map((h) => serviceHit(h.service))
+        : allServices()
+      : q
+        ? searchInformation(tenant, q)
+        : allInformation(tenant);
+  const answer = services?.answer;
+  const other = OTHER[pot];
+  const reasons = route?.signals.filter((s) => s.pot === pot).map((s) => `„${s.word}“`) ?? [];
+  if (route?.catalogue && pot === "leistungen") reasons.push("einem Treffer im Leistungskatalog");
+  const because = reasons.length > 1 ? `${reasons.slice(0, -1).join(", ")} und ${reasons[reasons.length - 1]}` : reasons[0];
 
   return (
     <>
       <SearchForm q={q} />
       <p className="t-search__summary" role="status">
-        {q ? `${pluralize(total, "Treffer", "Treffer")} für „${q}“` : "Kein Suchbegriff: Sie sehen alle Inhalte."}
+        {q
+          ? `${pluralize(hits.length, "Treffer", "Treffer")} für „${q}“ in ${POT_LABEL[pot]}`
+          : `Kein Suchbegriff: Sie sehen alle ${POT_LABEL[pot]}.`}
       </p>
-      {smart?.correction && smart.correction.toLowerCase() !== q.toLowerCase() && (
+      {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
         <p className="t-correction">
-          Meinten Sie: <Link href={`${base}/suche?q=${encodeURIComponent(smart.correction)}`}>{smart.correction}</Link>?
+          Meinten Sie: <Link href={searchHref(base, services.correction, pot)}>{services.correction}</Link>?
         </p>
       )}
-      {smart?.answer && (
+
+      <div className="t-route__bar" {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
+        <p>
+          Gesucht in <strong>{POT_LABEL[pot]}</strong>
+          {route?.pot ? `, automatisch gewählt${because ? `. Erkannt an ${because}` : ""}.` : "."}
+        </p>
+        <Link href={searchHref(base, q, other)} className="t-btn">
+          {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
+        </Link>
+      </div>
+
+      {answer && (
         <div className="t-answer">
           <p className="t-answer__eyebrow">
             <IconSparkle size={18} />
             Das passt am besten zu Ihrer Anfrage
           </p>
           <h2 className="t-answer__title">
-            <Link href={`${base}/leistungen/${smart.answer.slug}`}>{smart.answer.title}</Link>
+            <Link href={`${base}/leistungen/${answer.slug}`}>{answer.title}</Link>
           </h2>
-          <p>{smart.answer.summary}</p>
+          <p>{answer.summary}</p>
           <ul className="t-facts-line t-answer__facts">
-            <li className={smart.answer.online ? "t-facts-line__online" : undefined}>
-              {smart.answer.online && <IconCheck size={16} />}
-              {smart.answer.online ? "Online möglich" : "Termin vor Ort"}
+            <li className={answer.online ? "t-facts-line__online" : undefined}>
+              {answer.online && <IconCheck size={16} />}
+              {answer.online ? "Online möglich" : "Termin vor Ort"}
             </li>
-            <li>Kosten: {smart.answer.costs}</li>
-            <li>Dauer: {smart.answer.duration}</li>
+            <li>Kosten: {answer.costs}</li>
+            <li>Dauer: {answer.duration}</li>
           </ul>
-          {smart.related.length > 0 && (
+          {services.related.length > 0 && (
             <p className="t-answer__related">
               Das brauchen Sie oft auch:{" "}
-              {smart.related.map((s, i) => (
+              {services.related.map((s, i) => (
                 <span key={s.slug}>
                   {i > 0 && ", "}
                   <Link href={`${base}/leistungen/${s.slug}`}>{s.title}</Link>
@@ -141,59 +198,20 @@ function SearchResults() {
           <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Klick-Dummy lokal simuliert, ohne echte KI.</p>
         </div>
       )}
-      <div role="tablist" aria-label="Ergebnisse nach Art" className="t-tabs">
-        {order.map((key) => (
-          <button
-            key={key}
-            ref={(node) => {
-              tabRefs.current[key] = node;
-            }}
-            type="button"
-            role="tab"
-            id={`${tabsId}-${key}-tab`}
-            aria-selected={tab === key}
-            aria-controls={`${tabsId}-${key}-panel`}
-            tabIndex={tab === key ? 0 : -1}
-            className="t-tab"
-            onClick={() => select(key)}
-            onKeyDown={onKeyDown}
-          >
-            {labels[key]} <span className="t-tab__count">{results[key].length}</span>
-          </button>
-        ))}
-      </div>
-      {order.map((key) => (
-        <div
-          key={key}
-          role="tabpanel"
-          id={`${tabsId}-${key}-panel`}
-          aria-labelledby={`${tabsId}-${key}-tab`}
-          hidden={tab !== key}
-          tabIndex={0}
-          className="t-tabpanel"
-        >
-          <h2 className="visually-hidden">{labels[key]}</h2>
-          {key === tab &&
-            (hits.length > 0 ? (
-              <HitList hits={hits} />
-            ) : (
-              <div className="t-empty">
-                <p>
-                  Keine {labels[key]} zu „{q}“.
-                  {results[other].length > 0 &&
-                    ` Unter ${labels[other]} gibt es ${pluralize(results[other].length, "Treffer", "Treffer")}.`}
-                </p>
-                {results[other].length > 0 ? (
-                  <button type="button" className="t-btn" onClick={() => select(other, true)}>
-                    {labels[other]} anzeigen
-                  </button>
-                ) : (
-                  <p>Prüfen Sie die Schreibweise oder versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
-                )}
-              </div>
-            ))}
+
+      <h2 className="visually-hidden">{POT_LABEL[pot]}</h2>
+      {hits.length > 0 ? (
+        <HitList hits={hits} />
+      ) : (
+        <div className="t-empty">
+          <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
+          <Link href={searchHref(base, q, other)} className="t-btn">
+            In {POT_LABEL[other]} suchen
+          </Link>
+          <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
         </div>
-      ))}
+      )}
+      {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
     </>
   );
 }

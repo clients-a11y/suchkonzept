@@ -53,6 +53,11 @@ export const TENANTS: Tenant[] = [
     ],
     meta: { dgs: true, ls: true, es: true },
     languages: ["Deutsch", "English"],
+    assistant: {
+      enabled: true,
+      greeting: "Guten Tag! Ich bin der automatische Assistent des Landesportals. Ich finde mit Ihnen die passende Leistung und die zuständige Stelle, auch in Ihrer Gemeinde.",
+      starters: ["Mein Ausweis läuft ab", "Zuschuss für unseren Sportverein", "Ich ziehe nach Seehausen", "Wie ist der Stand meines Antrags?"],
+    },
     contact: {
       office: "Bürgerservice der Landesregierung",
       address: "Schlossplatz 1, 10000 Musterstadt",
@@ -109,6 +114,11 @@ export const TENANTS: Tenant[] = [
     ],
     meta: { dgs: false, ls: true, es: true },
     languages: ["Deutsch"],
+    assistant: {
+      enabled: true,
+      greeting: "Guten Tag! Ich bin der automatische Assistent des Rathauses Beispielstadt. Ich helfe Ihnen, Ihr Anliegen zu erledigen.",
+      starters: ["Ich bin umgezogen", "Wir bekommen ein Kind", "Hund anmelden", "Wie ist der Stand meines Antrags?"],
+    },
     contact: {
       office: "Bürgeramt Beispielstadt",
       address: "Marktplatz 1, 20000 Beispielstadt",

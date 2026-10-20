@@ -25,6 +25,7 @@ type Draft = {
   nav: string[];
   meta: Tenant["meta"];
   languages: string[];
+  assistant: boolean;
 };
 
 const KINDS = ["Land", "Landkreis", "Stadt", "Gemeinde", "Verband"];
@@ -70,6 +71,7 @@ function draftFrom(tenant: Tenant): Draft {
     nav: tenant.nav.map((item) => item.href),
     meta: { ...tenant.meta },
     languages: tenant.languages.filter((name) => name !== "Deutsch"),
+    assistant: tenant.assistant?.enabled !== false,
   };
 }
 
@@ -88,6 +90,7 @@ function initialDraft(): Draft {
     nav: defaultNav("service").map((item) => item.href),
     meta: { dgs: false, ls: true, es: true },
     languages: [],
+    assistant: true,
   };
 }
 
@@ -115,6 +118,8 @@ function buildTenant(draft: Draft, id: string, seconds?: number): Tenant {
     footer: defaultFooter(tagline, nav),
     meta: draft.meta,
     languages: ["Deutsch", ...draft.languages],
+    // Greeting and starters come from the template until the editorial team writes its own.
+    assistant: { enabled: draft.assistant },
     contact: defaultContact(name, draft.type, region),
     custom: true,
     createdInSeconds: seconds,
@@ -651,6 +656,18 @@ export function Wizard({ editing }: { editing?: Tenant }) {
                       ))}
                     </div>
                   </fieldset>
+                  <fieldset className="pf-fieldset">
+                    <legend className="pf-label">Chat-Assistent</legend>
+                    <p className="pf-hint">
+                      Fragt nach dem Anliegen und der Postleitzahl und leitet zur zuständigen Stelle. Begrüßung und
+                      Einstiegsfragen kommen aus der Vorlage.
+                    </p>
+                    <div className="pf-choices">
+                      <Choice type="checkbox" name="assistant" checked={draft.assistant} onChange={() => update({ assistant: !draft.assistant })}>
+                        Chat-Assistent anbieten
+                      </Choice>
+                    </div>
+                  </fieldset>
                 </>
               )}
 
@@ -699,6 +716,8 @@ export function Wizard({ editing }: { editing?: Tenant }) {
                       Im Kopf: {META_LABEL.filter((m) => draft.meta[m.key]).map((m) => m.label).join(", ") || "keine Plätze"}
                       <br />
                       Sprachen: {preview.languages.join(", ")}
+                      <br />
+                      Chat-Assistent: {draft.assistant ? "ja" : "nein"}
                     </dd>
                     <dd>
                       <button type="button" className="pf-textbutton" onClick={() => goTo(2)}>

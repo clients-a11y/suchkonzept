@@ -28,6 +28,8 @@ export type Tenant = {
   meta: { dgs: boolean; ls: boolean; es: boolean };
   languages: string[];
   contact: { office: string; address: string; phone: string; hours: string };
+  // Chat assistant: on unless switched off. Without greeting and starters the template applies.
+  assistant?: { enabled: boolean; greeting?: string; starters?: string[] };
   custom?: boolean;
   createdInSeconds?: number;
 };
