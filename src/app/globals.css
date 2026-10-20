@@ -1260,6 +1260,45 @@ button.pf-steps__link:hover .pf-steps__label {
   bottom: 0.25rem;
 }
 
+/* Password gate for shared previews */
+
+.pf-access__bar {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--pf-line);
+}
+
+.pf-access__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.pf-access__main {
+  padding-block: clamp(2.5rem, 1.5rem + 5vw, 5rem);
+}
+
+.pf-access__inner {
+  max-width: 36rem;
+}
+
+.pf-access__form {
+  display: grid;
+  justify-items: start;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.pf-access__form .pf-field {
+  width: 100%;
+}
+
+.pf-access__setup {
+  margin-top: 1rem;
+}
+
 /* ---------- Tenant ---------- */
 
 .t-root {

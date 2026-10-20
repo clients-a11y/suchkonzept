@@ -10,6 +10,7 @@ const mono = IBM_Plex_Mono({ variable: "--f-mono", subsets: ["latin"], weight: [
 export const metadata: Metadata = {
   title: { default: "Portalbaukasten · Klick-Dummy", template: "%s · Portalbaukasten" },
   description: "Klick-Dummy für eine mandantenfähige Portalplattform mit fiktiven Mandanten.",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

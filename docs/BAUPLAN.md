@@ -189,6 +189,16 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   Filter nach Stand, Fortschritt, Steckbrief, Meilensteine, verantwortliche Stelle und Meldungen. Verlinkt aus
   Menü, Startseite, Stellen-Seiten und Suche. Eigene, frei erfundene Inhalte.
 
+## Vorschau mit Passwort (Nachtrag 20.10.2026)
+
+- `src/proxy.ts` schützt alle Seiten, sobald die Umgebungsvariable `DEMO_PASSWORD` gesetzt ist. Ohne Passwort
+  ist das Gate lokal aus; in Produktion bleibt dann alles geschlossen (Seite `/zugang/fehlt`).
+- Die Zugangsseite (`AccessGate`, Routen unter `/zugang`) ist ein einfaches Formular ohne JavaScript. Der
+  Proxy prüft das Passwort, setzt ein Cookie für 30 Tage und leitet auf die angefragte Seite zurück.
+- Suchmaschinen bleiben draußen: `robots.txt`, `noindex` in den Metadaten und `X-Robots-Tag`.
+- Hosting auf Railway mit `railway up` aus dem Projektordner, ohne GitHub. `.railwayignore` hält `.claude`
+  und Build-Reste aus dem Upload.
+
 ## Technische Hinweise
 
 - Seitentitel setzen die Mandantenseiten im Browser (`useDocumentTitle`). `generateMetadata` mit `params`
