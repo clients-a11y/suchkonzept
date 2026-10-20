@@ -230,10 +230,11 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   der Startseiten-Suche und der Suchseite. Zwei Antwortkarten mit zweifarbigen Piktogrammen in den
   Mandantenfarben (`PotIcons`), leises „Unsicher? Im Chat fragen“, Hinweis „Backend: noch keine Anfrage“.
   Escape oder Schließen setzen den Fokus zurück ins Suchfeld. Direkte Links zeigen die Frage auf der Suchseite.
-- **Wohnort in der Landessuche** (`HomePlace`): Feld „Ihr Wohnort (optional)“ unter der Suche im
-  Landesportal, sofortige Prüfung gegen die PLZ-Bereiche, Auswahl bei mehreren Orten, Hinweis auf eigene
-  Stadtportale. Der beste Treffer zeigt danach die zuständige Stelle oder den Weg ins Stadtportal, der Chat
-  übernimmt den Ort ohne Rückfrage.
+- **Wohnort erst, wenn er gebraucht wird** (`HomePlace`): Die Startseite fragt nicht nach dem Ort. Die
+  Leistungsseite einer Gemeindeleistung im Landesportal fragt „Wo wohnen Sie?“ mit sofortiger Prüfung gegen die
+  PLZ-Bereiche (ersetzt das Formular mit „Stelle finden“), Auswahl bei mehreren Orten, Verweis auf eigene
+  Stadtportale. Landesleistungen fragen nicht. Ist der Ort bekannt, zeigt auch der beste Suchtreffer die
+  zuständige Stelle.
 - **Gepflegte Suchbegriffe** (`src/data/search-terms.ts`): Die Redaktion ordnet Begriffe fest einem Topf zu
   (10 Punkte), zum Beispiel „Wie hoch ist das Kindergeld?“. Die Erklärung zeigt außerdem die eine Anfrage an
   das Backend, etwa `GET /api/leistungen?q=…`.

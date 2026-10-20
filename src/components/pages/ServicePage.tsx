@@ -6,6 +6,7 @@ import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow } from "@/components/Icons";
 import { PlaceFinder } from "@/components/PlaceFinder";
+import { HomePlace } from "@/components/HomePlace";
 import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
 import type { Place } from "@/data/content";
 import { unitForService } from "@/data/organisation";
@@ -79,7 +80,7 @@ function Responsible({ tenant, service }: { tenant: Tenant; service: Service }) 
     office = officeForPlace(place, service, tenants);
     note = `Zuständig für ${place.name}.`;
   } else {
-    note = "Geben Sie oben Postleitzahl oder Ort ein, dann sehen Sie hier die zuständige Stelle. Alle Informationen zur Leistung gelten auch ohne Angabe.";
+    note = "Hängt von Ihrem Wohnort ab. Geben Sie oben Postleitzahl oder Ort ein. Alle Informationen zur Leistung gelten auch ohne Angabe.";
   }
 
   return (
@@ -135,7 +136,7 @@ function ServiceView({ service }: { service: Service }) {
 
       {choosePlace && (
         <div className="t-place" {...origin("zentral", "Zentral · Plattform: Zuständigkeitsfinder")}>
-          <PlaceFinder places={places} label="Zuständige Stelle finden: Postleitzahl oder Ort (optional)" />
+          <HomePlace />
           {place && <Referral place={place} service={service} tenants={tenants} current={tenant} />}
         </div>
       )}

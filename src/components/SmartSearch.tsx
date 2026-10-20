@@ -16,7 +16,6 @@ import { origin } from "@/lib/origin";
 import { openAssistant } from "@/lib/assistant-dock";
 import { routeQuery } from "@/lib/search-router";
 import { PotDialog } from "@/components/PotDialog";
-import { HomePlace } from "@/components/HomePlace";
 
 type Item = { key: string; group: string; href?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
@@ -56,16 +55,11 @@ export function SmartSearch({ label }: { label: string }) {
   const chatEnabled = tenant.assistant?.enabled !== false;
 
   // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
-  // A place typed into this search counts as confirmed when the chat takes over.
-  const enteredPlace = useRef<string | undefined>(undefined);
+  // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
   const askChat = (text: string) => {
     setOpen(false);
-    const place = enteredPlace.current;
-    if (openAssistant(text || undefined, place)) return;
-    const params = new URLSearchParams();
-    if (text) params.set("frage", text);
-    if (place) params.set("ort", place);
-    router.push(`${base}/assistent${params.size ? `?${params.toString()}` : ""}`);
+    if (openAssistant(text || undefined)) return;
+    router.push(text ? `${base}/assistent?frage=${encodeURIComponent(text)}` : `${base}/assistent`);
   };
 
   const items = useMemo<Item[]>(() => {
@@ -347,8 +341,6 @@ export function SmartSearch({ label }: { label: string }) {
             </button>
           )}
         </div>
-        {/* Land portals route to the municipality: the place belongs right next to the request. */}
-        {tenant.type === "info" && <HomePlace onChosen={(place) => (enteredPlace.current = place.id)} />}
         <p id={ids.hint} className="t-smart__hint">
           Schreiben Sie in eigenen Worten, was Sie vorhaben, zum Beispiel „Garage bauen“. „Suchen“ zeigt eine
           Trefferliste. „Im Chat fragen“ klärt Ihr Anliegen im Gespräch. Simuliert, ohne echte KI.

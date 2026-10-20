@@ -7,13 +7,20 @@ import { IconCheck } from "@/components/Icons";
 import type { Place } from "@/data/content";
 import { allPlaces, findPlaces, setPlaceId, usePlaceId } from "@/lib/place-store";
 import { normalize } from "@/lib/smart-search";
-import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
+import { useCustomTenants } from "@/lib/tenant-store";
 
-// Place of residence right in the search of a Land portal: checked as it is typed, without a
-// database (the postcode ranges are static data). Returning visitors see their place instead.
-export function HomePlace({ onChosen }: { onChosen?: (place: Place) => void }) {
+// Place of residence, asked only where it matters (a municipal service in a Land portal). Checked
+// as it is typed, without a database: the postcode ranges are static data. Known places show instead.
+export function HomePlace({
+  label = "Wo wohnen Sie?",
+  hint = "Dann zeigen wir die zuständige Stelle. Bleibt nur in diesem Browser.",
+  onChosen,
+}: {
+  label?: string;
+  hint?: string;
+  onChosen?: (place: Place) => void;
+}) {
   const { tenant } = useCurrentTenant();
-  const tenants = useAllTenants();
   const places = allPlaces(useCustomTenants() ?? []);
   const placeId = usePlaceId();
   const ids = { input: useId(), hint: useId(), status: useId() };
@@ -32,14 +39,13 @@ export function HomePlace({ onChosen }: { onChosen?: (place: Place) => void }) {
     onChosen?.(place);
   };
 
+  // A city with its own portal is pointed out by the page underneath (Referral), not here again.
   if (stored && !editing) {
-    const portal = stored.tenant && stored.tenant !== tenant.id ? tenants.find((t) => t.id === stored.tenant) : undefined;
     return (
       <p className="t-homeplace t-homeplace--known">
         <IconCheck size={16} />
         <span>
           Ihr Wohnort: <strong>{stored.name}</strong>
-          {portal && <> · mit eigenem {portal.tagline}</>}
         </span>
         <button
           type="button"
@@ -64,8 +70,7 @@ export function HomePlace({ onChosen }: { onChosen?: (place: Place) => void }) {
 
   let status = "";
   if (current) {
-    const portal = current.tenant && current.tenant !== tenant.id ? tenants.find((t) => t.id === current.tenant) : undefined;
-    status = `${digits ? `${text} · ` : ""}${current.name}. Gemerkt.${portal ? ` ${current.name} hat ein eigenes ${portal.tagline}.` : ""}`;
+    status = `${digits ? `${text} · ` : ""}${current.name}. Gemerkt.`;
   } else if (ready && matches.length === 0) {
     status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${tenant.name}.` : `Einen Ort „${text}“ kennen wir in ${tenant.name} nicht.`;
   } else if (matches.length > 1) {
@@ -96,7 +101,7 @@ export function HomePlace({ onChosen }: { onChosen?: (place: Place) => void }) {
   return (
     <div className="t-homeplace">
       <label htmlFor={ids.input} className="t-homeplace__label">
-        Ihr Wohnort <span className="t-homeplace__optional">(optional)</span>
+        {label}
       </label>
       <input
         ref={inputRef}
@@ -111,7 +116,7 @@ export function HomePlace({ onChosen }: { onChosen?: (place: Place) => void }) {
         aria-describedby={`${ids.hint} ${ids.status}`}
       />
       <p id={ids.hint} className="t-homeplace__hint">
-        Damit wir gleich die zuständige Stelle zeigen. Bleibt nur in diesem Browser.
+        {hint}
       </p>
       <p id={ids.status} role="status" className={current ? "t-homeplace__status t-homeplace__status--ok" : "t-homeplace__status"}>
         {current && <IconCheck size={16} />}
