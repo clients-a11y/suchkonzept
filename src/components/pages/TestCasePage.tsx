@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useId } from "react";
+import { DemoReset } from "@/components/DemoReset";
 
 // Script for demos: shows how the portal tells services from information, with Kindergeld as the
 // example. Every step links to the place where it can be tried.
@@ -172,6 +173,7 @@ export function TestCasePage() {
         Die Schritte laufen im Landesportal Musterland, einer im Serviceportal Beispielstadt. Inhalte, Stellen und Beträge
         sind fiktiv.
       </p>
+      <DemoReset />
       {PARTS.map((part, index) => (
         <PartSection key={part.title} part={part} index={index} />
       ))}

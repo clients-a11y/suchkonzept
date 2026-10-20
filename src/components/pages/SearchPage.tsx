@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import Form from "next/form";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useId } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useId, useState } from "react";
+import { PotChoices, PotDialog } from "@/components/PotDialog";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
@@ -27,19 +28,46 @@ function searchHref(base: string, q: string, pot?: Pot): string {
 }
 
 function SearchForm({ q }: { q: string }) {
-  const { base } = useCurrentTenant();
+  const { tenant, base } = useCurrentTenant();
+  const router = useRouter();
   const inputId = useId();
+  const [asking, setAsking] = useState<string | null>(null);
+  const askChat = (text: string) => {
+    if (!openAssistant(text)) router.push(`${base}/assistent?frage=${encodeURIComponent(text)}`);
+  };
   return (
-    <Form action={`${base}/suche`} role="search" className="t-searchform">
-      <label htmlFor={inputId}>Suchbegriff</label>
-      <div className="t-searchform__row">
-        <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
-        <button type="submit" className="t-btn t-btn--primary">
-          <IconSearch />
-          Suchen
-        </button>
-      </div>
-    </Form>
+    <>
+      <Form
+        action={`${base}/suche`}
+        role="search"
+        className="t-searchform"
+        onSubmit={(event) => {
+          // Unclear between services and information: ask over the page instead of guessing.
+          const value = String(new FormData(event.currentTarget).get("q") ?? "").trim();
+          if (value && !routeQuery(value).pot) {
+            event.preventDefault();
+            setAsking(value);
+          }
+        }}
+      >
+        <label htmlFor={inputId}>Suchbegriff</label>
+        <div className="t-searchform__row">
+          <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
+          <button type="submit" className="t-btn t-btn--primary">
+            <IconSearch />
+            Suchen
+          </button>
+        </div>
+      </Form>
+      <PotDialog
+        query={asking}
+        onClose={(dismissed) => {
+          setAsking(null);
+          if (dismissed) document.getElementById(inputId)?.focus();
+        }}
+        onChat={tenant.assistant?.enabled === false ? undefined : askChat}
+      />
+    </>
   );
 }
 
@@ -80,9 +108,36 @@ function AssistantHint({ q }: { q: string }) {
   );
 }
 
+// What the backend would receive: exactly one request to one pot, or none while the person chooses.
+function RequestLine({ q, pot }: { q: string; pot?: Pot }) {
+  if (!pot) {
+    return (
+      <p className="t-route__request">
+        Anfrage an das Backend: <strong>noch keine.</strong> Erst Ihre Wahl löst sie aus.
+      </p>
+    );
+  }
+  const query = new URLSearchParams(q ? { q } : {}).toString();
+  return (
+    <p className="t-route__request">
+      Anfrage an das Backend: <code className="t-route__code">GET /api/{pot}{query ? `?${query}` : ""}</code>. Genau eine
+      Anfrage, nur an den Topf {POT_LABEL[pot]}.
+    </p>
+  );
+}
+
 // Makes the decision of the search switch visible, for demos and for curious visitors.
-function RouteExplain({ route }: { route: Route }) {
+function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }) {
   const pots: Pot[] = ["leistungen", "informationen"];
+  if (!route) {
+    return (
+      <details className="t-route__why">
+        <summary>So läuft die Suche</summary>
+        <p className="t-route__rule">Sie haben den Bereich selbst gewählt, die Weiche hat nicht entschieden.</p>
+        <RequestLine q={q} pot={pot} />
+      </details>
+    );
+  }
   return (
     <details className="t-route__why">
       <summary>So hat die Suche entschieden</summary>
@@ -112,13 +167,13 @@ function RouteExplain({ route }: { route: Route }) {
       <p className="t-route__rule">
         {RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.
       </p>
+      <RequestLine q={q} pot={pot} />
     </details>
   );
 }
 
 // The search switch could not decide: one question, two answers.
 function PotQuestion({ q, route }: { q: string; route?: Route }) {
-  const { base } = useCurrentTenant();
   const titleId = useId();
   return (
     <section className="t-route" aria-labelledby={titleId} {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
@@ -126,21 +181,8 @@ function PotQuestion({ q, route }: { q: string; route?: Route }) {
         Was suchen Sie?
       </h2>
       <p>„{q}“ kann beides sein. Die Suche schaut immer in einem Bereich nach.</p>
-      <ul className="t-route__choices">
-        <li>
-          <Link href={searchHref(base, q, "leistungen")} className="t-route__choice">
-            <span className="t-route__title">Etwas beantragen oder erledigen</span>
-            <span className="t-route__text">Leistungen wie Ausweis, Ummeldung oder Förderung</span>
-          </Link>
-        </li>
-        <li>
-          <Link href={searchHref(base, q, "informationen")} className="t-route__choice">
-            <span className="t-route__title">Informationen und Meldungen</span>
-            <span className="t-route__text">Nachrichten, Projekte, Ansprechpersonen und Seiten</span>
-          </Link>
-        </li>
-      </ul>
-      {route && <RouteExplain route={route} />}
+      <PotChoices query={q} />
+      {route && <RouteExplain route={route} q={q} />}
     </section>
   );
 }
@@ -205,7 +247,7 @@ function SearchResults() {
         <Link href={searchHref(base, q, other)} className="t-btn">
           {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
         </Link>
-        {route?.pot && <RouteExplain route={route} />}
+        {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
       </div>
 
       {answer && (

@@ -1,3 +1,5 @@
+import type { Check } from "@/lib/validate";
+
 // Fields of the online application per service. Configuration like the service catalogue:
 // shared by all tenants, a later backend would deliver it from the form management.
 
@@ -8,6 +10,8 @@ export type FormField = {
   required?: boolean;
   hint?: string;
   options?: string[];
+  // Format check with an explanation, see src/lib/validate.ts.
+  check?: Check;
 };
 
 export const SERVICE_FORMS: Record<string, FormField[]> = {
@@ -50,8 +54,8 @@ export const SERVICE_FORMS: Record<string, FormField[]> = {
     { id: "kind", label: "Vor- und Nachname des Kindes", type: "text", required: true },
     { id: "geburt", label: "Geburtsdatum des Kindes", type: "date", required: true },
     { id: "verhaeltnis", label: "Sie sind", type: "select", required: true, options: ["Mutter", "Vater", "Pflegeelternteil", "Großelternteil"] },
-    { id: "steuerid", label: "Steuer-Identifikationsnummer des Kindes", type: "text", required: true, hint: "Elf Ziffern. Im Klick-Dummy genügt eine erfundene Nummer." },
-    { id: "konto", label: "IBAN für die Auszahlung", type: "text", required: true, hint: "Im Klick-Dummy bitte keine echte Kontonummer eingeben." },
+    { id: "steuerid", label: "Steuer-Identifikationsnummer des Kindes", type: "text", required: true, check: "steuerid", hint: "Elf Ziffern. Im Klick-Dummy genügt eine erfundene Nummer, zum Beispiel 12345678901." },
+    { id: "konto", label: "IBAN für die Auszahlung", type: "text", required: true, check: "iban", hint: "Bitte keine echte Kontonummer eingeben. Zum Testen: DE36 0000 0000 0000 0000 00." },
   ],
   "vereinsfoerderung-beantragen": [
     { id: "verein", label: "Name des Vereins", type: "text", required: true },

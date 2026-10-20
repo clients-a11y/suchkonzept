@@ -16,6 +16,7 @@ import { formatDate } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { origin } from "@/lib/origin";
+import { checkValue } from "@/lib/validate";
 
 const STEPS = ["Anmelden", "Angaben", "Unterlagen", "Prüfen und absenden"];
 
@@ -83,7 +84,8 @@ function Field({ field, value, error, onChange }: { field: FormField; value: str
         <input
           className="t-input"
           type={field.type === "number" ? "text" : field.type}
-          inputMode={field.type === "number" ? "numeric" : undefined}
+          inputMode={field.type === "number" || field.check === "steuerid" ? "numeric" : undefined}
+          spellCheck={field.check ? false : undefined}
           autoComplete={field.id === "person-name" ? "name" : field.id === "person-email" ? "email" : "off"}
           {...common}
         />
@@ -99,6 +101,10 @@ function validate(fields: FormField[], values: Values): Errors {
     if (f.required && !v) errors[f.id] = `Bitte ausfüllen: ${f.label}`;
     else if (v && f.type === "number" && !/^\d+([.,]\d+)?$/.test(v)) errors[f.id] = `${f.label}: bitte nur Ziffern eingeben.`;
     else if (v && f.id === "person-email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) errors[f.id] = "Geben Sie eine E-Mail-Adresse im Format name@beispiel.de an.";
+    else if (v && f.check) {
+      const problem = checkValue(f.check, v);
+      if (problem) errors[f.id] = problem;
+    }
   }
   return errors;
 }

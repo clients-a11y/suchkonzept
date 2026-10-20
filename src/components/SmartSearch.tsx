@@ -14,6 +14,8 @@ import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { origin } from "@/lib/origin";
 import { openAssistant } from "@/lib/assistant-dock";
+import { routeQuery } from "@/lib/search-router";
+import { PotDialog } from "@/components/PotDialog";
 
 type Item = { key: string; group: string; href?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
@@ -42,6 +44,8 @@ export function SmartSearch({ label }: { label: string }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [announcement, setAnnouncement] = useState("");
+  // Query the search switch could not place: asked in an overlay.
+  const [asking, setAsking] = useState<string | null>(null);
 
   // A hidden route keeps its state: close the list when it is hidden.
   useLayoutEffect(() => () => setOpen(false), []);
@@ -186,6 +190,7 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
+    if (item.key === "all" && !routeQuery(trimmed).pot) return setAsking(trimmed);
     if (item.href) router.push(base + item.href);
   };
 
@@ -245,7 +250,19 @@ export function SmartSearch({ label }: { label: string }) {
 
   return (
     <div className="t-smart" {...origin("zentral", "Zentral · Plattform: Suche")}>
-      <Form action={`${base}/suche`} role="search" className="t-smart__form" onSubmit={() => setOpen(false)}>
+      <Form
+        action={`${base}/suche`}
+        role="search"
+        className="t-smart__form"
+        onSubmit={(event) => {
+          setOpen(false);
+          // Unclear between services and information: ask over the page instead of guessing.
+          if (trimmed && !routeQuery(trimmed).pot) {
+            event.preventDefault();
+            setAsking(trimmed);
+          }
+        }}
+      >
         <div className="t-smart__head">
           <label htmlFor={ids.input} className="t-smart__label">
             {label}
@@ -332,6 +349,14 @@ export function SmartSearch({ label }: { label: string }) {
       <p className="visually-hidden" role="status">
         {announcement}
       </p>
+      <PotDialog
+        query={asking}
+        onClose={(dismissed) => {
+          setAsking(null);
+          if (dismissed) inputRef.current?.focus();
+        }}
+        onChat={chatEnabled ? askChat : undefined}
+      />
 
       <div className="t-smart__examples">
         <p id={ids.examples} className="t-smart__examples-label">
