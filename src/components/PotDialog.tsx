@@ -22,6 +22,8 @@ export function PotChoices({ query, onChoose }: { query: string; onChoose?: () =
           <Link href={href(choice.pot)} className="t-route__choice" onClick={onChoose}>
             <span className="t-route__icon">{choice.icon}</span>
             <span className="t-route__title">{choice.title}</span>
+            {/* Read as two sentences, not as one long word. */}
+            <span className="visually-hidden">. </span>
             <span className="t-route__text">{choice.text}</span>
             <span className="t-route__arrow" aria-hidden="true">
               <IconArrow size={18} />

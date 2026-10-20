@@ -224,6 +224,30 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   Ergebnisseite zeigt die Rechnung unter „So hat die Suche entschieden“. Der Assistent nutzt dieselbe Weiche
   und fragt bei Unklarheit „erledigen oder Informationen lesen?“.
 
+## Feinschliff Suche, Chat und Vorführung (Nachtrag 20.10.2026)
+
+- **Unklare Suchen im Overlay** (`PotDialog`): „Was suchen Sie?“ als nativer modaler Dialog über der Seite, aus
+  der Startseiten-Suche und der Suchseite. Zwei Antwortkarten mit zweifarbigen Piktogrammen in den
+  Mandantenfarben (`PotIcons`), leises „Unsicher? Im Chat fragen“, Hinweis „Backend: noch keine Anfrage“.
+  Escape oder Schließen setzen den Fokus zurück ins Suchfeld. Direkte Links zeigen die Frage auf der Suchseite.
+- **Wohnort in der Landessuche** (`HomePlace`): Feld „Ihr Wohnort (optional)“ unter der Suche im
+  Landesportal, sofortige Prüfung gegen die PLZ-Bereiche, Auswahl bei mehreren Orten, Hinweis auf eigene
+  Stadtportale. Der beste Treffer zeigt danach die zuständige Stelle oder den Weg ins Stadtportal, der Chat
+  übernimmt den Ort ohne Rückfrage.
+- **Gepflegte Suchbegriffe** (`src/data/search-terms.ts`): Die Redaktion ordnet Begriffe fest einem Topf zu
+  (10 Punkte), zum Beispiel „Wie hoch ist das Kindergeld?“. Die Erklärung zeigt außerdem die eine Anfrage an
+  das Backend, etwa `GET /api/leistungen?q=…`.
+- **Informationstreffer:** im Text nur klare Treffer, Bonus wenn alle Wörter im Titel stehen, bei Gleichstand
+  Stellen und Seiten vor Projekten vor Meldungen, neuere Meldungen zuerst.
+- **Formular:** Steuer-ID (11 Ziffern) und IBAN (Länge, Prüfziffern) mit verständlichen Meldungen
+  (`src/lib/validate.ts`). Erfundene Test-IBAN: DE36 0000 0000 0000 0000 00.
+- **Chat:** Verlauf je Portal im Tab gespeichert (`src/lib/chat-store.ts`), gleich in Fenster und Seite.
+  Übergabe an ein anderes Portal öffnet dort das Fenster. Unter 40rem kein schwebender Knopf, der Chat steht im
+  Menü und neben der Suche.
+- **Testfall:** „Demo zurücksetzen“ löscht Ort, Demo-Konto, Chatverläufe und den Schalter „Herkunft
+  anzeigen“. Neue Schritte für Overlay, gepflegte Begriffe, Wohnort, IBAN-Prüfung und Übergabe im Fenster.
+- **Fotos:** drei KI-Fotos für die Kindergeld-Meldungen, siehe `docs/BILDER.md`.
+
 ## Vorschau mit Passwort (Nachtrag 20.10.2026)
 
 - `src/proxy.ts` schützt alle Seiten, sobald die Umgebungsvariable `DEMO_PASSWORD` gesetzt ist. Ohne Passwort

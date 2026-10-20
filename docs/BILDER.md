@@ -77,3 +77,14 @@ studio background, soft light, business attire, friendly neutral expression“
 | `projects/hallenbad` | 1970s indoor pool during renovation, empty pool, scaffolding |
 
 Hochwasserschutz und Stadtpark verwenden die vorhandenen Meldungsbilder `m3-deich` und `b4-hundewiese`.
+
+## Kindergeld-Meldungen (20.10.2026, gleiche Einstellungen)
+
+| Datei | Beschreibung |
+| --- | --- |
+| `m8-kindergeld-online` | parent at a kitchen table filling in an online application on a laptop, baby bottle and a closed paper folder nearby, seen over the shoulder, laptop screen softly blurred |
+| `m9-beratung` | counselling session in a bright public advice office, a counsellor and a young parent with a baby in a carrier talking at a desk, faces not in sharp focus |
+| `b7-familienbuero` | family office in a town hall with a small play corner, a staff member helps a mother at a computer desk, seen from behind, green trees outside, no flags |
+
+Für `b7` war ein zweiter Versuch nötig: Im ersten Bild war vor dem Fenster eine Nationalflagge zu sehen.
+Zusammen 2 Credits.

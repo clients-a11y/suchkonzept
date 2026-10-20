@@ -29,8 +29,14 @@ const PARTS: Part[] = [
       },
       {
         input: "Kindergeld",
-        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“",
+        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“ Auf der Startseite getippt, öffnet sich die Frage als Overlay über der Seite.",
         href: `/musterland/suche?q=${q("Kindergeld")}`,
+        action: "Suche öffnen",
+      },
+      {
+        input: "Wie hoch ist das Kindergeld?",
+        expect: "Informationen. Ausschlaggebend ist ein Suchbegriff, den die Redaktion fest den Informationen zugeordnet hat.",
+        href: `/musterland/suche?q=${q("Wie hoch ist das Kindergeld?")}`,
         action: "Suche öffnen",
       },
       {
@@ -60,6 +66,30 @@ const PARTS: Part[] = [
     ],
   },
   {
+    title: "Wohnort für neue Besucher",
+    intro: "Im Landesportal steht unter der Suche das Feld „Ihr Wohnort“. Es prüft die Eingabe sofort, ohne Datenbank, und merkt sich den Ort.",
+    steps: [
+      {
+        input: "20100 (im Feld „Ihr Wohnort“ auf der Startseite)",
+        expect: "Sofort: „20100 · Beispielstadt. Gemerkt. Beispielstadt hat ein eigenes Serviceportal.“ Danach zeigt der beste Treffer zu „Personalausweis beantragen“ den Weg ins Stadtportal.",
+        href: "/musterland",
+        action: "Startseite öffnen",
+      },
+      {
+        input: "10480",
+        expect: "Zwei Orte teilen sich die Postleitzahl. Sie wählen zwischen Neudorf und Mühlengrund.",
+        href: "/musterland",
+        action: "Startseite öffnen",
+      },
+      {
+        input: "99999",
+        expect: "Klare Auskunft: Die Postleitzahl gehört zu keinem Ort in Musterland.",
+        href: "/musterland",
+        action: "Startseite öffnen",
+      },
+    ],
+  },
+  {
     title: "Beantragung bis zum Formular",
     intro: "Kindergeld ist eine Leistung des Landes. Deshalb fragt das Portal hier nicht nach dem Wohnort.",
     steps: [
@@ -72,6 +102,12 @@ const PARTS: Part[] = [
       {
         way: "Online beantragen",
         expect: "Anmelden mit dem Demo-Konto ohne Passwort, dann das Formular: Kind, Geburtsdatum, Steuer-Identifikationsnummer und IBAN.",
+        href: "/musterland/antrag/kindergeld-beantragen",
+        action: "Antrag öffnen",
+      },
+      {
+        way: "Formular mit einer falschen IBAN absenden",
+        expect: "Die Fehlerübersicht nennt das Problem: „Die Prüfziffern der IBAN passen nicht.“ Zum Testen passt die erfundene IBAN DE36 0000 0000 0000 0000 00.",
         href: "/musterland/antrag/kindergeld-beantragen",
         action: "Antrag öffnen",
       },
@@ -110,6 +146,12 @@ const PARTS: Part[] = [
         expect: "Die Stadt ist nicht zuständig. Der Assistent gibt das Anliegen an das Landesportal Musterland weiter.",
         href: `/beispielstadt/assistent?frage=${q("Kindergeld beantragen")}`,
         action: "Im Chat fragen",
+      },
+      {
+        way: "Im Chatfenster der Startseite: „Mein Ausweis läuft ab“, dann „20100“, dann „Im Serviceportal Beispielstadt weiterfragen“",
+        expect: "Das Chatfenster öffnet sich im Serviceportal Beispielstadt, mit dem Anliegen und ohne neue Frage nach dem Ort.",
+        href: "/musterland",
+        action: "Startseite öffnen",
       },
     ],
   },
