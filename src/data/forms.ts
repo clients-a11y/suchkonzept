@@ -46,6 +46,13 @@ export const SERVICE_FORMS: Record<string, FormField[]> = {
     { id: "evb", label: "eVB-Nummer der Versicherung", type: "text", required: true, hint: "Sieben Zeichen, zum Beispiel A1B2C3D" },
     { id: "kennzeichen", label: "Wunschkennzeichen", type: "text", hint: "Optional" },
   ],
+  "kindergeld-beantragen": [
+    { id: "kind", label: "Vor- und Nachname des Kindes", type: "text", required: true },
+    { id: "geburt", label: "Geburtsdatum des Kindes", type: "date", required: true },
+    { id: "verhaeltnis", label: "Sie sind", type: "select", required: true, options: ["Mutter", "Vater", "Pflegeelternteil", "Großelternteil"] },
+    { id: "steuerid", label: "Steuer-Identifikationsnummer des Kindes", type: "text", required: true, hint: "Elf Ziffern. Im Klick-Dummy genügt eine erfundene Nummer." },
+    { id: "konto", label: "IBAN für die Auszahlung", type: "text", required: true, hint: "Im Klick-Dummy bitte keine echte Kontonummer eingeben." },
+  ],
   "vereinsfoerderung-beantragen": [
     { id: "verein", label: "Name des Vereins", type: "text", required: true },
     { id: "projekt", label: "Projekttitel", type: "text", required: true },

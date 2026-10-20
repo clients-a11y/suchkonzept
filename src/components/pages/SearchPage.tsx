@@ -9,8 +9,8 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { searchInformation, searchServices } from "@/lib/smart-search";
-import { POT_LABEL, routeQuery } from "@/lib/search-router";
-import type { Pot } from "@/lib/search-router";
+import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
+import type { Pot, Route } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
@@ -80,8 +80,44 @@ function AssistantHint({ q }: { q: string }) {
   );
 }
 
+// Makes the decision of the search switch visible, for demos and for curious visitors.
+function RouteExplain({ route }: { route: Route }) {
+  const pots: Pot[] = ["leistungen", "informationen"];
+  return (
+    <details className="t-route__why">
+      <summary>So hat die Suche entschieden</summary>
+      <div className="t-route__points">
+        {pots.map((pot) => {
+          const signals = route.signals.filter((s) => s.pot === pot);
+          return (
+            <div key={pot}>
+              <p className="t-route__pot">
+                {POT_LABEL[pot]}: {pluralize(route.points[pot], "Punkt", "Punkte")}
+              </p>
+              {signals.length > 0 ? (
+                <ul>
+                  {signals.map((s) => (
+                    <li key={s.label + s.word}>
+                      „{s.word}“: {s.label}, +{s.points}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="t-route__none">Keine Hinweise</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p className="t-route__rule">
+        {RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.
+      </p>
+    </details>
+  );
+}
+
 // The search switch could not decide: one question, two answers.
-function PotQuestion({ q }: { q: string }) {
+function PotQuestion({ q, route }: { q: string; route?: Route }) {
   const { base } = useCurrentTenant();
   const titleId = useId();
   return (
@@ -104,6 +140,7 @@ function PotQuestion({ q }: { q: string }) {
           </Link>
         </li>
       </ul>
+      {route && <RouteExplain route={route} />}
     </section>
   );
 }
@@ -127,7 +164,7 @@ function SearchResults() {
         <p className="t-search__summary" role="status">
           Für „{q}“ bitte einen Suchbereich wählen.
         </p>
-        <PotQuestion q={q} />
+        <PotQuestion q={q} route={route} />
         <AssistantHint q={q} />
       </>
     );
@@ -145,9 +182,6 @@ function SearchResults() {
         : allInformation(tenant);
   const answer = services?.answer;
   const other = OTHER[pot];
-  const reasons = route?.signals.filter((s) => s.pot === pot).map((s) => `„${s.word}“`) ?? [];
-  if (route?.catalogue && pot === "leistungen") reasons.push("einem Treffer im Leistungskatalog");
-  const because = reasons.length > 1 ? `${reasons.slice(0, -1).join(", ")} und ${reasons[reasons.length - 1]}` : reasons[0];
 
   return (
     <>
@@ -166,11 +200,12 @@ function SearchResults() {
       <div className="t-route__bar" {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
         <p>
           Gesucht in <strong>{POT_LABEL[pot]}</strong>
-          {route?.pot ? `, automatisch gewählt${because ? `. Erkannt an ${because}` : ""}.` : "."}
+          {route?.pot ? ", automatisch gewählt." : "."}
         </p>
         <Link href={searchHref(base, q, other)} className="t-btn">
           {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
         </Link>
+        {route?.pot && <RouteExplain route={route} />}
       </div>
 
       {answer && (

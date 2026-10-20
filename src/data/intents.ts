@@ -28,7 +28,13 @@ export const INTENTS: Intent[] = [
   {
     phrases: ["kind", "kinder", "baby", "kita", "kindergarten", "krippe", "betreuung", "tagesmutter", "tagespflege", "nachwuchs"],
     services: ["kitaplatz-beantragen"],
-    related: ["wohngeld-beantragen"],
+    related: ["kindergeld-beantragen", "wohngeld-beantragen"],
+  },
+  {
+    // "Baby" also points to the Kita: the assistant then asks which one is meant.
+    phrases: ["kindergeld", "familienkasse", "geld fuer kinder", "geld fuers kind", "kind geboren", "geburt", "neugeboren", "baby"],
+    services: ["kindergeld-beantragen"],
+    related: ["kitaplatz-beantragen"],
   },
   {
     phrases: ["hund", "welpe", "hundesteuer", "haustier"],
@@ -74,6 +80,6 @@ export const STOPWORDS = new Set([
 
 // Beispiele unter dem Suchfeld: zeigen, dass Anliegen in eigenen Worten funktionieren.
 export const EXAMPLE_QUERIES: Record<PortalType, string[]> = {
-  info: ["Ich möchte eine Garage bauen", "Zuschuss für unseren Sportverein", "Führungszeugnis für das Ehrenamt"],
+  info: ["Kindergeld beantragen", "Ich möchte eine Garage bauen", "Zuschuss für unseren Sportverein"],
   service: ["Ich bin umgezogen", "Mein Ausweis läuft ab", "Wir bekommen ein Kind"],
 };

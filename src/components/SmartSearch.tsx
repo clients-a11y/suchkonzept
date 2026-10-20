@@ -1,7 +1,6 @@
 "use client";
 
 import Form from "next/form";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
@@ -16,7 +15,7 @@ import type { Service } from "@/lib/types";
 import { origin } from "@/lib/origin";
 import { openAssistant } from "@/lib/assistant-dock";
 
-type Item = { key: string; group: string; href?: string; fill?: string; label: string; node: ReactNode };
+type Item = { key: string; group: string; href?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
 function ServiceFacts({ service }: { service: Service }) {
   return (
@@ -49,6 +48,14 @@ export function SmartSearch({ label }: { label: string }) {
 
   const result = useMemo(() => searchServices(query, true), [query]);
   const trimmed = query.trim();
+  const chatEnabled = tenant.assistant?.enabled !== false;
+
+  // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
+  const askChat = (text: string) => {
+    setOpen(false);
+    if (openAssistant(text || undefined)) return;
+    router.push(text ? `${base}/assistent?frage=${encodeURIComponent(text)}` : `${base}/assistent`);
+  };
 
   const items = useMemo<Item[]>(() => {
     const list: Item[] = [];
@@ -119,6 +126,22 @@ export function SmartSearch({ label }: { label: string }) {
         </>
       ),
     });
+    if (chatEnabled) {
+      list.push({
+        key: "chat",
+        group: "",
+        chat: true,
+        label: `„${trimmed}“ im Chat-Assistenten fragen`,
+        node: (
+          <>
+            <span className="t-smart__chatoption">
+              <IconBubble size={16} />„{trimmed}“ im Chat-Assistenten fragen
+            </span>
+            <IconArrow size={16} />
+          </>
+        ),
+      });
+    }
     list.push({
       key: "info",
       group: "",
@@ -131,7 +154,7 @@ export function SmartSearch({ label }: { label: string }) {
       ),
     });
     return list;
-  }, [result, trimmed, tenant.type]);
+  }, [result, trimmed, tenant.type, chatEnabled]);
 
   const visible = open && items.length > 0;
   const optionId = (i: number) => `${ids.list}-opt-${i}`;
@@ -161,6 +184,7 @@ export function SmartSearch({ label }: { label: string }) {
       inputRef.current?.focus();
       return;
     }
+    if (item.chat) return askChat(trimmed);
     setOpen(false);
     if (item.href) router.push(base + item.href);
   };
@@ -208,7 +232,7 @@ export function SmartSearch({ label }: { label: string }) {
         "t-smart__option",
         item.key.startsWith("answer") ? "t-smart__option--answer" : "",
         item.key === "fix" ? "t-smart__option--fix" : "",
-        item.key === "all" || item.key === "info" ? "t-smart__option--all" : "",
+        ["all", "chat", "info"].includes(item.key) ? "t-smart__option--all" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -292,10 +316,16 @@ export function SmartSearch({ label }: { label: string }) {
           <button type="submit" className="t-btn t-btn--primary t-smart__submit">
             Suchen
           </button>
+          {chatEnabled && (
+            <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
+              <IconBubble size={20} />
+              Im Chat fragen
+            </button>
+          )}
         </div>
         <p id={ids.hint} className="t-smart__hint">
-          Schreiben Sie, was Sie vorhaben, zum Beispiel „Garage bauen“. Im Klick-Dummy werden die Vorschläge lokal
-          simuliert, ohne echte KI.
+          Schreiben Sie, was Sie vorhaben, zum Beispiel „Garage bauen“. „Im Chat fragen“ führt Schritt für Schritt
+          weiter. Im Klick-Dummy lokal simuliert, ohne echte KI.
         </p>
       </Form>
 
@@ -327,20 +357,6 @@ export function SmartSearch({ label }: { label: string }) {
         </ul>
       </div>
 
-      {tenant.assistant?.enabled !== false && (
-        <p className="t-smart__assist">
-          <IconBubble size={18} />
-          <Link
-            href={trimmed ? `${base}/assistent?frage=${encodeURIComponent(trimmed)}` : `${base}/assistent`}
-            onClick={(event) => {
-              // Wide screens: the small window takes the question. Otherwise the link opens the page.
-              if (openAssistant(trimmed || undefined)) event.preventDefault();
-            }}
-          >
-            Lieber Schritt für Schritt? Chat-Assistent öffnen
-          </Link>
-        </p>
-      )}
     </div>
   );
 }

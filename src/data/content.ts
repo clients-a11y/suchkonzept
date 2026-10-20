@@ -1,13 +1,16 @@
 import type { ContentPage, NewsItem, Tenant } from "@/lib/types";
 
 const NEWS: NewsItem[] = [
+  { id: "m8", tenant: "musterland", title: "Kindergeld jetzt vollständig online beantragen", teaser: "Familien stellen den Antrag ab sofort digital, laden die Geburtsurkunde hoch und bekommen den Bescheid ins Postfach.", date: "2026-10-16", topic: "Familie", source: "Ministerium für Gesundheit und Familie", image: { scene: "digital", alt: "Illustration: Laptop mit einem Antragsformular auf dem Bildschirm", credit: "Ministerium für Gesundheit und Familie" } },
+  { id: "m9", tenant: "musterland", title: "Mehr Beratung zum Kindergeld in allen Landkreisen", teaser: "Ab November bieten Beratungsstellen in allen fünf Landkreisen offene Sprechstunden zu Familienleistungen an.", date: "2026-10-01", topic: "Familie", source: "Ministerium für Gesundheit und Familie", image: { scene: "haeuser", alt: "Illustration: Reihe von Wohnhäusern mit Vorgärten", credit: "Ministerium für Gesundheit und Familie" } },
   { id: "m1", tenant: "musterland", title: "Landesregierung beschließt Programm für Dorfläden", teaser: "Bis 2028 fließen Mittel in Nahversorgung auf dem Land. Anträge sind ab Januar möglich.", date: "2026-10-14", topic: "Wirtschaft", source: "Staatskanzlei", image: { scene: "laden", alt: "Dorfladen mit gestreifter Markise, davor Kisten mit Obst, Gemüse und Kürbissen", photo: "/images/news/m1-dorfladen.webp", credit: "Staatskanzlei/Bildstelle" } },
   { id: "m2", tenant: "musterland", title: "Neue Schulsozialarbeit an 40 Standorten", teaser: "Das Bildungsministerium stockt die Stellen auf. Schulen können sich bis Ende November melden.", date: "2026-10-09", topic: "Bildung", source: "Ministerium für Bildung", image: { scene: "schule", alt: "Eingang eines modernen Schulgebäudes mit Fahrradständern und Herbstbäumen", photo: "/images/news/m2-schule.webp", credit: "Ministerium für Bildung" } },
   { id: "m3", tenant: "musterland", title: "Hochwasserschutz an der Musterau fertig", teaser: "Der neue Deich schützt rund 3.000 Haushalte. Der Radweg auf der Deichkrone ist wieder offen.", date: "2026-10-02", topic: "Umwelt", source: "Ministerium für Umwelt", image: { scene: "deich", alt: "Luftbild eines grünen Deichs am Fluss mit Radweg auf der Krone, dahinter ein Dorf", photo: "/images/news/m3-deich.webp", credit: "Ministerium für Umwelt/Luftbild" } },
   { id: "m4", tenant: "musterland", title: "Vereinsförderung: zweiter Stichtag naht", teaser: "Vereine können Projekte für das kommende Jahr bis zum 30. September einreichen.", date: "2026-09-18", topic: "Ehrenamt", source: "Staatskanzlei", image: { scene: "verein", alt: "Ehrenamtliche stellen in einer hellen Halle Tische und Stühle auf", photo: "/images/news/m4-verein.webp", credit: "Staatskanzlei/Bildstelle" } },
-  { id: "m5", tenant: "musterland", title: "Landarztquote zeigt erste Wirkung", teaser: "Zwölf Ärztinnen und Ärzte haben sich in unterversorgten Regionen niedergelassen.", date: "2026-08-27", topic: "Gesundheit", source: "Ministerium für Gesundheit", image: { scene: "praxis", alt: "Eingang einer Arztpraxis in einem renovierten Dorfhaus mit Bank und Pflanzen", photo: "/images/news/m5-praxis.webp", credit: "Ministerium für Gesundheit" } },
+  { id: "m5", tenant: "musterland", title: "Landarztquote zeigt erste Wirkung", teaser: "Zwölf Ärztinnen und Ärzte haben sich in unterversorgten Regionen niedergelassen.", date: "2026-08-27", topic: "Gesundheit", source: "Ministerium für Gesundheit und Familie", image: { scene: "praxis", alt: "Eingang einer Arztpraxis in einem renovierten Dorfhaus mit Bank und Pflanzen", photo: "/images/news/m5-praxis.webp", credit: "Ministerium für Gesundheit und Familie" } },
   { id: "m6", tenant: "musterland", title: "Digitale Bauanträge in allen Landkreisen", teaser: "Ab sofort lassen sich Bauanträge im ganzen Land vollständig online stellen.", date: "2026-07-15", topic: "Digitales", source: "Ministerium für Digitales", image: { scene: "digital", alt: "Laptop mit einem Grundriss auf dem Bildschirm, daneben Kaffeetasse und Pflanze", photo: "/images/news/m6-digital.webp", credit: "Ministerium für Digitales" } },
   { id: "m7", tenant: "musterland", title: "Sommerferien: Badestellen mit bester Wasserqualität", teaser: "41 von 44 Badestellen erhalten die Bestnote. Die Karte zeigt alle Messwerte.", date: "2025-07-01", topic: "Umwelt", source: "Ministerium für Umwelt", image: { scene: "see", alt: "Holzsteg an einem klaren See mit Bojen, im Hintergrund Wald", photo: "/images/news/m7-see.webp", credit: "Ministerium für Umwelt" } },
+  { id: "b7", tenant: "beispielstadt", title: "Familienbüro hilft beim Kindergeldantrag", teaser: "Im Familienbüro im Rathaus gibt es dienstags Hilfe beim Ausfüllen des Online-Antrags.", date: "2026-10-13", topic: "Familie", source: "Jugendamt", image: { scene: "rathaus", alt: "Illustration: Rathaus mit Uhrturm am Marktplatz", credit: "Jugendamt Beispielstadt" } },
   { id: "b1", tenant: "beispielstadt", title: "Bürgeramt jetzt auch samstags geöffnet", teaser: "Ab November öffnet das Bürgeramt jeden ersten Samstag im Monat von 9 bis 13 Uhr.", date: "2026-10-15", topic: "Rathaus", source: "Bürgeramt", image: { scene: "rathaus", alt: "Historisches Rathaus mit Uhrturm am Marktplatz im Morgenlicht", photo: "/images/news/b1-rathaus.webp", credit: "Stadt Beispielstadt/Presseamt" } },
   { id: "b2", tenant: "beispielstadt", title: "Kitaplätze: Anmeldung für 2027 startet", teaser: "Eltern können ab sofort ihre Wunsch-Kitas im Serviceportal angeben.", date: "2026-10-06", topic: "Familie", source: "Jugendamt", image: { scene: "spielplatz", alt: "Spielplatz einer Kita mit Rutsche, Schaukel und Sandkasten im Herbstlaub", photo: "/images/news/b2-spielplatz.webp", credit: "Jugendamt Beispielstadt" } },
   { id: "b3", tenant: "beispielstadt", title: "Baustelle Marktplatz: Umleitung für Busse", teaser: "Die Linien 2 und 5 fahren bis Dezember über die Hafenstraße.", date: "2026-09-29", topic: "Verkehr", source: "Tiefbauamt", image: { scene: "bus", alt: "Linienbus fährt an einer Baustellenabsperrung mit Warnleuchten vorbei", photo: "/images/news/b3-baustelle.webp", credit: "Tiefbauamt Beispielstadt" } },
@@ -28,6 +31,18 @@ export function newsFor(tenant: Tenant): NewsItem[] {
 }
 
 const PAGES: ContentPage[] = [
+  {
+    tenant: "musterland",
+    slug: "kindergeld",
+    title: "Kindergeld: Das Wichtigste für Familien",
+    lead: "Kindergeld unterstützt Familien jeden Monat. Hier lesen Sie, wer es bekommt, wie hoch es ist und wie der Antrag funktioniert.",
+    sections: [
+      { id: "wer", title: "Wer bekommt Kindergeld?", body: ["Eltern, Pflegeeltern oder Großeltern, bei denen das Kind lebt.", "Für jedes Kind bekommt nur eine Person Kindergeld."] },
+      { id: "hoehe", title: "Wie hoch ist das Kindergeld?", body: ["Beispielwert im Klick-Dummy: 250 Euro pro Kind und Monat.", "Der Betrag ist für alle Kinder gleich hoch."] },
+      { id: "antrag", title: "So stellen Sie den Antrag", body: ["Den Antrag stellen Sie online über die Leistung „Kindergeld beantragen“.", "Sie brauchen die Geburtsurkunde, die Steuer-Identifikationsnummern und Ihre Bankverbindung."] },
+      { id: "beratung", title: "Beratung", body: ["Das Ministerium für Gesundheit und Familie berät unter 0100 123 48 00, Montag bis Freitag von 8 bis 18 Uhr."] },
+    ],
+  },
   {
     tenant: "musterland",
     slug: "land-und-leute",
@@ -154,12 +169,12 @@ export const THEMES = [
   { title: "Bildung", text: "Schulen, Kitas, Weiterbildung", query: "bildung" },
   { title: "Umwelt", text: "Natur, Wasser, Klimaschutz", query: "umwelt" },
   { title: "Wirtschaft", text: "Förderung, Arbeit, Ansiedlung", query: "wirtschaft" },
-  { title: "Gesundheit", text: "Versorgung, Pflege, Vorsorge", query: "gesundheit" },
+  { title: "Gesundheit und Familie", text: "Versorgung, Pflege, Kindergeld", query: "familie" },
 ];
 
 // Services shown under "Häufig gesucht", by portal type.
 export const FEATURED_SERVICES: Record<Tenant["type"], string[]> = {
-  info: ["vereinsfoerderung-beantragen", "baugenehmigung-beantragen", "fuehrungszeugnis-beantragen", "fischereischein-beantragen"],
+  info: ["kindergeld-beantragen", "vereinsfoerderung-beantragen", "baugenehmigung-beantragen", "fuehrungszeugnis-beantragen"],
   service: ["personalausweis-beantragen", "wohnsitz-anmelden", "kitaplatz-beantragen", "hund-anmelden", "wohngeld-beantragen", "fahrzeug-zulassen"],
 };
 

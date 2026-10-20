@@ -119,6 +119,22 @@ export const SERVICES: Service[] = [
     ],
   },
   {
+    slug: "kindergeld-beantragen",
+    title: "Kindergeld beantragen",
+    summary: "Monatliche Unterstützung für Familien, ab dem Monat der Geburt. Der Antrag geht vollständig online.",
+    keywords: ["kindergeld", "familienkasse", "familie", "eltern", "geburt"],
+    level: "land",
+    online: true,
+    costs: "kostenlos",
+    duration: "etwa 4 bis 6 Wochen",
+    documents: ["Geburtsurkunde des Kindes", "Steuer-Identifikationsnummer von Ihnen und Ihrem Kind", "Bankverbindung für die Auszahlung"],
+    sections: [
+      { title: "Voraussetzungen", body: ["Sie wohnen im Land, und das Kind lebt in Ihrem Haushalt.", "Für jedes Kind bekommt nur eine Person Kindergeld."] },
+      { title: "Fristen", body: ["Beispiel aus der Vorlage: rückwirkend höchstens für sechs Monate."] },
+      { title: "Ablauf", body: ["Online beantragen und die Geburtsurkunde hochladen.", "Die Familienkasse prüft den Antrag und meldet sich im Postfach.", "Der Bescheid kommt ins Postfach, das Geld monatlich aufs Konto."] },
+    ],
+  },
+  {
     slug: "fahrzeug-zulassen",
     title: "Fahrzeug zulassen",
     summary: "Ein neues oder gebrauchtes Fahrzeug anmelden und Kennzeichen erhalten.",

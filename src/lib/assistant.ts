@@ -6,6 +6,7 @@ import { formatDate, pluralize } from "@/lib/format";
 import { type Office, officeForPlace, officeOf } from "@/lib/offices";
 import { findPlaces } from "@/lib/place-store";
 import { normalize, searchInformation, searchServices } from "@/lib/smart-search";
+import { routeQuery } from "@/lib/search-router";
 import type { Service, Tenant } from "@/lib/types";
 
 // Guided assistant: a small dialogue on top of the search engine. It asks only what the answer
@@ -498,6 +499,31 @@ class Turn {
     });
   }
 
+  // Like the search: one request goes to one pot. Information only when that is what is asked for.
+  information(query: string, service?: Service) {
+    const hits = searchInformation(this.env.tenant, query).slice(0, 4);
+    const back = service ? [{ label: `Lieber: ${service.title}`, value: `#leistung:${service.slug}` }] : [];
+    if (!hits.length) {
+      return this.say({ text: [`Zu „${query.trim()}“ finde ich keine Informationen oder Meldungen.`], choices: [...back, TALK_TO_HUMAN] });
+    }
+    this.say({
+      text: ["Dazu habe ich Informationen und Meldungen gefunden:"],
+      links: hits.map((hit) => ({ label: hit.title, href: this.env.base + hit.href })),
+      choices: back,
+    });
+  }
+
+  // Unclear whether the person wants to apply or to read: one question instead of a guess.
+  askPot(query: string, service: Service) {
+    this.say({
+      text: [`Möchten Sie „${service.title}“ erledigen oder Informationen und Meldungen dazu lesen?`],
+      choices: [
+        { label: service.title, value: `#leistung:${service.slug}` },
+        { label: "Informationen und Meldungen", value: `#info:${query.trim()}` },
+      ],
+    });
+  }
+
   clarify(services: Service[]) {
     this.say({
       text: ["Dazu passen mehrere Leistungen. Welche meinen Sie?"],
@@ -556,6 +582,10 @@ function handleToken(turn: Turn, token: string) {
     return service ? turn.service(service) : turn.help();
   }
   if (token.startsWith("#detail:") && current) return turn.detail(current, token.slice(8) as Detail);
+  if (token.startsWith("#info:")) {
+    const query = token.slice(6);
+    return turn.information(query, searchServices(query).answer);
+  }
   if (token.startsWith("#ort:")) {
     const place = env.places.find((p) => p.id === token.slice(5));
     return place ? turn.place(pendingService ?? current, place) : turn.askPlace(pendingService ?? current);
@@ -601,12 +631,16 @@ function handleText(turn: Turn, text: string) {
   if (mentions(text, SIMPLE)) return turn.simple();
 
   const detail = detailIn(text);
+  const route = routeQuery(text);
+  if (route.pot === "informationen" && !detail) return turn.information(text, found.service);
   if (found.service) {
     c.question = text.trim();
     // "Ich ziehe nach Seehausen": the place comes with the request.
     const named = placesIn(text, env.places, false);
     if (named.length === 1 && found.service.level === "kommune") c.place = named[0].id;
-    return detail ? turn.detail(found.service, detail) : turn.service(found.service);
+    if (detail) return turn.detail(found.service, detail);
+    if (!route.pot && !named.length) return turn.askPot(text, found.service);
+    return turn.service(found.service);
   }
   if (found.options.length > 1) return turn.clarify(found.options);
 

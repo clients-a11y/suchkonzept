@@ -107,6 +107,14 @@ function scoreText(queryTokens: string[], title: string, text: string): number {
   return score;
 }
 
+// Phrases from the life situations that the request contains, for the search switch.
+export function intentPhrases(input: string): string[] {
+  const query = normalize(input);
+  const queryTokens = tokens(input);
+  if (!queryTokens.length) return [];
+  return INTENTS.flatMap((intent) => intent.phrases.filter((p) => phraseMatches(p, query, queryTokens, false)));
+}
+
 // Pot 1: services. Uses only the catalogue, which can ship with the page as a static file.
 export function searchServices(input: string, typing = false): ServiceResult {
   const query = normalize(input);

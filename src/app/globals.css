@@ -1260,6 +1260,66 @@ button.pf-steps__link:hover .pf-steps__label {
   bottom: 0.25rem;
 }
 
+/* Test case script */
+
+.pf-case__note {
+  margin-top: 0.75rem;
+}
+
+.pf-case__intro {
+  max-width: 44rem;
+  margin-top: 0.5rem;
+}
+
+.pf-cases {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: case;
+}
+
+.pf-case {
+  display: grid;
+  gap: 0.375rem;
+  justify-items: start;
+  padding: 1rem 1.25rem 1rem 3.25rem;
+  border: 1px solid var(--pf-line);
+  border-radius: 4px;
+  background: var(--pf-white);
+  counter-increment: case;
+  position: relative;
+}
+
+.pf-case::before {
+  content: counter(case);
+  position: absolute;
+  top: 1rem;
+  left: 1.125rem;
+  color: var(--pf-red);
+  font-family: var(--f-mono), monospace;
+  font-weight: 600;
+}
+
+.pf-case__input {
+  font-size: 1.0625rem;
+}
+
+.pf-case__label {
+  font-weight: 700;
+}
+
+.pf-case .pf-btn {
+  margin-top: 0.375rem;
+}
+
+@media (min-width: 56rem) {
+  .pf-cases {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Password gate for shared previews */
 
 .pf-access__bar {
@@ -2190,12 +2250,14 @@ button.pf-steps__link:hover .pf-steps__label {
 
 .t-smart__field {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+/* The buttons move below the field when it would get too narrow. */
 .t-smart__control {
   position: relative;
-  flex: 1;
+  flex: 1 1 15rem;
   min-width: 0;
 }
 
@@ -3750,18 +3812,10 @@ button.pf-steps__link:hover .pf-steps__label {
   border-top: 0;
 }
 
-.t-smart__assist {
-  display: flex;
+.t-smart__chatoption {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-}
-
-.t-smart__assist svg {
-  flex: none;
-  color: var(--t-primary);
 }
 
 .t-route__bar {
@@ -3778,6 +3832,52 @@ button.pf-steps__link:hover .pf-steps__label {
 
 .t-route__bar p {
   max-width: 44rem;
+}
+
+.t-route__why {
+  flex-basis: 100%;
+  font-size: 0.9375rem;
+}
+
+.t-route__why summary {
+  color: var(--t-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.t-route .t-route__why {
+  margin-top: 1.25rem;
+}
+
+.t-route__points {
+  display: grid;
+  gap: 0.75rem 2rem;
+  margin-top: 0.75rem;
+}
+
+.t-route__points ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.t-route__pot {
+  font-weight: 700;
+}
+
+.t-route__none,
+.t-route__rule {
+  color: var(--t-muted);
+}
+
+.t-route__rule {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 40rem) {
+  .t-route__points {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .t-route {
@@ -4218,9 +4318,11 @@ button.pf-steps__link:hover .pf-steps__label {
   padding-bottom: 5rem;
 }
 
-/* A small window would cover the page on phones: there the launcher opens the assistant page. */
+/* A small window would cover the page on phones: there the launcher opens the assistant page.
+   On the start page the search already offers "Im Chat fragen", so the launcher steps aside. */
 @media (max-width: 39.99rem) {
-  .t-dock__panel {
+  .t-dock__panel,
+  .t-dock--home {
     display: none;
   }
 }
@@ -4467,6 +4569,10 @@ button.pf-steps__link:hover .pf-steps__label {
 
   .t-smart__field {
     flex-direction: column;
+  }
+
+  .t-smart__control {
+    flex-basis: auto;
   }
 
   .t-smart__form {

@@ -48,7 +48,7 @@ studio background, soft light, business attire, friendly neutral expression“
 | `musterland-staatskanzlei` | Dr. Erika Mustermann, Ministerpräsidentin | woman in her late fifties, short grey hair, glasses, dark blazer |
 | `musterland-bildung` | Sabine Beispiel, Ministerin für Bildung | woman in her mid forties, shoulder-length brown hair, blue blazer |
 | `musterland-umwelt` | Jonas Vorlage, Minister für Umwelt | man around forty, short beard, green-grey jacket, open collar |
-| `musterland-gesundheit` | Dr. Leyla Platzhalter, Ministerin für Gesundheit | woman in her early forties, dark hair tied back, light grey blazer |
+| `musterland-gesundheit` | Dr. Leyla Platzhalter, Ministerin für Gesundheit und Familie | woman in her early forties, dark hair tied back, light grey blazer |
 | `musterland-wirtschaft` | Tobias Entwurf, Minister für Wirtschaft | man around fifty, short dark blond hair, navy suit, tie |
 | `musterland-digitales` | Mia Prototyp, Ministerin für Digitales | woman in her mid thirties, short curly hair, black blazer |
 | `musterland-inneres` | Paul Probe, Minister für Inneres | man around sixty, grey hair, glasses, dark suit, tie |

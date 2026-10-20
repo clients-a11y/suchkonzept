@@ -34,6 +34,9 @@ export function DemoBar() {
         <Link href="/neu" className="pf-demobar__cta">
           Neuen Mandanten anlegen
         </Link>
+        <Link href="/testfall" className="pf-demobar__home">
+          Testfall Kindergeld
+        </Link>
         {tenant.custom && (
           <Link href={`/bearbeiten?mandant=${tenant.id}`} className="pf-demobar__home">
             Diesen Mandanten bearbeiten

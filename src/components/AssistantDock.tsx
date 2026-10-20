@@ -62,7 +62,7 @@ export function AssistantDock() {
   };
 
   return (
-    <div className="t-dock">
+    <div className={pathname === base ? "t-dock t-dock--home" : "t-dock"}>
       {used && (
         <section
           ref={panelRef}

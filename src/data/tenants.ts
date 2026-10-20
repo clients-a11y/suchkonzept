@@ -56,7 +56,7 @@ export const TENANTS: Tenant[] = [
     assistant: {
       enabled: true,
       greeting: "Guten Tag! Ich bin der automatische Assistent des Landesportals. Ich finde mit Ihnen die passende Leistung und die zuständige Stelle, auch in Ihrer Gemeinde.",
-      starters: ["Mein Ausweis läuft ab", "Zuschuss für unseren Sportverein", "Ich ziehe nach Seehausen", "Wie ist der Stand meines Antrags?"],
+      starters: ["Kindergeld beantragen", "Ich ziehe nach Seehausen", "Wie ist der Stand meines Antrags?"],
     },
     contact: {
       office: "Bürgerservice der Landesregierung",
@@ -117,7 +117,7 @@ export const TENANTS: Tenant[] = [
     assistant: {
       enabled: true,
       greeting: "Guten Tag! Ich bin der automatische Assistent des Rathauses Beispielstadt. Ich helfe Ihnen, Ihr Anliegen zu erledigen.",
-      starters: ["Ich bin umgezogen", "Wir bekommen ein Kind", "Hund anmelden", "Wie ist der Stand meines Antrags?"],
+      starters: ["Ich bin umgezogen", "Wir haben ein Baby bekommen", "Wie ist der Stand meines Antrags?"],
     },
     contact: {
       office: "Bürgeramt Beispielstadt",

@@ -19,6 +19,7 @@ export function PlatformMark({ size = 28 }: { size?: number }) {
 const LINKS = [
   { href: "/", label: "Übersicht" },
   { href: "/neu", label: "Neuen Mandanten anlegen" },
+  { href: "/testfall", label: "Testfall Kindergeld" },
 ];
 
 export function PlatformShell({ children }: { children: ReactNode }) {

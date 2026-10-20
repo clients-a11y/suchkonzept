@@ -207,12 +207,22 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   - Einstiege: Startseite unter der Suche, Suchseite bei unklaren Treffern; auf breiten Bildschirmen öffnen
     sie das Fenster und geben die Frage mit. Mandant: Schalter, Begrüßung und
     Einstiegsfragen (`assistant` in `tenants.ts`, Schalter im Assistenten zum Anlegen).
+- **Chat in der KI-Suche:** Knopf „Im Chat fragen“ neben „Suchen“ und ein Eintrag im Vorschlagsmenü. Beide
+  geben das Getippte an das Fenster weiter (auf dem Handy an die Seite `/assistent`).
+- **Testfall Kindergeld** (`/testfall`, verlinkt in Plattform-Navigation und Demo-Leiste): Vorführablauf mit
+  Suche, Vorschlägen, Antrag bis zum Formular, Chat und Inhalten. Dazu gehören die Landesleistung „Kindergeld
+  beantragen“ mit Formular, die Infoseite `/musterland/seite/kindergeld`, zwei Meldungen in Musterland und eine
+  in Beispielstadt. Das Ministerium für Gesundheit heißt jetzt „Ministerium für Gesundheit und Familie“.
 - **Suchweiche** (`src/lib/search-router.ts`): Das Backend kann nur einen Suchtopf je Anfrage durchsuchen,
   Leistungen oder Informationen. Die Weiche entscheidet vorab ohne Datenbank, nur mit dem Leistungskatalog als
   statischer Datei und festen Signalwörtern. Eindeutig: Suche in einem Topf, mit Begründung und Knopf
   „Stattdessen in … suchen“. Unklar (etwa „Kita“, „Hund“, „Hochwasser“): Rückfrage „Was suchen Sie?“ mit
-  zwei Antworten. Vorschläge beim Tippen kommen nur aus dem Leistungskatalog. Der Assistent fragt
-  Informationen nur als zweiten Schritt ab, wenn keine Leistung passt.
+  zwei Antworten. Vorschläge beim Tippen kommen nur aus dem Leistungskatalog. Signalwörter nach Art mit Punkten:
+  Handlung (beantragen, Antrag …) 3, Dokument (Ausweis, Zeugnis …) 2, Art des Inhalts (Meldung, Pressemitteilung,
+  Neuigkeiten …) 4, Thema (Ministerium, Programm …) 2, Jahreszahl 1, Treffer im Leistungskatalog 1 oder 2,
+  erkanntes Anliegen 1. Leistungen ab 3 Punkten, Informationen ab 2, jeweils mit 1 Punkt Vorsprung. Die
+  Ergebnisseite zeigt die Rechnung unter „So hat die Suche entschieden“. Der Assistent nutzt dieselbe Weiche
+  und fragt bei Unklarheit „erledigen oder Informationen lesen?“.
 
 ## Vorschau mit Passwort (Nachtrag 20.10.2026)
 

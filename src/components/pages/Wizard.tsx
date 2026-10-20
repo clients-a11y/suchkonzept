@@ -128,7 +128,7 @@ function buildTenant(draft: Draft, id: string, seconds?: number): Tenant {
 
 function uniqueId(name: string, taken: string[]): string {
   const base = slugify(name) || "mandant";
-  const reserved = new Set(["neu", "bearbeiten", "zugang", ...taken]);
+  const reserved = new Set(["neu", "bearbeiten", "zugang", "testfall", ...taken]);
   let id = base;
   for (let n = 2; reserved.has(id); n++) id = `${base}-${n}`;
   return id;
