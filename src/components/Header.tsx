@@ -32,6 +32,7 @@ function useDisclosure(buttonRef: RefObject<HTMLButtonElement | null>) {
 
 type NavListProps = {
   items: NavItem[];
+  chat: boolean;
   base: string;
   id: string;
   open: boolean;
@@ -39,7 +40,7 @@ type NavListProps = {
   isCurrent?: (href: string) => boolean;
 };
 
-function NavList({ items, base, id, open, onNavigate, isCurrent }: NavListProps) {
+function NavList({ items, chat, base, id, open, onNavigate, isCurrent }: NavListProps) {
   return (
     <ul id={id} className="t-nav__list" data-open={open}>
       {items.map((item) => (
@@ -54,6 +55,20 @@ function NavList({ items, base, id, open, onNavigate, isCurrent }: NavListProps)
           </Link>
         </li>
       ))}
+      {/* On phones the floating chat button would cover the page: the chat sits in the menu. */}
+      {chat && (
+        <li className="t-nav__chat">
+          <Link
+            href={`${base}/assistent`}
+            className="t-nav__link"
+            aria-current={isCurrent?.("/assistent") ? "page" : undefined}
+            onClick={onNavigate}
+          >
+            <IconBubble size={18} />
+            Chat-Assistent
+          </Link>
+        </li>
+      )}
     </ul>
   );
 }
@@ -160,7 +175,7 @@ export function Header() {
   if (tenant.meta.es) meta.push({ href: "/seite/einfache-sprache", label: "Einfache Sprache", icon: <IconBubble size={18} /> });
   const multilingual = tenant.languages.length > 1;
 
-  const listProps = { items: tenant.nav, base, id: menuId, open, onNavigate: () => setOpen(false) };
+  const listProps = { items: tenant.nav, chat: tenant.assistant?.enabled !== false, base, id: menuId, open, onNavigate: () => setOpen(false) };
 
   return (
     <header className="t-header" {...origin("mandant", "Mandant · Einstellung: Name, Emblem, Menü")}>

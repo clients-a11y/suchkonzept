@@ -1,13 +1,14 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import type { KeyboardEvent } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { AssistantChat } from "@/components/AssistantChat";
 import type { ChatRequest } from "@/components/AssistantChat";
 import { IconBubble, IconClose } from "@/components/Icons";
 import { DOCK_MEDIA, registerDock } from "@/lib/assistant-dock";
+import { clearHandoff, parseHandoff, readHandoffRaw, subscribeChat } from "@/lib/chat-store";
 
 // Small chat window at the bottom right. It does not block the page (non-modal dialog), keeps the
 // conversation while the person moves through the portal and closes with Escape.
@@ -21,17 +22,33 @@ export function AssistantDock() {
   const [open, setOpen] = useState(false);
   const [used, setUsed] = useState(false);
   const [request, setRequest] = useState<ChatRequest | undefined>();
+  const [seenHandoff, setSeenHandoff] = useState<string | null>(null);
+  const waiting = useSyncExternalStore(subscribeChat, readHandoffRaw, () => null);
 
   const enabled = tenant.assistant?.enabled !== false;
   // On the assistant page the chat is already there.
   const onPage = pathname === `${base}/assistent`;
 
-  useEffect(() => {
-    if (!enabled || onPage) return;
-    registerDock((question) => {
+  // Another portal handed a conversation over: open the window with it.
+  if (waiting && waiting !== seenHandoff && enabled && !onPage) {
+    setSeenHandoff(waiting);
+    const handoff = parseHandoff(waiting);
+    if (handoff?.tenantId === tenant.id && window.matchMedia(DOCK_MEDIA).matches) {
       setUsed(true);
       setOpen(true);
-      if (question) setRequest((last) => ({ question, nonce: (last?.nonce ?? 0) + 1 }));
+      setRequest((last) => ({ handoff: { question: handoff.question, from: handoff.from, place: handoff.place }, nonce: (last?.nonce ?? 0) + 1 }));
+    }
+  }
+  useEffect(() => {
+    if (seenHandoff && parseHandoff(seenHandoff)?.tenantId === tenant.id) clearHandoff();
+  }, [seenHandoff, tenant.id]);
+
+  useEffect(() => {
+    if (!enabled || onPage) return;
+    registerDock((question, place) => {
+      setUsed(true);
+      setOpen(true);
+      if (question) setRequest((last) => ({ question, place, nonce: (last?.nonce ?? 0) + 1 }));
     });
     return () => registerDock(null);
   }, [enabled, onPage]);
@@ -62,7 +79,7 @@ export function AssistantDock() {
   };
 
   return (
-    <div className={pathname === base ? "t-dock t-dock--home" : "t-dock"}>
+    <div className="t-dock">
       {used && (
         <section
           ref={panelRef}

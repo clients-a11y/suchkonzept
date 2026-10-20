@@ -4,7 +4,7 @@
 // small window would cover the page, so there the entry points lead to the assistant page.
 export const DOCK_MEDIA = "(min-width: 40rem)";
 
-type Opener = (question?: string) => void;
+type Opener = (question?: string, place?: string) => void;
 let opener: Opener | null = null;
 
 export function registerDock(fn: Opener | null) {
@@ -12,8 +12,9 @@ export function registerDock(fn: Opener | null) {
 }
 
 // True if the window took over; otherwise the caller's link to the assistant page applies.
-export function openAssistant(question?: string): boolean {
+// A place entered just before (in the search) counts as confirmed in the conversation.
+export function openAssistant(question?: string, place?: string): boolean {
   if (!opener || !window.matchMedia(DOCK_MEDIA).matches) return false;
-  opener(question);
+  opener(question, place);
   return true;
 }

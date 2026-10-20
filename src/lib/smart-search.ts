@@ -10,7 +10,7 @@ import type { Service, Tenant } from "@/lib/types";
 // Like the real backend it has two separate pots that are never searched at once:
 // services from the catalogue, and information (news, pages, projects, offices).
 
-export type InfoHit = { key: string; kind: string; title: string; text: string; href: string; score: number };
+export type InfoHit = { key: string; kind: string; title: string; text: string; href: string; score: number; date?: string };
 export type ServiceHit = { service: Service; score: number };
 export type ServiceResult = {
   query: string;
@@ -93,19 +93,34 @@ function phraseMatches(phrase: string, query: string, queryTokens: string[], typ
   return parts.length > 1 && parts.every((p) => queryTokens.some((t) => compare(t, p, false) !== null));
 }
 
-// Exact words in the title count most, similar words less, words in the text least.
+// In running text only clear matches count: the same word, or a word that starts with the
+// search word. "Bürger" must not count for "Bürgeramt".
+function inText(t: string, w: string): boolean {
+  return t === w || (t.length >= 4 && w.startsWith(t)) || (t.length >= 6 && w.includes(t));
+}
+
+// Exact words in the title count most, similar words less, words in the text least. A title that
+// contains every search word gets a bonus.
 function scoreText(queryTokens: string[], title: string, text: string): number {
   const titleWords = tokens(title);
   const textWords = tokens(text);
   let score = 0;
+  let allInTitle = true;
   for (const t of queryTokens) {
     const inTitle = titleWords.map((w) => compare(t, w, false));
     if (inTitle.includes("exact")) score += 4;
     else if (inTitle.some(Boolean)) score += 2;
-    else if (textWords.some((w) => compare(t, w, false))) score += 1;
+    else {
+      allInTitle = false;
+      if (textWords.some((w) => inText(t, w))) score += 1;
+    }
   }
+  if (queryTokens.length > 1 && allInTitle) score += 3;
   return score;
 }
+
+// Equal scores: offices and pages before projects, projects before news; newer news first.
+const KIND_ORDER = ["stelle", "seite", "projekt", "meldung"];
 
 // Phrases from the life situations that the request contains, for the search switch.
 export function intentPhrases(input: string): string[] {
@@ -191,7 +206,7 @@ export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
   const queryTokens = tokens(input);
   if (!queryTokens.length) return [];
   const org = organisationFor(tenant);
-  return [
+  const hits: InfoHit[] = [
     ...org.units.map((u) => ({
       key: `stelle-${u.id}`,
       kind: `${org.unitLabel} · ${u.head.role} ${u.head.name}`,
@@ -223,8 +238,15 @@ export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
       text: n.teaser,
       href: `/aktuelles#meldung-${n.id}`,
       score: scoreText(queryTokens, `${n.title} ${n.topic}`, `${n.teaser} ${n.source}`),
+      date: n.date,
     })),
-  ]
+  ];
+  return hits
     .filter((h) => h.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        KIND_ORDER.indexOf(a.key.split("-")[0]) - KIND_ORDER.indexOf(b.key.split("-")[0]) ||
+        (b.date ?? "").localeCompare(a.date ?? ""),
+    );
 }

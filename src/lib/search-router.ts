@@ -1,3 +1,4 @@
+import { CURATED_TERMS } from "@/data/search-terms";
 import { intentPhrases, normalize, searchServices } from "@/lib/smart-search";
 
 // Search switch: decides before the search which pot a request goes to, because the backend can
@@ -39,7 +40,7 @@ const SIGNALS: { pot: Pot; label: string; points: number; stems: string[] }[] = 
 ];
 
 // Thresholds: a pot needs enough points and a lead over the other one.
-export const RULE = "Leistungen ab 3 Punkten, Informationen ab 2 Punkten, jeweils mit mindestens 1 Punkt Vorsprung. Sonst fragt die Suche nach.";
+export const RULE = "Leistungen ab 3 Punkten, Informationen ab 2 Punkten, jeweils mit mindestens 1 Punkt Vorsprung. Sonst fragt die Suche nach. Von der Redaktion zugeordnete Suchbegriffe zählen 10 Punkte.";
 
 export type Signal = { pot: Pot; word: string; label: string; points: number };
 export type Route = { pot?: Pot; signals: Signal[]; points: Record<Pot, number>; catalogue?: string };
@@ -84,6 +85,11 @@ export function routeQuery(input: string): Route {
     const phrase = intentPhrases(input)[0];
     if (phrase) signals.push({ pot: "leistungen", word: phrase, label: "Anliegen erkannt", points: 1 });
   }
+
+  // Terms the editorial team has placed win over the signal words.
+  const whole = ` ${normalize(input)} `;
+  const curated = CURATED_TERMS.find((c) => whole.includes(` ${c.term} `));
+  if (curated) signals.push({ pot: curated.pot, word: input.trim(), label: "Von der Redaktion zugeordnet", points: 10 });
 
   const points: Record<Pot, number> = { leistungen: 0, informationen: 0 };
   for (const s of signals) points[s.pot] += s.points;

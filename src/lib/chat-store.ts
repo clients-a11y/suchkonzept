@@ -51,17 +51,33 @@ export function saveHandoff(handoff: PendingHandoff) {
   }
 }
 
-// Returns the waiting handover for this portal once and removes it.
-export function takeHandoff(tenantId: string): PendingHandoff | null {
+export function subscribeChat(callback: () => void): () => void {
+  window.addEventListener(EVENT, callback);
+  return () => window.removeEventListener(EVENT, callback);
+}
+
+// The waiting handover as text, so components can read it like a store.
+export function readHandoffRaw(): string | null {
   try {
-    const raw = storage()?.getItem(HANDOFF);
-    if (!raw) return null;
-    const handoff = JSON.parse(raw) as PendingHandoff;
-    if (handoff.tenantId !== tenantId) return null;
-    storage()?.removeItem(HANDOFF);
-    return handoff;
+    return storage()?.getItem(HANDOFF) ?? null;
   } catch {
     return null;
+  }
+}
+
+export function parseHandoff(raw: string): PendingHandoff | null {
+  try {
+    return JSON.parse(raw) as PendingHandoff;
+  } catch {
+    return null;
+  }
+}
+
+export function clearHandoff() {
+  try {
+    storage()?.removeItem(HANDOFF);
+  } catch {
+    // Nothing stored.
   }
 }
 

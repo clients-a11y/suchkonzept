@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, MouseEvent } from "react";
 import { useCurrentTenant } from "@/components/TenantContext";
 import { IconArrow } from "@/components/Icons";
 import { respond, startConversation } from "@/lib/assistant";
@@ -11,13 +12,28 @@ import { signIn, useAccount } from "@/lib/account-store";
 import { allPlaces, setPlaceId, usePlaceId } from "@/lib/place-store";
 import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
 import { origin } from "@/lib/origin";
+import { loadChat, onChatChange, saveChat, saveHandoff } from "@/lib/chat-store";
 
 function apply(effects: Effects) {
   if (effects.placeId) setPlaceId(effects.placeId);
   if (effects.signIn) signIn();
 }
 
-function BotItem({ message, active, onChoose, greeting, maxChoices }: { message: BotMessage; active: boolean; onChoose: (choice: Choice) => void; greeting: object; maxChoices: number }) {
+function BotItem({
+  message,
+  active,
+  onChoose,
+  onLink,
+  greeting,
+  maxChoices,
+}: {
+  message: BotMessage;
+  active: boolean;
+  onChoose: (choice: Choice) => void;
+  onLink: (href: string, event: MouseEvent) => void;
+  greeting: object;
+  maxChoices: number;
+}) {
   const { office, list, facts, links, source, choices } = message;
   return (
     <li className="t-chat__msg t-chat__msg--bot" {...(message.greeting ? greeting : {})}>
@@ -62,7 +78,7 @@ function BotItem({ message, active, onChoose, greeting, maxChoices }: { message:
           <ul className="t-chat__links">
             {links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className={link.primary ? "t-btn t-btn--primary" : "t-more"}>
+                <Link href={link.href} className={link.primary ? "t-btn t-btn--primary" : "t-more"} onClick={(event) => onLink(link.href, event)}>
                   {link.label}
                   {!link.primary && <IconArrow size={16} />}
                 </Link>
@@ -93,12 +109,14 @@ function BotItem({ message, active, onChoose, greeting, maxChoices }: { message:
 }
 
 export type Handoff = { question?: string; from?: string; place?: string };
-export type ChatRequest = { question?: string; restart?: boolean; nonce: number };
+export type ChatRequest = { question?: string; place?: string; restart?: boolean; handoff?: Handoff; nonce: number };
 
 // The conversation itself: on its own page or in the small window (dock). The dock passes new
 // questions as requests, the page passes what the search or another portal handed over.
 export function AssistantChat({ variant, handoff, request }: { variant: "page" | "dock"; handoff?: Handoff; request?: ChatRequest }) {
   const { tenant, base } = useCurrentTenant();
+  const router = useRouter();
+  const instance = useId();
   const tenants = useAllTenants();
   const custom = useCustomTenants();
   const placeId = usePlaceId();
@@ -111,6 +129,9 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
   const [conv, setConv] = useState<Conversation | null>(null);
   const [effects, setEffects] = useState<Effects>({});
   const [handled, setHandled] = useState(0);
+  // Counts changes made here; only those are saved, so two open chats do not echo each other.
+  const [changes, setChanges] = useState(0);
+  const saved = useRef(0);
   const [draft, setDraft] = useState("");
   const dock = variant === "dock";
 
@@ -120,19 +141,66 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
   // Start once the browser data is read (place, account). The search or another portal can hand
   // over a question, the place it already knows and where it came from.
   if (conv === null && account !== null && custom !== null) {
-    const started = startConversation(env, handoff ?? {});
-    setConv(started.conv);
-    setEffects(started.effects);
+    // A conversation from before (reload, the other view) continues, unless a new question comes in.
+    const stored = handoff?.question ? null : loadChat(tenant.id);
+    if (stored) {
+      setConv(stored);
+    } else {
+      const started = startConversation(env, handoff ?? {});
+      setConv(started.conv);
+      setEffects(started.effects);
+      setChanges((n) => n + 1);
+    }
   } else if (conv && request && request.nonce !== handled) {
-    // From outside: a new question (for example the search on the start page) or a fresh start.
+    // From outside: a new question (for example the search), a handover or a fresh start.
     setHandled(request.nonce);
-    const next = request.restart ? startConversation(env, {}) : respond(conv, { value: request.question ?? "" }, env);
+    const base = request.place ? { ...conv, place: request.place } : conv;
+    const next = request.handoff
+      ? startConversation(env, request.handoff)
+      : request.restart
+        ? startConversation(env, {})
+        : respond(base, { value: request.question ?? "" }, env);
     setConv(next.conv);
     setEffects(next.effects);
+    setChanges((n) => n + 1);
   }
 
   // Remembering the place and signing in reach other components, so they run after rendering.
   useEffect(() => apply(effects), [effects]);
+
+  // The conversation survives a reload and is shared by the window and the assistant page.
+  useEffect(() => {
+    if (!conv || changes === saved.current) return;
+    saved.current = changes;
+    saveChat(tenant.id, conv, instance);
+  }, [conv, changes, tenant.id, instance]);
+
+  useEffect(
+    () =>
+      onChatChange((change) => {
+        if (change.reset) return setConv(null);
+        if (change.tenantId !== tenant.id || change.source === instance) return;
+        const stored = loadChat(tenant.id);
+        if (stored) setConv(stored);
+      }),
+    [tenant.id, instance],
+  );
+
+  // In the window, a handover to another portal opens the window there instead of a new page.
+  const followLink = (href: string, event: MouseEvent) => {
+    if (!dock) return;
+    const match = href.match(/^\/([^/?]+)\/assistent\?(.*)$/);
+    if (!match || match[1] === tenant.id) return;
+    event.preventDefault();
+    const params = new URLSearchParams(match[2]);
+    saveHandoff({
+      tenantId: match[1],
+      question: params.get("frage") ?? "",
+      from: params.get("von") ?? undefined,
+      place: params.get("ort") ?? undefined,
+    });
+    router.push(`/${match[1]}`);
+  };
 
   const count = conv?.messages.length ?? 0;
   useEffect(() => {
@@ -151,6 +219,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     interacted.current = true;
     setConv(next.conv);
     setEffects(next.effects);
+    setChanges((n) => n + 1);
   };
 
   const choose = (choice: Choice) => {
@@ -171,6 +240,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     const started = startConversation(env, {});
     interacted.current = false;
     setConv(started.conv);
+    setChanges((n) => n + 1);
     if (!dock) window.history.replaceState(null, "", `${base}/assistent`);
     inputRef.current?.focus();
   };
@@ -216,6 +286,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
                 message={message}
                 active={message === last}
                 onChoose={choose}
+                onLink={followLink}
                 greeting={greeting}
                 maxChoices={dock ? 3 : 5}
               />

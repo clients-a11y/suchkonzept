@@ -16,6 +16,10 @@ import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { origin } from "@/lib/origin";
+import { officeForPlace } from "@/lib/offices";
+import { allPlaces, usePlaceId } from "@/lib/place-store";
+import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
+import type { Service } from "@/lib/types";
 import { openAssistant } from "@/lib/assistant-dock";
 
 const OTHER: Record<Pot, Pot> = { leistungen: "informationen", informationen: "leistungen" };
@@ -172,6 +176,31 @@ function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }
   );
 }
 
+// In a Land portal the remembered place shows right away who is in charge, or which portal.
+function AnswerPlace({ service }: { service: Service }) {
+  const { tenant } = useCurrentTenant();
+  const tenants = useAllTenants();
+  const placeId = usePlaceId();
+  const place = allPlaces(useCustomTenants() ?? []).find((p) => p.id === placeId);
+  if (tenant.type !== "info" || service.level !== "kommune" || !place) return null;
+  const portal = place.tenant && place.tenant !== tenant.id ? tenants.find((t) => t.id === place.tenant) : undefined;
+  if (portal) {
+    return (
+      <p className="t-answer__place">
+        Ihr Wohnort {place.name} hat ein eigenes {portal.tagline}:{" "}
+        <Link href={`/${portal.id}/leistungen/${service.slug}`}>
+          {service.title} bei {portal.name}
+        </Link>
+      </p>
+    );
+  }
+  return (
+    <p className="t-answer__place">
+      Zuständig für {place.name}: <strong>{officeForPlace(place, service, tenants).office}</strong>
+    </p>
+  );
+}
+
 // The search switch could not decide: one question, two answers.
 function PotQuestion({ q, route }: { q: string; route?: Route }) {
   const titleId = useId();
@@ -260,6 +289,7 @@ function SearchResults() {
             <Link href={`${base}/leistungen/${answer.slug}`}>{answer.title}</Link>
           </h2>
           <p>{answer.summary}</p>
+          <AnswerPlace service={answer} />
           <ul className="t-facts-line t-answer__facts">
             <li className={answer.online ? "t-facts-line__online" : undefined}>
               {answer.online && <IconCheck size={16} />}
