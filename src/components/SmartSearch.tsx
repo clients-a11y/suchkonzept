@@ -14,6 +14,7 @@ import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { origin } from "@/lib/origin";
+import { openAssistant } from "@/lib/assistant-dock";
 
 type Item = { key: string; group: string; href?: string; fill?: string; label: string; node: ReactNode };
 
@@ -329,7 +330,13 @@ export function SmartSearch({ label }: { label: string }) {
       {tenant.assistant?.enabled !== false && (
         <p className="t-smart__assist">
           <IconBubble size={18} />
-          <Link href={trimmed ? `${base}/assistent?frage=${encodeURIComponent(trimmed)}` : `${base}/assistent`}>
+          <Link
+            href={trimmed ? `${base}/assistent?frage=${encodeURIComponent(trimmed)}` : `${base}/assistent`}
+            onClick={(event) => {
+              // Wide screens: the small window takes the question. Otherwise the link opens the page.
+              if (openAssistant(trimmed || undefined)) event.preventDefault();
+            }}
+          >
             Lieber Schritt für Schritt? Chat-Assistent öffnen
           </Link>
         </p>

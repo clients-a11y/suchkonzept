@@ -201,7 +201,11 @@ behalten immer die Illustrationen. Beschreibungen, Dateinamen und Regeln für al
   - Folgefragen zu Kosten, Unterlagen, Dauer, Fristen und Ablauf, „Einfacher erklären“, Weg zum Menschen.
   - Antragsstand aus dem Demo-Konto, auch per Vorgangsnummer; Anmeldung mit dem Demo-Konto direkt im Chat.
   - Jede Antwort nennt ihre Quelle. Hinweis, dass ein automatisches System antwortet. Verlauf druckbar.
-  - Einstiege: Startseite unter der Suche, Suchseite bei unklaren Treffern. Mandant: Schalter, Begrüßung und
+  - Kleines Fenster rechts unten (`AssistantDock`): nicht modaler Dialog, Escape schließt, Fokus zurück
+    zum Knopf, das Gespräch bleibt beim Blättern im Portal erhalten. Unter 40rem öffnet der Knopf die Seite
+    `/assistent`, weil ein Fenster dort den Inhalt verdecken würde.
+  - Einstiege: Startseite unter der Suche, Suchseite bei unklaren Treffern; auf breiten Bildschirmen öffnen
+    sie das Fenster und geben die Frage mit. Mandant: Schalter, Begrüßung und
     Einstiegsfragen (`assistant` in `tenants.ts`, Schalter im Assistenten zum Anlegen).
 - **Suchweiche** (`src/lib/search-router.ts`): Das Backend kann nur einen Suchtopf je Anfrage durchsuchen,
   Leistungen oder Informationen. Die Weiche entscheidet vorab ohne Datenbank, nur mit dem Leistungskatalog als

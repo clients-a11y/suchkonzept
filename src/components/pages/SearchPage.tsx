@@ -15,6 +15,7 @@ import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { origin } from "@/lib/origin";
+import { openAssistant } from "@/lib/assistant-dock";
 
 const OTHER: Record<Pot, Pot> = { leistungen: "informationen", informationen: "leistungen" };
 
@@ -66,7 +67,13 @@ function AssistantHint({ q }: { q: string }) {
   return (
     <div className="t-assisthint" {...origin("zentral", "Zentral · Plattform: Assistent")}>
       <p>Nicht eindeutig? Der Chat-Assistent fragt nach und grenzt Ihr Anliegen Schritt für Schritt ein.</p>
-      <Link href={`${base}/assistent?frage=${encodeURIComponent(q)}`} className="t-more">
+      <Link
+        href={`${base}/assistent?frage=${encodeURIComponent(q)}`}
+        className="t-more"
+        onClick={(event) => {
+          if (openAssistant(q)) event.preventDefault();
+        }}
+      >
         Mit dem Assistenten weiterfragen <IconArrow size={18} />
       </Link>
     </div>

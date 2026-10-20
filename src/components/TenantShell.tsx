@@ -9,6 +9,7 @@ import { SkipLink } from "@/components/SkipLink";
 import { DemoBar } from "@/components/DemoBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { AssistantDock } from "@/components/AssistantDock";
 import { themeStyle, useTenant } from "@/lib/tenant-store";
 import type { Tenant } from "@/lib/types";
 import { useDocumentTitle } from "@/lib/use-document-title";
@@ -64,6 +65,7 @@ function ThemedShell({ tenant, children }: { tenant: Tenant; children: ReactNode
           {children}
         </main>
         <Footer />
+        <AssistantDock />
       </div>
     </TenantContext.Provider>
   );
