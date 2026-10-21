@@ -912,10 +912,12 @@ main:focus {
 
 /* ---------- Start page: stage ---------- */
 
+/* No overflow clipping: the suggestion list of the search may hang over the next section.
+   The z-index keeps it above cards further down the page. */
 .t-stage {
   position: relative;
+  z-index: 2;
   isolation: isolate;
-  overflow: hidden;
   background: var(--c-navy);
   color: var(--c-white);
 }
