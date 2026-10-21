@@ -7,6 +7,7 @@ import { Suspense, useEffect, useId, useState } from "react";
 import type { CSSProperties } from "react";
 import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { DiagramLink } from "@/components/DiagramLink";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { searchInformation, searchServices } from "@/lib/smart-search";
@@ -206,6 +207,7 @@ function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }
         </div>
         <p className="t-route__rule">{RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.</p>
         <RequestLine q={q} pot={pot} />
+        <DiagramLink />
       </div>
     </details>
   );

@@ -1843,6 +1843,15 @@ main:focus {
   font-size: 0.875rem;
 }
 
+.t-diagramlink {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.t-testcase > .t-diagramlink {
+  margin: 0 0 1rem;
+}
+
 .t-route__code {
   padding: 0.0625rem 0.375rem;
   border-radius: var(--radius);

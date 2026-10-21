@@ -12,6 +12,8 @@ type Site = {
   languages: string[];
   contact: Contact & { email: string; hours: string };
   assistant: { greeting: string; starters: string[] };
+  // Diagram of the search switch for stakeholders, published separately.
+  searchDiagram: string;
 };
 
 // The one portal of this prototype: services of the Land and its municipalities in one place.
@@ -73,4 +75,5 @@ export const SITE: Site = {
       "Guten Tag! Ich bin der automatische Assistent des Verwaltungsportals Musterland. Ich finde mit Ihnen die passende Leistung und die zuständige Stelle, auch in Ihrer Gemeinde.",
     starters: ["Kindergeld beantragen", "Mein Ausweis läuft ab", "Wie ist der Stand meines Antrags?"],
   },
+  searchDiagram: "https://claude.ai/artifact/X5jZUjayMBEJGTudigZuVC",
 };
