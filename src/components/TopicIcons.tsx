@@ -54,18 +54,6 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M15 13v-3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3M5 22h30M18 22v3h4v-3" {...stroke} />
     </>
   ),
-  privat: (
-    <>
-      <circle cx="20" cy="13" r="6" style={tint} {...stroke} />
-      <path d="M8 34c1.2-7 5.8-11 12-11s10.8 4 12 11" {...stroke} />
-    </>
-  ),
-  unternehmen: (
-    <>
-      <path d="M6 34V12l10-4v26M16 34V16h18v18" style={tint} {...stroke} />
-      <path d="M4 34h32M10 15v2M10 21v2M10 27v2M21 21h2M27 21h2M21 27h2M27 27h2" {...stroke} />
-    </>
-  ),
 };
 
 export function TopicIcon({ name }: { name: string }) {

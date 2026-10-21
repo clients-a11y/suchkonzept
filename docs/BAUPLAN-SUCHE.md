@@ -106,7 +106,7 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 
 **Ergänzt**
 - `/leistungen`: Leistungen A bis Z mit Filter „Für Privatpersonen“ und „Für Unternehmen“ (`audience` je Leistung),
-  Ziel der beiden Einstiegskarten und der Brotkrumen auf Leistungsseiten.
+  Ziel der Brotkrumen auf Leistungsseiten.
 - Zwei Leistungen für Unternehmen: „Gewerbe anmelden“ (Gemeinde) und „Förderung für Dorfläden beantragen“ (Land),
   mit Formular und Anliegen in `intents.ts`. „förderung“ allein zeigt nicht mehr auf die Vereinsförderung.
 - Seiten für den Fuß: Über dieses Portal, Kontakt, Hilfe, Impressum, Datenschutz, Barrierefreiheit (Beispieltexte).
@@ -118,8 +118,10 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Kopf: schmale Leiste mit Hinweis „Prototyp“, Testfall und „Demo zurücksetzen“ links, Gebärdensprache, Leichte
   Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
   ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
-- Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche im weißen Feld, Beispiele und zwei
-  Einstiegskarten; danach Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band.
+- Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche im weißen Feld und Beispiele; danach
+  Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band. Die zwei Einstiegskarten
+  „Für Privatpersonen“ und „Für Unternehmen“ aus dem Plan sind auf Wunsch wieder entfernt (21.10.2026); die Suche
+  steht in der Stage allein.
 - Rot nur für die Hauptaktion (Suchen, Online beantragen, Weiter, Absenden). Im Chat sind Senden und Links blau.
 - Unterseiten mit hellblauem Seitenkopf (Brotkrumen, H1, Einleitung), Leistungsseite mit Seitenbox rechts und
   Akkordeons, Suchergebnisse als hellblaue Karten unter den Reitern Leistungen und Informationen.

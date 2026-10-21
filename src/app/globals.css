@@ -961,69 +961,8 @@ main:focus {
   margin-top: 1.5rem;
 }
 
-.t-stage a:not(.t-entry):not(.t-btn) {
+.t-stage a:not(.t-btn) {
   color: var(--c-white);
-}
-
-.t-entries {
-  display: grid;
-  gap: 0.75rem;
-  max-width: 52rem;
-  margin: 1.5rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.t-entry {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  height: 100%;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid var(--c-blue);
-  border-radius: var(--radius);
-  background: var(--c-white);
-  color: var(--c-navy);
-  text-decoration: none;
-}
-
-.t-entry > .icon {
-  color: var(--c-blue);
-  transition: transform 0.15s;
-}
-
-.t-entry:hover {
-  background: var(--c-surface);
-  color: var(--c-navy);
-}
-
-.t-entry:hover .t-entry__title {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.t-entry:hover > .icon {
-  transform: translateX(3px);
-}
-
-.t-entry__icon {
-  color: var(--c-blue);
-}
-
-.t-entry__body {
-  display: grid;
-}
-
-.t-entry__title {
-  font-size: 1.1875rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.t-entry__text {
-  color: var(--c-muted);
-  font-size: 0.9375rem;
 }
 
 /* ---------- Central search ---------- */
@@ -1262,8 +1201,7 @@ main:focus {
   --focus-halo: var(--c-navy);
 }
 
-.t-stage .t-smart__form :focus-visible,
-.t-stage .t-entry:focus-visible {
+.t-stage .t-smart__form :focus-visible {
   --focus: var(--c-navy);
   --focus-halo: var(--c-white);
 }
@@ -3648,7 +3586,6 @@ main:focus {
     flex: 0 0 auto;
   }
 
-  .t-entries,
   .t-cards--4 {
     grid-template-columns: 1fr 1fr;
   }
@@ -3766,7 +3703,6 @@ main:focus {
     scroll-behavior: auto !important;
   }
 
-  .t-entry:hover > .icon,
   .t-route__choice:hover .t-route__arrow {
     transform: none;
   }

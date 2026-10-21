@@ -11,10 +11,6 @@ import { findService } from "@/data/services";
 import { SITE } from "@/data/site";
 import type { Service } from "@/lib/types";
 
-const ENTRIES = [
-  { href: "/leistungen?fuer=privat", icon: "privat", title: "Für Privatpersonen", text: "Ausweis, Umzug, Familie, Bauen und Wohnen" },
-  { href: "/leistungen?fuer=unternehmen", icon: "unternehmen", title: "Für Unternehmen", text: "Gewerbe, Förderung, Genehmigungen und Fahrzeuge" },
-];
 
 function services(slugs: string[]): Service[] {
   return slugs.map(findService).filter((s): s is Service => Boolean(s));
@@ -49,22 +45,6 @@ export function StartPage() {
           <div className="t-stage__search">
             <SmartSearch label="Was möchten Sie erledigen?" />
           </div>
-          <ul className="t-entries" aria-label="Einstiege">
-            {ENTRIES.map((entry) => (
-              <li key={entry.href}>
-                <Link href={entry.href} className="t-entry">
-                  <span className="t-entry__icon">
-                    <TopicIcon name={entry.icon} />
-                  </span>
-                  <span className="t-entry__body">
-                    <span className="t-entry__title">{entry.title}</span>
-                    <span className="t-entry__text">{entry.text}</span>
-                  </span>
-                  <IconArrow size={22} />
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
