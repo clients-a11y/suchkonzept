@@ -65,6 +65,12 @@ const PARTS: Part[] = [
         href: "/",
         action: "Startseite öffnen",
       },
+      {
+        input: "Neuigkeiten Kindergeld",
+        expect: "Die Weiche rechnet schon beim Tippen mit, ohne Anfrage. Oben steht „Informationen zu ‚Neuigkeiten Kindergeld‘“, die Leistung Kindergeld beantragen erst darunter.",
+        href: "/",
+        action: "Startseite öffnen",
+      },
     ],
   },
   {

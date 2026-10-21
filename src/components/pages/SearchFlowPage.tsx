@@ -320,8 +320,10 @@ export function SearchFlowPage() {
             </div>
             <figcaption>
               Beim Tippen entsteht keine Anfrage: Die Vorschläge kommen aus dem Leistungskatalog, der als feste Datei im Browser
-              liegt. Erst nach dem Absenden rechnet die Weiche. Sie schickt genau eine Anfrage in einen Bereich oder, wenn sie
-              unsicher ist, gar keine und fragt zuerst.
+              liegt. Die Weiche rechnet dabei schon mit. Zeigt sie klar auf Informationen, etwa bei „Neuigkeiten Kindergeld“,
+              steht die Suche in Informationen oben in der Liste und keine Leistung wird als beste Antwort genannt. Nach dem
+              Absenden schickt die Weiche genau eine Anfrage in einen Bereich oder, wenn sie unsicher ist, gar keine und fragt
+              zuerst.
             </figcaption>
           </figure>
         </section>

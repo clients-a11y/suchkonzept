@@ -14,6 +14,11 @@ import { openAssistant } from "@/lib/assistant-dock";
 import { routeQuery } from "@/lib/search-router";
 import { PotDialog } from "@/components/PotDialog";
 
+// The highlighted first suggestion: the best service, or the information search when the switch points there.
+function isLead(item: { key: string }): boolean {
+  return item.key.startsWith("answer") || item.key === "info-top";
+}
+
 type Item = { key: string; group: string; href?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
 function ServiceFacts({ service }: { service: Service }) {
@@ -29,9 +34,9 @@ function ServiceFacts({ service }: { service: Service }) {
   );
 }
 
-// Central search with suggestions while typing. The "intelligence" is simulated locally
-// (phrases, typo tolerance, best match) and the hint under the field says so. Suggestions come
-// only from the service catalogue, a static file: information needs a request to its own pot.
+// Central search with suggestions while typing: phrases, typo tolerance and a best match, all with fixed
+// rules in the browser. Suggestions come only from the service catalogue, a static file; information needs a
+// request to its own pot. The search switch runs while typing too, so the list never contradicts it.
 export function SmartSearch({ label }: { label: string }) {
   const router = useRouter();
   const ids = { input: useId(), list: useId(), hint: useId() };
@@ -56,6 +61,10 @@ export function SmartSearch({ label }: { label: string }) {
 
   const result = useMemo(() => searchServices(query, true), [query]);
   const trimmed = query.trim();
+  // "Neuigkeiten Kindergeld": the catalogue knows Kindergeld, but the switch sends the search to information.
+  // Then the information search leads the list, and no service is called the best match.
+  const infoFirst = useMemo(() => Boolean(trimmed) && routeQuery(trimmed).pot === "informationen", [trimmed]);
+  const answer = infoFirst ? undefined : result.answer;
 
   // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
   const askChat = (text: string) => {
@@ -93,7 +102,21 @@ export function SmartSearch({ label }: { label: string }) {
         ),
       });
     }
-    const answer = result.answer;
+    const infoHref = `/suche?q=${encodeURIComponent(trimmed)}&in=informationen`;
+    if (infoFirst) {
+      list.push({
+        key: "info-top",
+        group: "Das passt am besten",
+        href: infoHref,
+        label: `Das passt am besten: Informationen zu „${trimmed}“. Meldungen, Seiten, Projekte und Stellen`,
+        node: (
+          <span className="t-smart__answer">
+            <span className="t-smart__answer-title">Informationen zu „{trimmed}“</span>
+            <span className="t-smart__answer-text">Meldungen, Seiten, Projekte und Stellen</span>
+          </span>
+        ),
+      });
+    }
     if (answer) {
       list.push({
         key: `answer-${answer.slug}`,
@@ -147,19 +170,21 @@ export function SmartSearch({ label }: { label: string }) {
         </>
       ),
     });
-    list.push({
-      key: "info",
-      group: "",
-      href: `/suche?q=${encodeURIComponent(trimmed)}&in=informationen`,
-      label: `„${trimmed}“ in Informationen und Meldungen suchen`,
-      node: (
-        <>
-          „{trimmed}“ in Informationen und Meldungen suchen <IconArrow size={16} />
-        </>
-      ),
-    });
+    if (!infoFirst) {
+      list.push({
+        key: "info",
+        group: "",
+        href: infoHref,
+        label: `„${trimmed}“ in Informationen und Meldungen suchen`,
+        node: (
+          <>
+            „{trimmed}“ in Informationen und Meldungen suchen <IconArrow size={16} />
+          </>
+        ),
+      });
+    }
     return list;
-  }, [result, trimmed]);
+  }, [result, trimmed, infoFirst, answer]);
 
   const visible = open && items.length > 0;
   const optionId = (i: number) => `${ids.list}-opt-${i}`;
@@ -171,11 +196,11 @@ export function SmartSearch({ label }: { label: string }) {
     const text = !trimmed
       ? "Häufige Anliegen. Pfeil nach unten zum Auswählen."
       : found
-        ? `${pluralize(found, "Vorschlag", "Vorschläge")}${result.answer ? `, am besten passt ${result.answer.title}` : ""}. Pfeil nach unten zum Auswählen.`
+        ? `${pluralize(found, "Vorschlag", "Vorschläge")}${answer ? `, am besten passt ${answer.title}` : infoFirst ? ", am besten passen Informationen" : ""}. Pfeil nach unten zum Auswählen.`
         : "Keine Vorschläge. Mit Eingabe suchen Sie im ganzen Portal.";
     const timer = window.setTimeout(() => setAnnouncement(text), 500);
     return () => window.clearTimeout(timer);
-  }, [visible, items, trimmed, result.answer]);
+  }, [visible, items, trimmed, answer, infoFirst]);
 
   useEffect(() => {
     if (active < 0) return;
@@ -192,7 +217,7 @@ export function SmartSearch({ label }: { label: string }) {
     if (item.chat) return askChat(trimmed);
     setOpen(false);
     if (item.key === "all" && !routeQuery(trimmed).pot) return setAsking(trimmed);
-    if (item.key === "all" || item.key === "info") setSearching(true);
+    if (["all", "info", "info-top"].includes(item.key)) setSearching(true);
     if (item.href) router.push(item.href);
   };
 
@@ -234,10 +259,10 @@ export function SmartSearch({ label }: { label: string }) {
       id={optionId(index)}
       role="option"
       aria-selected={index === active}
-      aria-label={item.key.startsWith("answer") ? item.label : undefined}
+      aria-label={isLead(item) ? item.label : undefined}
       className={[
         "t-smart__option",
-        item.key.startsWith("answer") ? "t-smart__option--answer" : "",
+        isLead(item) ? "t-smart__option--answer" : "",
         item.key === "fix" ? "t-smart__option--fix" : "",
         ["all", "chat", "info"].includes(item.key) ? "t-smart__option--all" : "",
       ]

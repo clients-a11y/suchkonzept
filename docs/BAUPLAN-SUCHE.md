@@ -111,6 +111,9 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   mit Formular und Anliegen in `intents.ts`. „förderung“ allein zeigt nicht mehr auf die Vereinsförderung.
 - Seiten für den Fuß: Über dieses Portal, Kontakt, Hilfe, Impressum, Datenschutz, Barrierefreiheit (Beispieltexte).
 - Gleiche Punktzahl in der Suche: Top-Aufgaben (`TOP_TASKS`) zuerst.
+- Die Weiche rechnet schon beim Tippen mit (lokal, ohne Anfrage). Zeigt sie klar auf Informationen
+  („Neuigkeiten Kindergeld“), steht „Informationen zu …“ als beste Wahl oben in der Vorschlagsliste und keine Leistung
+  heißt „Das passt am besten“. So widersprechen sich Liste und Enter nicht mehr.
 - `/so-entscheidet-die-suche`: Erklärseite für Stakeholder mit Diagrammen zu Ablauf, Leistungskatalog (heute im
   Prototyp und Vorschlag für den Betrieb), Punkteregeln, Beispielen aus dem Testfall, Wohnort und Sortierung.
   Dezent verlinkt in „So hat die Suche entschieden“, auf der Testfall-Seite und im Fuß unter „Allgemein“.
