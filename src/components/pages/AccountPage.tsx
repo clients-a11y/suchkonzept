@@ -27,7 +27,14 @@ export function AccountPage() {
   const account = useAccount();
   const [status, setStatus] = useState("");
 
-  if (account === null) return <p className="t-container t-page t-loading">Konto wird geladen …</p>;
+  if (account === null) {
+    return (
+      <>
+        <Head title="Nutzerkonto" lead="Ihr Konto wird geladen …" />
+        <div className="t-container t-page" />
+      </>
+    );
+  }
 
   if (!account.signedIn) {
     return (
