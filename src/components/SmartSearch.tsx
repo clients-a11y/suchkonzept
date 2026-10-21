@@ -271,10 +271,6 @@ export function SmartSearch({ label }: { label: string }) {
           <label htmlFor={ids.input} className="t-smart__label">
             {label}
           </label>
-          <span className="t-smart__badge">
-            <IconSparkle size={14} />
-            KI-Vorschläge
-          </span>
         </div>
         <div className="t-smart__field">
           <div className="t-smart__control">

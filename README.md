@@ -13,6 +13,7 @@ Was der Prototyp zeigt:
 - **Chat-Assistent** als Seite und als kleines Fenster, auf Basis derselben Suche
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“
+- **So entscheidet die Suche** unter `/so-entscheidet-die-suche`: Diagramme und Punkteregeln für Stakeholder
 
 ## Starten
 

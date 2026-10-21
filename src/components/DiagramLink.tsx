@@ -1,13 +1,11 @@
+import Link from "next/link";
 import { SITE } from "@/data/site";
 
-// Quiet link to the diagram of the search switch, for demos with stakeholders.
+// Quiet link to the page that explains the search switch, for demos with stakeholders.
 export function DiagramLink() {
   return (
     <p className="t-diagramlink">
-      <a href={SITE.searchDiagram} target="_blank" rel="noopener noreferrer">
-        Ablauf und Punkteregeln als Diagramm
-        <span className="visually-hidden"> (öffnet in neuem Tab)</span>
-      </a>
+      <Link href={SITE.searchDiagram}>Ablauf und Punkteregeln als Diagramm</Link>
     </p>
   );
 }

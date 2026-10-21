@@ -12,7 +12,7 @@ type Site = {
   languages: string[];
   contact: Contact & { email: string; hours: string };
   assistant: { greeting: string; starters: string[] };
-  // Diagram of the search switch for stakeholders, published separately.
+  // Page with the diagrams of the search switch, for stakeholders.
   searchDiagram: string;
 };
 
@@ -38,6 +38,7 @@ export const SITE: Site = {
         { label: "Leistungen A bis Z", href: "/leistungen" },
         { label: "Aktuelles", href: "/aktuelles" },
         { label: "Testfall Kindergeld", href: "/testfall" },
+        { label: "So entscheidet die Suche", href: "/so-entscheidet-die-suche" },
       ],
     },
     {
@@ -75,5 +76,5 @@ export const SITE: Site = {
       "Guten Tag! Ich bin der automatische Assistent des Verwaltungsportals Musterland. Ich finde mit Ihnen die passende Leistung und die zuständige Stelle, auch in Ihrer Gemeinde.",
     starters: ["Kindergeld beantragen", "Mein Ausweis läuft ab", "Wie ist der Stand meines Antrags?"],
   },
-  searchDiagram: "https://claude.ai/artifact/X5jZUjayMBEJGTudigZuVC",
+  searchDiagram: "/so-entscheidet-die-suche",
 };

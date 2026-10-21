@@ -111,6 +111,9 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   mit Formular und Anliegen in `intents.ts`. „förderung“ allein zeigt nicht mehr auf die Vereinsförderung.
 - Seiten für den Fuß: Über dieses Portal, Kontakt, Hilfe, Impressum, Datenschutz, Barrierefreiheit (Beispieltexte).
 - Gleiche Punktzahl in der Suche: Top-Aufgaben (`TOP_TASKS`) zuerst.
+- `/so-entscheidet-die-suche`: Erklärseite für Stakeholder mit Diagrammen zu Ablauf, Leistungskatalog (heute im
+  Prototyp und Vorschlag für den Betrieb), Punkteregeln, Beispielen aus dem Testfall, Wohnort und Sortierung.
+  Dezent verlinkt in „So hat die Suche entschieden“, auf der Testfall-Seite und im Fuß unter „Allgemein“.
 - Overlay „Was suchen Sie?“ nur noch bei der Suche auf der Startseite. Auf der Suchseite öffnet sich kein Overlay:
   Ein unklarer Begriff zeigt die Wahl im Inhalt unter den Reitern. Die Texte sprechen Bürgerinnen und Bürger an
   („Etwas beantragen“, „Sich informieren“), der technische Hinweis zur Backend-Anfrage steht nur noch in
@@ -123,7 +126,8 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
   ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
 - Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche direkt auf dem Blau (weißes Eingabefeld,
-  weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“), ohne Beispielanfragen; danach
+  weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“), ohne Beispielanfragen und ohne
+  Hinweis „KI-Vorschläge“, weil die Suche mit Regeln arbeitet; danach
   Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band. Die zwei Einstiegskarten
   „Für Privatpersonen“ und „Für Unternehmen“ aus dem Plan sind auf Wunsch wieder entfernt (21.10.2026); die Suche
   steht in der Stage allein.
