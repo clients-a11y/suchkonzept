@@ -117,13 +117,24 @@ const META_ICON = { hand: <IconHand size={18} />, book: <IconBook size={18} /> }
 
 export function Header() {
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const [open, setOpen] = useDisclosure(buttonRef);
   const close = () => setOpen(false);
 
+  // The menu lies over the page: a click or tap outside the header closes it.
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer);
+    return () => document.removeEventListener("pointerdown", onPointer);
+  }, [open, setOpen]);
+
   return (
-    <header className="t-header">
+    <header className="t-header" ref={headerRef}>
       <div className="t-topbar">
         <div className="t-container t-topbar__inner">
           <div className="t-topbar__demo">
@@ -172,7 +183,7 @@ export function Header() {
           </button>
         </div>
       </div>
-      <nav aria-label="Hauptnavigation" className="t-nav">
+      <nav aria-label="Hauptnavigation" className="t-nav" data-open={open}>
         <div className="t-container">
           <ul id={menuId} className="t-nav__list" data-open={open}>
             {SITE.nav.map((item) => (

@@ -126,8 +126,10 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.
 - Fokus: doppelter Ring (dunkel außen, weiß innen), auf dunklem Grund umgekehrt.
 - Kopf: schmale Leiste mit Hinweis „Prototyp“, Testfall und „Demo zurücksetzen“ links, Gebärdensprache, Leichte
-  Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
-  ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
+  Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü.
+  Die Hauptnavigation liegt wie beim Vorbild auf allen Breiten hinter „Menü“ (auf Wunsch geändert, statt sichtbarer
+  Navigation auf dem Desktop). Sie öffnet als Panel über der Seite; Escape, ein Klick daneben oder ein Seitenwechsel
+  schließen es. Unter 30rem nur Symbole mit verstecktem Namen.
 - Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche direkt auf dem Blau (weißes Eingabefeld,
   weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“), ohne Beispielanfragen und ohne
   Hinweis „KI-Vorschläge“, weil die Suche mit Regeln arbeitet; danach

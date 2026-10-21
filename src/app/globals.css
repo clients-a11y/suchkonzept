@@ -728,19 +728,30 @@ main:focus {
   text-align: center;
 }
 
+/* The main navigation sits behind "Menü", as in the model: a panel that opens over the page. */
 .t-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: none;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
   border-top: 1px solid var(--c-line-soft);
+  background: var(--c-white);
+  box-shadow: 0 16px 32px rgb(21 41 61 / 0.18);
+}
+
+.t-nav[data-open="true"] {
+  display: block;
+  animation: t-drop 0.16s ease-out;
 }
 
 .t-nav__list {
-  display: none;
+  display: grid;
   margin: 0;
-  padding: 0.25rem 0 0.75rem;
+  padding: 0.5rem 0 1rem;
   list-style: none;
-}
-
-.t-nav__list[data-open="true"] {
-  display: block;
 }
 
 .t-nav__link {
@@ -4030,37 +4041,20 @@ main:focus {
   }
 }
 
-/* Desktop: the main navigation is always visible (unlike the menu-only header of the model). */
 @media (min-width: 64rem) {
   .t-masthead {
     padding-block: 1.125rem;
   }
 
-  .t-menu-button {
-    display: none;
-  }
-
-  .t-nav__list,
-  .t-nav__list[data-open="true"] {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 0.5rem;
-    padding: 0;
+  /* On wide screens the open menu shows the entries side by side. */
+  .t-nav__list {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    column-gap: 2rem;
+    padding-block: 1rem 1.5rem;
   }
 
   .t-nav__link {
-    padding: 0.875rem 0.75rem 0.625rem;
-    border-bottom: 4px solid transparent;
-  }
-
-  .t-nav__link:hover {
-    border-bottom-color: var(--c-tint);
-  }
-
-  .t-nav__link[aria-current] {
-    padding-left: 0.75rem;
-    border-bottom-color: var(--c-blue);
-    box-shadow: none;
+    font-size: 1.125rem;
   }
 
   .t-layout {

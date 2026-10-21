@@ -32,7 +32,7 @@ function ServiceList() {
   const requested = params.get("fuer");
   const audience = FILTERS.find((f) => f.value && f.value === requested)?.value;
   const list = audience ? SERVICES.filter((s) => s.audience.includes(audience)) : SERVICES;
-  const label = FILTERS.find((f) => f.value === audience)?.label;
+  const label = audience ? FILTERS.find((f) => f.value === audience)?.label : undefined;
 
   return (
     <>
