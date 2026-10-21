@@ -20,6 +20,6 @@ export const PLACES: Place[] = [
   { id: "beispielstadt", name: "Beispielstadt", office: "Bürgeramt Beispielstadt", address: "Marktplatz 1, 20000 Beispielstadt", phone: "0200 98 76 54", plz: [20000, 20999] },
 ];
 
-export function findPlace(id: string): Place | undefined {
-  return PLACES.find((p) => p.id === id);
+export function findPlace(id: string | undefined): Place | undefined {
+  return id ? PLACES.find((p) => p.id === id) : undefined;
 }

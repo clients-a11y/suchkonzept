@@ -42,6 +42,10 @@ export function onChatChange(callback: (change: ChatChange) => void): () => void
 }
 
 export function clearChat() {
-  storage()?.removeItem(KEY);
+  try {
+    storage()?.removeItem(KEY);
+  } catch {
+    // Nothing stored.
+  }
   window.dispatchEvent(new CustomEvent<ChatChange>(EVENT, { detail: { reset: true } }));
 }

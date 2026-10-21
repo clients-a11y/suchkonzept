@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { PLACES } from "@/data/places";
+import { PLACES, findPlace } from "@/data/places";
 import type { Place } from "@/data/places";
 
 // The place a visitor entered is remembered in this browser, so the service pages, the search and
@@ -31,8 +31,7 @@ export function usePlaceId(): string {
 }
 
 export function usePlace(): Place | undefined {
-  const id = usePlaceId();
-  return PLACES.find((p) => p.id === id);
+  return findPlace(usePlaceId());
 }
 
 export function setPlaceId(id: string) {

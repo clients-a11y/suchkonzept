@@ -20,10 +20,6 @@ export const NEWS: NewsItem[] = [
   { id: "m7", level: "land", title: "Sommerferien: Badestellen mit bester Wasserqualität", teaser: "41 von 44 Badestellen erhalten die Bestnote. Die Karte zeigt alle Messwerte.", date: "2025-07-01", topic: "Umwelt", source: "Ministerium für Umwelt", image: { src: "/images/news/m7-see.webp", alt: "Holzsteg an einem klaren See mit Bojen, im Hintergrund Wald" } },
 ];
 
-export function findNews(id: string): NewsItem | undefined {
-  return NEWS.find((n) => n.id === id);
-}
-
 const PAGES: ContentPage[] = [
   {
     slug: "kindergeld",

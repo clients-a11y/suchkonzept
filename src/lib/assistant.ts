@@ -1,4 +1,4 @@
-import { PLACES } from "@/data/places";
+import { PLACES, findPlace } from "@/data/places";
 import type { Place } from "@/data/places";
 import { INTENTS } from "@/data/intents";
 import { findService } from "@/data/services";
@@ -93,10 +93,6 @@ function saysWord(text: string, list: string[]): boolean {
 
 function detailIn(text: string): Detail | undefined {
   return DETAILS.find((d) => mentions(text, d.stems))?.key;
-}
-
-function findPlace(id: string | undefined): Place | undefined {
-  return id ? PLACES.find((p) => p.id === id) : undefined;
 }
 
 function placeLabel(place: Place): string {

@@ -101,22 +101,6 @@ export function IconCheck(props: IconProps) {
   );
 }
 
-export function IconCross(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M7 7l10 10M17 7 7 17" />
-    </Svg>
-  );
-}
-
-export function IconChevron(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="m9 6 6 6-6 6" />
-    </Svg>
-  );
-}
-
 export function IconSparkle(props: IconProps) {
   return (
     <Svg {...props}>
@@ -131,41 +115,6 @@ export function IconUser(props: IconProps) {
     <Svg {...props}>
       <circle cx="12" cy="8" r="4" />
       <path d="M4 21c1-4.5 4.2-7 8-7s7 2.5 8 7" />
-    </Svg>
-  );
-}
-
-export function IconBriefcase(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <rect x="3" y="7" width="18" height="13" rx="2" />
-      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18" />
-    </Svg>
-  );
-}
-
-export function IconPhone(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z" />
-    </Svg>
-  );
-}
-
-export function IconMail(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m4 7 8 6 8-6" />
-    </Svg>
-  );
-}
-
-export function IconInfo(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v6M12 7.5v.5" />
     </Svg>
   );
 }
