@@ -42,7 +42,7 @@ export function StartPage() {
   return (
     <>
       <div className="t-stage">
-        <Image src="/images/news/b1-rathaus.webp" alt="" fill preload sizes="100vw" className="t-stage__img" />
+        <Image src="/images/news/b1-rathaus.webp" alt="" fill preload loading="eager" sizes="100vw" className="t-stage__img" />
         <div className="t-container t-stage__inner">
           <h1 className="t-stage__title">Verwaltung in Musterland online erledigen</h1>
           <p className="t-stage__lead">Leistungen von Land und Gemeinden an einem Ort. Beschreiben Sie Ihr Anliegen, wir zeigen den Weg.</p>

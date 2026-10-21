@@ -66,9 +66,8 @@ function LanguageSwitch() {
         onClick={() => setOpen(!open)}
       >
         <IconGlobe size={18} />
-        <span>
-          <span className="t-lang__prefix">Sprache: </span>Deutsch
-        </span>
+        {/* On phones only the globe shows; the name stays for screen readers. */}
+        <span className="t-lang__text">Sprache: Deutsch</span>
       </button>
       <ul id={listId} className="t-lang__list" hidden={!open}>
         <li>
