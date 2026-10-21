@@ -1,11 +1,16 @@
 @AGENTS.md
 
-# Klick-Dummy Portalbaukasten
+# Suchkonzept (Fork des Klick-Dummys Portalbaukasten)
 
-Mandantenfähiger Klick-Dummy ohne Backend. Der vollständige Bauplan mit Gestaltung, Stand und offenen
-Aufgaben steht in `docs/BAUPLAN.md`. Vor jeder Arbeit lesen.
+Eigenständiger Prototyp für das Suchkonzept eines einzelnen Verwaltungsportals, ohne Mandantenfähigkeit und
+ohne Backend. Der Umbauplan steht in `docs/BAUPLAN-SUCHE.md`, der bisherige Stand in `docs/BAUPLAN.md`.
+Vor jeder Arbeit beide lesen.
 
-- Neutral halten: keine Bezüge zu realen Arbeitgebern oder internen Designsystemen, nur fiktive Mandanten.
-- Mandanten-Komponenten verwenden ausschließlich die Theme-Variablen `--t-*`, nie feste Farben.
-- Neue Mandanten sind Konfiguration (`src/data/tenants.ts` oder Assistent), nie Code.
+- Nicht mandantenfähig: ein Portal, Routen ohne Mandanten-Präfix.
+- Gestaltung am Bundesportal orientiert (Aufbau, Farben, Fira Sans), aber **ohne Hoheitszeichen**:
+  kein Bundesadler, keine Bundesflagge, kein Banner „Eine offizielle Website der Bundesrepublik Deutschland“,
+  keine Wortmarke „Verwaltung digital“, keine Namen oder Logos echter Behörden oder Firmen, keine Texte von
+  verwaltung.bund.de. Eigene, neutrale Wortmarke, nur fiktive Inhalte.
+- Alle Inhalte sind Beispieldaten, das steht sichtbar im Footer.
 - UI-Texte auf Deutsch, Satzanfang groß, aktive Verben auf Buttons.
+- Remote `klickdummy` zeigt auf das Ursprungsprojekt. Nicht dorthin pushen.
