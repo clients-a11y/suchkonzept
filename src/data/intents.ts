@@ -1,5 +1,5 @@
 // Anliegen in eigenen Worten: Redewendungen, die auf Leistungen zeigen.
-// Die Suche im Prototyp simuliert damit eine KI-gestützte Suche, ganz ohne Backend.
+// Damit versteht die Suche Anliegen in eigenen Worten, mit festen Regeln und ohne Backend.
 // Wörter in normalisierter Form: klein, ä → ae, ö → oe, ü → ue, ß → ss.
 export type Intent = {
   phrases: string[];

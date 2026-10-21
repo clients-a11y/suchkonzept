@@ -340,7 +340,7 @@ export function SmartSearch({ label }: { label: string }) {
           </button>
         </div>
         <p id={ids.hint} className="t-smart__hint">
-          In eigenen Worten, zum Beispiel „Garage bauen“. Simuliert, ohne echte KI.
+          In eigenen Worten, zum Beispiel „Garage bauen“.
         </p>
       </Form>
 

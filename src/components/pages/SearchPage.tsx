@@ -322,7 +322,7 @@ function SearchResults() {
               ))}
             </p>
           )}
-          <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Prototyp lokal simuliert, ohne echte KI.</p>
+          <p className="t-answer__note">Vorschlag aus Ihren Worten.</p>
         </div>
       )}
 

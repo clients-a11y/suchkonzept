@@ -75,7 +75,7 @@ export function AssistantDock() {
               <h2 id={ids.title} className="t-dock__title">
                 Chat-Assistent
               </h2>
-              <p className="t-dock__notice">Automatische Hilfe, keine Person. Simuliert, ohne echte KI.</p>
+              <p className="t-dock__notice">Automatische Hilfe, keine Person.</p>
             </div>
             <button
               type="button"

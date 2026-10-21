@@ -29,8 +29,8 @@ export function AssistantPage() {
       <div className="t-container t-page">
         <p className="t-chat__notice">
           <IconSparkle size={16} />
-          Automatischer Assistent, keine Person. Im Prototyp lokal simuliert, ohne echte KI: Die Antworten stammen aus dem
-          Leistungskatalog und den Inhalten dieses Portals.
+          Automatischer Assistent, keine Person. Die Antworten stammen aus dem Leistungskatalog und den Inhalten dieses
+          Portals.
         </p>
         <div className="t-layout">
           <div className="t-layout__main">

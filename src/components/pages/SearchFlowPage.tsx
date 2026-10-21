@@ -494,7 +494,7 @@ export function SearchFlowPage() {
         </section>
 
         <p className="t-flow__muted">
-          Prototyp mit Beispieldaten. Die Weiche ist im Browser simuliert, ohne echte KI. Die Regeln stehen in{" "}
+          Prototyp mit Beispieldaten. Die Weiche arbeitet im Browser mit festen Regeln. Die Regeln stehen in{" "}
           <code>src/lib/search-router.ts</code>, die von der Redaktion zugeordneten Begriffe in <code>src/data/search-terms.ts</code>.
         </p>
       </div>
