@@ -9,8 +9,8 @@ import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/componen
 export function PotChoices({ query, onChoose }: { query: string; onChoose?: () => void }) {
   const href = (pot: string) => `/suche?${new URLSearchParams({ q: query, in: pot }).toString()}`;
   const choices = [
-    { pot: "leistungen", title: "Etwas beantragen oder erledigen", text: "Leistungen wie Ausweis, Ummeldung oder Förderung", icon: <PictogramApplication size={36} /> },
-    { pot: "informationen", title: "Informationen und Meldungen", text: "Nachrichten, Projekte, Ansprechpersonen und Seiten", icon: <PictogramNews size={36} /> },
+    { pot: "leistungen", title: "Etwas beantragen", text: "Zum Beispiel einen Ausweis, eine Ummeldung oder Kindergeld", icon: <PictogramApplication size={36} /> },
+    { pot: "informationen", title: "Sich informieren", text: "Neuigkeiten, Erklärungen, Projekte und Ansprechpersonen", icon: <PictogramNews size={36} /> },
   ];
   return (
     <ul className="t-route__choices">
@@ -76,17 +76,19 @@ export function PotDialog({ query, onClose, onChat }: { query: string | null; on
               <h2 id={titleId} className="t-potdialog__title">
                 Was suchen Sie?
               </h2>
-              <p className="t-potdialog__lead">„{query}“ kann beides sein. Die Suche schaut immer in einem Bereich nach.</p>
+              <p className="t-potdialog__lead">
+                Zu „{query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.
+              </p>
             </div>
             <button type="button" className="t-potdialog__close" onClick={close} aria-label="Frage schließen">
               <IconClose size={20} />
             </button>
           </div>
           <PotChoices query={query} onChoose={choose} />
-          <div className="t-potdialog__foot">
-            {onChat && (
+          {onChat && (
+            <div className="t-potdialog__foot">
               <p className="t-potdialog__chat">
-                Unsicher?{" "}
+                Nicht sicher?{" "}
                 <button
                   type="button"
                   className="t-textbutton t-potdialog__chatbutton"
@@ -99,12 +101,8 @@ export function PotDialog({ query, onClose, onChat }: { query: string | null; on
                   Im Chat fragen
                 </button>
               </p>
-            )}
-            <p className="t-potdialog__tech">
-              <span className="t-potdialog__badge">Backend</span>
-              Noch keine Anfrage. Erst Ihre Wahl löst sie aus.
-            </p>
-          </div>
+            </div>
+          )}
         </div>
       )}
     </dialog>

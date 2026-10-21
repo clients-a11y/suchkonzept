@@ -111,6 +111,10 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   mit Formular und Anliegen in `intents.ts`. „förderung“ allein zeigt nicht mehr auf die Vereinsförderung.
 - Seiten für den Fuß: Über dieses Portal, Kontakt, Hilfe, Impressum, Datenschutz, Barrierefreiheit (Beispieltexte).
 - Gleiche Punktzahl in der Suche: Top-Aufgaben (`TOP_TASKS`) zuerst.
+- Overlay „Was suchen Sie?“ nur noch bei der Suche auf der Startseite. Auf der Suchseite öffnet sich kein Overlay:
+  Ein unklarer Begriff zeigt die Wahl im Inhalt unter den Reitern. Die Texte sprechen Bürgerinnen und Bürger an
+  („Etwas beantragen“, „Sich informieren“), der technische Hinweis zur Backend-Anfrage steht nur noch in
+  „So hat die Suche entschieden“ auf der Ergebnisseite.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

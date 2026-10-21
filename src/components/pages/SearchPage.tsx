@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Form from "next/form";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useId, useState } from "react";
-import { PotChoices, PotDialog } from "@/components/PotDialog";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useId } from "react";
+import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
@@ -28,48 +28,22 @@ function searchHref(q: string, pot?: Pot): string {
   return `/suche?${params.toString()}`;
 }
 
+// On the search page no overlay opens: an unclear term shows the choice in the page, under the tabs.
 function SearchForm({ q }: { q: string }) {
-  const router = useRouter();
   const inputId = useId();
-  const [asking, setAsking] = useState<string | null>(null);
-  const askChat = (text: string) => {
-    if (!openAssistant(text)) router.push(`/assistent?frage=${encodeURIComponent(text)}`);
-  };
   return (
-    <>
-      <Form
-        action="/suche"
-        role="search"
-        className="t-searchform"
-        onSubmit={(event) => {
-          // Unclear between services and information: ask over the page instead of guessing.
-          const value = String(new FormData(event.currentTarget).get("q") ?? "").trim();
-          if (value && !routeQuery(value).pot) {
-            event.preventDefault();
-            setAsking(value);
-          }
-        }}
-      >
-        <label htmlFor={inputId} className="t-searchform__label">
-          Suchbegriff
-        </label>
-        <div className="t-searchform__row">
-          <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
-          <button type="submit" className="t-btn t-btn--primary">
-            <IconSearch />
-            Suchen
-          </button>
-        </div>
-      </Form>
-      <PotDialog
-        query={asking}
-        onClose={(dismissed) => {
-          setAsking(null);
-          if (dismissed) document.getElementById(inputId)?.focus();
-        }}
-        onChat={askChat}
-      />
-    </>
+    <Form action="/suche" role="search" className="t-searchform">
+      <label htmlFor={inputId} className="t-searchform__label">
+        Suchbegriff
+      </label>
+      <div className="t-searchform__row">
+        <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
+        <button type="submit" className="t-btn t-btn--primary">
+          <IconSearch />
+          Suchen
+        </button>
+      </div>
+    </Form>
   );
 }
 
@@ -224,7 +198,7 @@ function PotQuestion({ q, route }: { q: string; route?: Route }) {
       <h2 id={titleId} className="t-h2">
         Was suchen Sie?
       </h2>
-      <p>„{q}“ kann beides sein. Die Suche schaut immer in einem Bereich nach.</p>
+      <p>Zu „{q}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.</p>
       <PotChoices query={q} />
       {route && <RouteExplain route={route} q={q} />}
     </section>
