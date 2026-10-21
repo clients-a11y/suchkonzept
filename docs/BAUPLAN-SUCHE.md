@@ -123,7 +123,7 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
   ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
 - Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche direkt auf dem Blau (weißes Eingabefeld,
-  weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“) und Beispiele; danach
+  weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“), ohne Beispielanfragen; danach
   Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band. Die zwei Einstiegskarten
   „Für Privatpersonen“ und „Für Unternehmen“ aus dem Plan sind auf Wunsch wieder entfernt (21.10.2026); die Suche
   steht in der Stage allein.
@@ -136,6 +136,9 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Ladebalken und drei Platzhalter („Suche läuft in Leistungen …“), dann steigen Erklärung, beste Antwort und Treffer
   nacheinander ein. Bei einer Rückfrage gibt es keinen Ladezustand, weil noch keine Anfrage läuft.
 - Vorschlagsliste, Overlay und Hintergrund blenden kurz ein. Bei „weniger Bewegung“ im System ist alles aus.
+- Chat: Die eigene Nachricht gleitet von rechts ein, der Assistent „schreibt“ 0,7 Sekunden (drei Punkte), dann steigt
+  die Antwort ein und die Antwortknöpfe folgen nacheinander. Gespeicherte Verläufe erscheinen ohne Animation. Das
+  Chatfenster öffnet mit einer kurzen Bewegung von rechts unten.
 
 **Technik**
 - Dynamische Routen lesen `params` in einer Suspense-Grenze (sonst meldet Next 16 „URL data outside of Suspense“),

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { IconArrow, IconBubble, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
-import { EXAMPLE_QUERIES } from "@/data/intents";
 import { TOP_TASKS } from "@/data/content";
 import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
@@ -35,7 +34,7 @@ function ServiceFacts({ service }: { service: Service }) {
 // only from the service catalogue, a static file: information needs a request to its own pot.
 export function SmartSearch({ label }: { label: string }) {
   const router = useRouter();
-  const ids = { input: useId(), list: useId(), hint: useId(), examples: useId() };
+  const ids = { input: useId(), list: useId(), hint: useId() };
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -360,30 +359,6 @@ export function SmartSearch({ label }: { label: string }) {
         }}
         onChat={askChat}
       />
-
-      <div className="t-smart__examples">
-        <p id={ids.examples} className="t-smart__examples-label">
-          Probieren Sie:
-        </p>
-        <ul aria-labelledby={ids.examples}>
-          {EXAMPLE_QUERIES.map((example) => (
-            <li key={example}>
-              <button
-                type="button"
-                className="t-smart__example"
-                onClick={() => {
-                  setQuery(example);
-                  setOpen(true);
-                  setActive(-1);
-                  inputRef.current?.focus();
-                }}
-              >
-                „{example}“
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

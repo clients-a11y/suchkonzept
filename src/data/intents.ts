@@ -85,6 +85,3 @@ export const STOPWORDS = new Set([
   "vom", "wie", "wo", "was", "wann", "warum", "bitte", "gerne", "hallo", "neu", "neue", "neuen", "neuer", "nicht", "noch",
   "sich", "so", "da", "beantragen", "antrag", "anmelden", "machen", "bekommen", "kriegen", "gibt", "geht", "weil", "dass",
 ]);
-
-// Beispiele unter dem Suchfeld: zeigen, dass Anliegen in eigenen Worten funktionieren.
-export const EXAMPLE_QUERIES = ["Kindergeld beantragen", "Ich bin umgezogen", "Ich möchte eine Garage bauen"];

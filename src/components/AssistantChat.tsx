@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import { IconArrow } from "@/components/Icons";
 import { respond, startConversation } from "@/lib/assistant";
 import type { AssistantEnv, BotMessage, Choice, Conversation, Effects } from "@/lib/assistant";
@@ -15,10 +15,20 @@ function apply(effects: Effects) {
   if (effects.signIn) signIn();
 }
 
-function BotItem({ message, active, onChoose, maxChoices }: { message: BotMessage; active: boolean; onChoose: (choice: Choice) => void; maxChoices: number }) {
+// After a question the assistant "types" for a moment before the answer appears.
+const TYPING_MS = 700;
+
+// The first answer after the person's last message: shown once typing is over.
+function replyStart(conv: Conversation): number | null {
+  const lastUser = conv.messages.map((m) => m.from).lastIndexOf("user");
+  const reply = conv.messages[lastUser + 1];
+  return lastUser >= 0 && reply ? reply.id : null;
+}
+
+function BotItem({ message, active, fresh, onChoose, maxChoices }: { message: BotMessage; active: boolean; fresh: boolean; onChoose: (choice: Choice) => void; maxChoices: number }) {
   const { office, list, facts, links, source, choices } = message;
   return (
-    <li className="t-chat__msg t-chat__msg--bot">
+    <li className={fresh ? "t-chat__msg t-chat__msg--bot t-chat__msg--new" : "t-chat__msg t-chat__msg--bot"}>
       <p className="t-chat__who">Assistent</p>
       <div className="t-chat__bubble">
         {message.text.map((text) => (
@@ -77,8 +87,8 @@ function BotItem({ message, active, onChoose, maxChoices }: { message: BotMessag
       {/* Only the latest message offers answers, older ones are history. */}
       {active && choices && choices.length > 0 && (
         <ul className="t-chat__choices" aria-label="Antwortvorschläge">
-          {choices.slice(0, maxChoices).map((choice) => (
-            <li key={choice.value}>
+          {choices.slice(0, maxChoices).map((choice, i) => (
+            <li key={choice.value} style={{ "--i": i } as CSSProperties}>
               <button type="button" className="t-chat__choice" onClick={() => onChoose(choice)}>
                 {choice.label}
               </button>
@@ -112,6 +122,10 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
   const [changes, setChanges] = useState(0);
   const saved = useRef(0);
   const [draft, setDraft] = useState("");
+  // Messages from this id on are hidden while the assistant types; null when nothing is pending.
+  const [typingFrom, setTypingFrom] = useState<number | null>(null);
+  // Messages from this id on are new in this view and animate in; older ones (from storage) do not.
+  const [freshFrom, setFreshFrom] = useState(1);
   const dock = variant === "dock";
 
   const env: AssistantEnv = { placeId, account };
@@ -123,9 +137,12 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     const stored = handoff?.question ? null : loadChat();
     if (stored) {
       setConv(stored);
+      setFreshFrom(stored.next);
     } else {
       const started = startConversation(env, handoff ?? {});
       setConv(started.conv);
+      setFreshFrom(1);
+      setTypingFrom(replyStart(started.conv));
       setEffects(started.effects);
       setChanges((n) => n + 1);
     }
@@ -135,9 +152,17 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     const base = request.place ? { ...conv, place: request.place } : conv;
     const next = request.restart ? startConversation(env, {}) : respond(base, { value: request.question ?? "" }, env);
     setConv(next.conv);
+    if (request.restart) setFreshFrom(1);
+    setTypingFrom(request.restart ? null : replyStart(next.conv));
     setEffects(next.effects);
     setChanges((n) => n + 1);
   }
+
+  useEffect(() => {
+    if (typingFrom === null) return;
+    const timer = window.setTimeout(() => setTypingFrom(null), TYPING_MS);
+    return () => window.clearTimeout(timer);
+  }, [typingFrom]);
 
   // Remembering the place and signing in reach other components, so they run after rendering.
   useEffect(() => apply(effects), [effects]);
@@ -155,12 +180,17 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
         if (change.reset) return setConv(null);
         if (change.source === instance) return;
         const stored = loadChat();
-        if (stored) setConv(stored);
+        if (!stored) return;
+        setConv(stored);
+        setFreshFrom(stored.next);
+        setTypingFrom(null);
       }),
     [instance],
   );
 
-  const count = conv?.messages.length ?? 0;
+  const shown = conv?.messages.filter((m) => typingFrom === null || m.id < typingFrom) ?? [];
+  const typing = typingFrom !== null;
+  const count = shown.length + (typing ? 1 : 0);
   useEffect(() => {
     if (dock) {
       const log = logRef.current;
@@ -176,6 +206,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     const next = respond(conv, input, env);
     interacted.current = true;
     setConv(next.conv);
+    setTypingFrom(replyStart(next.conv));
     setEffects(next.effects);
     setChanges((n) => n + 1);
   };
@@ -198,13 +229,15 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     const started = startConversation(env, {});
     interacted.current = false;
     setConv(started.conv);
+    setFreshFrom(1);
+    setTypingFrom(null);
     setChanges((n) => n + 1);
     if (!dock) window.history.replaceState(null, "", "/assistent");
     inputRef.current?.focus();
   };
 
   const askingPlace = conv?.pending.kind === "place" || conv?.pending.kind === "pick";
-  const last = conv?.messages[conv.messages.length - 1];
+  const last = shown[shown.length - 1];
   const changePlace = (
     <button type="button" className="t-textbutton" onClick={() => choose({ label: "Ort ändern", value: "#ort-aendern" })} disabled={!conv}>
       {place ? "Ort ändern" : "Ort angeben"}
@@ -228,15 +261,35 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
       {/* In the small window the history scrolls on its own, so it must be reachable by keyboard. */}
       <div ref={logRef} role="log" aria-labelledby={ids.log} className="t-chat__log" tabIndex={dock ? 0 : undefined}>
         <ol ref={listRef} className="t-chat__list">
-          {conv?.messages.map((message) =>
+          {shown.map((message) =>
             message.from === "user" ? (
-              <li key={message.id} className="t-chat__msg t-chat__msg--user">
+              <li key={message.id} className={message.id >= freshFrom ? "t-chat__msg t-chat__msg--user t-chat__msg--new" : "t-chat__msg t-chat__msg--user"}>
                 <p className="t-chat__who">Sie</p>
                 <p className="t-chat__bubble">{message.text}</p>
               </li>
             ) : (
-              <BotItem key={message.id} message={message} active={message === last} onChoose={choose} maxChoices={dock ? 3 : 5} />
+              <BotItem
+                key={message.id}
+                message={message}
+                active={message === last}
+                fresh={message.id >= freshFrom}
+                onChoose={choose}
+                maxChoices={dock ? 3 : 5}
+              />
             ),
+          )}
+          {/* Decorative: the answer itself is announced by the log once it appears. */}
+          {typing && (
+            <li className="t-chat__msg t-chat__msg--bot t-chat__msg--new t-chat__typing" aria-hidden="true">
+              <p className="t-chat__who">Assistent</p>
+              <p className="t-chat__bubble">
+                <span className="t-chat__dots">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </p>
+            </li>
           )}
         </ol>
         {!conv && <p className="t-chat__loading">Assistent wird geladen …</p>}
