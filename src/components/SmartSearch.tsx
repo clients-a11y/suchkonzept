@@ -43,9 +43,17 @@ export function SmartSearch({ label }: { label: string }) {
   const [announcement, setAnnouncement] = useState("");
   // Query the search switch could not place: asked in an overlay.
   const [asking, setAsking] = useState<string | null>(null);
+  // From sending until the results page takes over: the button shows that the search runs.
+  const [searching, setSearching] = useState(false);
 
-  // A hidden route keeps its state: close the list when it is hidden.
-  useLayoutEffect(() => () => setOpen(false), []);
+  // A hidden route keeps its state: close the list and reset the button when it is hidden.
+  useLayoutEffect(
+    () => () => {
+      setOpen(false);
+      setSearching(false);
+    },
+    [],
+  );
 
   const result = useMemo(() => searchServices(query, true), [query]);
   const trimmed = query.trim();
@@ -185,6 +193,7 @@ export function SmartSearch({ label }: { label: string }) {
     if (item.chat) return askChat(trimmed);
     setOpen(false);
     if (item.key === "all" && !routeQuery(trimmed).pot) return setAsking(trimmed);
+    if (item.key === "all" || item.key === "info") setSearching(true);
     if (item.href) router.push(item.href);
   };
 
@@ -254,7 +263,9 @@ export function SmartSearch({ label }: { label: string }) {
           if (trimmed && !routeQuery(trimmed).pot) {
             event.preventDefault();
             setAsking(trimmed);
+            return;
           }
+          setSearching(true);
         }}
       >
         <div className="t-smart__head">
@@ -324,8 +335,9 @@ export function SmartSearch({ label }: { label: string }) {
               )}
             </div>
           </div>
-          <button type="submit" className="t-btn t-btn--primary t-smart__submit">
-            Suchen
+          <button type="submit" className="t-btn t-btn--primary t-smart__submit" aria-disabled={searching || undefined}>
+            {searching && <span className="t-spinner" aria-hidden="true" />}
+            {searching ? "Suche läuft …" : "Suchen"}
           </button>
           <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
             <IconBubble size={20} />
@@ -333,8 +345,7 @@ export function SmartSearch({ label }: { label: string }) {
           </button>
         </div>
         <p id={ids.hint} className="t-smart__hint">
-          Schreiben Sie in eigenen Worten, was Sie vorhaben, zum Beispiel „Garage bauen“. „Suchen“ zeigt eine
-          Trefferliste. „Im Chat fragen“ klärt Ihr Anliegen im Gespräch. Simuliert, ohne echte KI.
+          In eigenen Worten, zum Beispiel „Garage bauen“. Simuliert, ohne echte KI.
         </p>
       </Form>
 

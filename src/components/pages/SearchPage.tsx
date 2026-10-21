@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Form from "next/form";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useId } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
+import type { CSSProperties } from "react";
 import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
@@ -77,11 +78,43 @@ function PotTabs({ q, pot }: { q: string; pot?: Pot }) {
   );
 }
 
+// A new search shows a short loading state: the one request runs, then the hits rise in one by one.
+const LOADING_MS = 550;
+
+function useArrival(key: string): boolean {
+  const [arrived, setArrived] = useState<string | null>(null);
+  useEffect(() => {
+    if (arrived === key) return;
+    const timer = window.setTimeout(() => setArrived(key), LOADING_MS);
+    return () => window.clearTimeout(timer);
+  }, [key, arrived]);
+  return arrived === key;
+}
+
+function Loading() {
+  return (
+    <div className="t-loadingbox" aria-hidden="true">
+      <div className="t-loadingbar">
+        <span />
+      </div>
+      <ol className="t-hits">
+        {[0, 1, 2].map((i) => (
+          <li key={i} className="t-hit t-hit--skeleton">
+            <span />
+            <span />
+            <span />
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function HitList({ hits }: { hits: Hit[] }) {
   return (
     <ol className="t-hits">
-      {hits.map((hit) => (
-        <li key={hit.key} className="t-hit">
+      {hits.map((hit, i) => (
+        <li key={hit.key} className="t-hit" style={{ "--i": i } as CSSProperties}>
           <p className="t-hit__kind">{hit.kind}</p>
           <h3 className="t-hit__title">
             <Link href={hit.href} className="t-cardlink">
@@ -215,6 +248,8 @@ function SearchResults() {
   const route = q && !chosen ? routeQuery(q) : undefined;
   // Without a search term the page lists all services, A to Z.
   const pot: Pot | undefined = chosen ?? (q ? route?.pot : "leistungen");
+  // An unclear term sends no request, so it has nothing to wait for.
+  const ready = useArrival(`${pot ?? "frage"}|${q}`);
 
   if (!pot) {
     return (
@@ -245,6 +280,66 @@ function SearchResults() {
   const answer = services?.answer;
   const other = OTHER[pot];
 
+  // The results, shown once the request has "arrived".
+  const results = (
+    <div className="t-results">
+      {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
+      {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
+        <p className="t-correction">
+          Meinten Sie: <Link href={searchHref(services.correction, pot)}>{services.correction}</Link>?
+        </p>
+      )}
+
+      {answer && (
+        <div className="t-answer">
+          <p className="t-answer__eyebrow">
+            <IconSparkle size={18} />
+            Das passt am besten zu Ihrer Anfrage
+          </p>
+          <h2 className="t-answer__title">
+            <Link href={`/leistungen/${answer.slug}`}>{answer.title}</Link>
+          </h2>
+          <p>{answer.summary}</p>
+          <AnswerPlace service={answer} />
+          <ul className="t-facts-line t-answer__facts">
+            <li className={answer.online ? "t-facts-line__online" : undefined}>
+              {answer.online && <IconCheck size={16} />}
+              {answer.online ? "Online möglich" : "Termin vor Ort"}
+            </li>
+            <li>Kosten: {answer.costs}</li>
+            <li>Dauer: {answer.duration}</li>
+          </ul>
+          {services.related.length > 0 && (
+            <p className="t-answer__related">
+              Das brauchen Sie oft auch:{" "}
+              {services.related.map((s, i) => (
+                <span key={s.slug}>
+                  {i > 0 && ", "}
+                  <Link href={`/leistungen/${s.slug}`}>{s.title}</Link>
+                </span>
+              ))}
+            </p>
+          )}
+          <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Prototyp lokal simuliert, ohne echte KI.</p>
+        </div>
+      )}
+
+      <h2 className="visually-hidden">{POT_LABEL[pot]}</h2>
+      {hits.length > 0 ? (
+        <HitList hits={hits} />
+      ) : (
+        <div className="t-empty">
+          <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
+          <Link href={searchHref(q, other)} className="t-btn">
+            In {POT_LABEL[other]} suchen
+          </Link>
+          <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
+        </div>
+      )}
+      {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
+    </div>
+  );
+
   return (
     <>
       <SearchHead q={q} />
@@ -252,68 +347,19 @@ function SearchResults() {
         <PotTabs q={q} pot={pot} />
         <div className="t-route__bar">
           <p className="t-search__summary" role="status">
-            {q
-              ? `${pluralize(hits.length, "Treffer", "Treffer")} für „${q}“ in ${POT_LABEL[pot]}${route?.pot ? ", automatisch gewählt" : ""}.`
-              : `Kein Suchbegriff: Sie sehen alle ${POT_LABEL[pot]}.`}
+            {!ready
+              ? `Suche läuft in ${POT_LABEL[pot]} …`
+              : q
+                ? `${pluralize(hits.length, "Treffer", "Treffer")} für „${q}“ in ${POT_LABEL[pot]}${route?.pot ? ", automatisch gewählt" : ""}.`
+                : `Kein Suchbegriff: Sie sehen alle ${POT_LABEL[pot]}.`}
           </p>
-          <Link href={searchHref(q, other)} className="t-btn t-btn--small">
-            {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
-          </Link>
-        </div>
-        {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
-        {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
-          <p className="t-correction">
-            Meinten Sie: <Link href={searchHref(services.correction, pot)}>{services.correction}</Link>?
-          </p>
-        )}
-
-        {answer && (
-          <div className="t-answer">
-            <p className="t-answer__eyebrow">
-              <IconSparkle size={18} />
-              Das passt am besten zu Ihrer Anfrage
-            </p>
-            <h2 className="t-answer__title">
-              <Link href={`/leistungen/${answer.slug}`}>{answer.title}</Link>
-            </h2>
-            <p>{answer.summary}</p>
-            <AnswerPlace service={answer} />
-            <ul className="t-facts-line t-answer__facts">
-              <li className={answer.online ? "t-facts-line__online" : undefined}>
-                {answer.online && <IconCheck size={16} />}
-                {answer.online ? "Online möglich" : "Termin vor Ort"}
-              </li>
-              <li>Kosten: {answer.costs}</li>
-              <li>Dauer: {answer.duration}</li>
-            </ul>
-            {services.related.length > 0 && (
-              <p className="t-answer__related">
-                Das brauchen Sie oft auch:{" "}
-                {services.related.map((s, i) => (
-                  <span key={s.slug}>
-                    {i > 0 && ", "}
-                    <Link href={`/leistungen/${s.slug}`}>{s.title}</Link>
-                  </span>
-                ))}
-              </p>
-            )}
-            <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Prototyp lokal simuliert, ohne echte KI.</p>
-          </div>
-        )}
-
-        <h2 className="visually-hidden">{POT_LABEL[pot]}</h2>
-        {hits.length > 0 ? (
-          <HitList hits={hits} />
-        ) : (
-          <div className="t-empty">
-            <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
-            <Link href={searchHref(q, other)} className="t-btn">
-              In {POT_LABEL[other]} suchen
+          {ready && (
+            <Link href={searchHref(q, other)} className="t-btn t-btn--small t-rise">
+              {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
             </Link>
-            <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
-          </div>
-        )}
-        {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
+          )}
+        </div>
+        {ready ? results : <Loading />}
       </div>
     </>
   );

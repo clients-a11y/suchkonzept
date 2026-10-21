@@ -935,7 +935,7 @@ main:focus {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(100deg, rgb(21 41 61 / 0.95) 0%, rgb(32 72 122 / 0.88) 55%, rgb(53 103 153 / 0.72) 100%);
+  background: linear-gradient(100deg, rgb(21 41 61 / 0.95) 0%, rgb(32 72 122 / 0.9) 60%, rgb(53 103 153 / 0.74) 100%);
 }
 
 .t-stage__inner {
@@ -969,17 +969,11 @@ main:focus {
 
 /* ---------- Central search ---------- */
 
+/* The search sits directly on the blue stage: white field, white text, no panel around it. */
 .t-smart {
   position: relative;
   z-index: 5;
-  color: var(--c-text);
-}
-
-.t-smart__form {
-  padding: 1rem;
-  border-radius: var(--radius);
-  background: var(--c-white);
-  box-shadow: var(--shadow);
+  color: var(--c-white);
 }
 
 .t-smart__head {
@@ -992,8 +986,8 @@ main:focus {
 }
 
 .t-smart__label {
-  color: var(--c-navy);
-  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  color: var(--c-white);
+  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
   font-weight: 600;
   line-height: 1.25;
 }
@@ -1002,12 +996,8 @@ main:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.3125rem;
-  color: var(--c-muted);
+  color: var(--c-on-dark);
   font-size: 0.8125rem;
-}
-
-.t-smart__badge .icon {
-  color: var(--c-blue);
 }
 
 .t-smart__field {
@@ -1037,11 +1027,12 @@ main:focus {
   width: 100%;
   min-height: 3.5rem;
   padding: 0.5rem 1rem 0.5rem 3rem;
-  border: 1px solid var(--c-muted);
+  border: 2px solid var(--c-white);
   border-radius: var(--radius);
   background: var(--c-white);
   color: var(--c-text);
   font-size: 1.125rem;
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.22);
 }
 
 .t-smart__input::placeholder {
@@ -1058,15 +1049,23 @@ main:focus {
   min-height: 3.5rem;
 }
 
-/* Second way next to "Suchen": quiet, so the search stays the main action. */
+/* Second way next to "Suchen": an outline on the blue, so the search stays the main action. */
 .t-smart__chat {
-  border-color: var(--c-blue);
+  border-color: rgb(255 255 255 / 0.85);
+  background: rgb(255 255 255 / 0.06);
+  color: var(--c-white);
+}
+
+.t-smart__chat:hover {
+  border-color: var(--c-white);
+  background: rgb(255 255 255 / 0.16);
+  color: var(--c-white);
 }
 
 .t-smart__hint {
-  margin-top: 0.625rem;
-  color: var(--c-muted);
-  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  color: var(--c-on-dark);
+  font-size: 0.8125rem;
 }
 
 .t-smart__list {
@@ -1201,11 +1200,6 @@ main:focus {
 .t-stage :focus-visible {
   --focus: var(--c-white);
   --focus-halo: var(--c-navy);
-}
-
-.t-stage .t-smart__form :focus-visible {
-  --focus: var(--c-navy);
-  --focus-halo: var(--c-white);
 }
 
 /* Quiet facts: plain text with dots, only "online" is green. */
@@ -3559,10 +3553,6 @@ main:focus {
     padding-block: 3.25rem 3rem;
   }
 
-  .t-smart__form {
-    padding: 1.25rem 1.5rem 1.125rem;
-  }
-
   .t-smart__submit {
     flex: 0 0 auto;
   }
@@ -3676,10 +3666,146 @@ main:focus {
   }
 }
 
+/* ---------- Motion: short, and only where something changes ---------- */
+
+@keyframes t-rise {
+  from { opacity: 0; transform: translateY(0.625rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes t-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes t-drop {
+  from { opacity: 0; transform: translateY(-0.25rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes t-pop {
+  from { opacity: 0; transform: translateY(0.75rem) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes t-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes t-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+@keyframes t-shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
+/* Results rise in: first the explanation and the best match, then the hits one by one. */
+.t-rise,
+.t-route,
+.t-results > * {
+  animation: t-rise 0.35s ease-out both;
+}
+
+.t-results > .t-answer {
+  animation-delay: 60ms;
+}
+
+.t-results > .t-hits {
+  animation: none;
+}
+
+.t-results .t-hit {
+  animation: t-rise 0.35s ease-out both;
+  animation-delay: calc(min(var(--i, 0), 8) * 50ms + 120ms);
+}
+
+.t-smart__list:not([hidden]) {
+  animation: t-drop 0.14s ease-out;
+}
+
+.t-potdialog[open] {
+  animation: t-pop 0.2s ease-out;
+}
+
+.t-potdialog[open]::backdrop {
+  animation: t-fade 0.2s ease-out;
+}
+
+.t-spinner {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: t-spin 0.7s linear infinite;
+}
+
+/* Loading: a running bar and three placeholder hits while the one request is on its way. */
+.t-loadingbox {
+  display: grid;
+  gap: 1rem;
+  max-width: 52rem;
+}
+
+.t-loadingbar {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--c-line-soft);
+}
+
+.t-loadingbar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  border-radius: inherit;
+  background: var(--c-blue);
+  animation: t-sweep 0.9s ease-in-out infinite;
+}
+
+.t-hit--skeleton {
+  gap: 0.625rem;
+  padding-block: 1.125rem;
+}
+
+.t-hit--skeleton:hover {
+  border-left-color: var(--c-surface);
+  background: var(--c-surface);
+}
+
+.t-hit--skeleton span {
+  display: block;
+  height: 0.75rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--c-line-soft) 0%, #e4e9ef 40%, var(--c-line-soft) 80%);
+  background-size: 200% 100%;
+  animation: t-shimmer 1.2s linear infinite;
+}
+
+.t-hit--skeleton span:nth-child(1) {
+  width: 28%;
+  height: 0.625rem;
+}
+
+.t-hit--skeleton span:nth-child(2) {
+  width: 55%;
+  height: 1rem;
+}
+
+.t-hit--skeleton span:nth-child(3) {
+  width: 85%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
   }

@@ -122,13 +122,20 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Kopf: schmale Leiste mit Hinweis „Prototyp“, Testfall und „Demo zurücksetzen“ links, Gebärdensprache, Leichte
   Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
   ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
-- Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche im weißen Feld und Beispiele; danach
+- Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche direkt auf dem Blau (weißes Eingabefeld,
+  weiße Schrift, Chat-Knopf als Umriss, kurzer Hinweis „In eigenen Worten …“) und Beispiele; danach
   Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band. Die zwei Einstiegskarten
   „Für Privatpersonen“ und „Für Unternehmen“ aus dem Plan sind auf Wunsch wieder entfernt (21.10.2026); die Suche
   steht in der Stage allein.
 - Rot nur für die Hauptaktion (Suchen, Online beantragen, Weiter, Absenden). Im Chat sind Senden und Links blau.
 - Unterseiten mit hellblauem Seitenkopf (Brotkrumen, H1, Einleitung), Leistungsseite mit Seitenbox rechts und
   Akkordeons, Suchergebnisse als hellblaue Karten unter den Reitern Leistungen und Informationen.
+
+**Bewegung**
+- „Suchen“ zeigt beim Absenden „Suche läuft …“ mit Kreisel. Die Suchseite zeigt danach gut eine halbe Sekunde einen
+  Ladebalken und drei Platzhalter („Suche läuft in Leistungen …“), dann steigen Erklärung, beste Antwort und Treffer
+  nacheinander ein. Bei einer Rückfrage gibt es keinen Ladezustand, weil noch keine Anfrage läuft.
+- Vorschlagsliste, Overlay und Hintergrund blenden kurz ein. Bei „weniger Bewegung“ im System ist alles aus.
 
 **Technik**
 - Dynamische Routen lesen `params` in einer Suspense-Grenze (sonst meldet Next 16 „URL data outside of Suspense“),
