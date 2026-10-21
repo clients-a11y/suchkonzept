@@ -1,16 +1,18 @@
-# Portalbaukasten · Klick-Dummy
+# Suchkonzept · Verwaltungsportal Musterland
 
-Klick-Dummy für eine mandantenfähige Portalplattform ohne Backend. Zwei fiktive Mandanten zeigen,
-wie verschieden Portale aus demselben System aussehen können:
+Prototyp für das Suchkonzept eines einzelnen Verwaltungsportals, ohne Backend. Das fiktive
+„Verwaltungsportal Musterland“ bündelt die Leistungen des Landes und seiner Gemeinden. Aufbau und Farben
+orientieren sich an einem Bundesportal, ohne Hoheitszeichen und ohne übernommene Texte. Alle Inhalte sind
+Beispieldaten, die Fotos sind KI-generiert.
 
-- **Musterland** (`/musterland`): Land, Informationsportal
-- **Beispielstadt** (`/beispielstadt`): Stadt, Serviceportal
+Was der Prototyp zeigt:
 
-Beide Startseiten haben eine zentrale Suche, die Anliegen in eigenen Worten versteht und beim Tippen
-Leistungen vorschlägt (im Klick-Dummy lokal simuliert, ohne echte KI).
-
-Unter `/neu` legt ein Assistent in vier Schritten einen dritten Mandanten an und misst die Zeit.
-Neue Mandanten liegen nur im `localStorage` des Browsers. Alle Inhalte sind Beispieldaten.
+- **Zentrale Suche** in eigenen Worten mit Vorschlägen, Tippfehlerkorrektur und Kurzantwort
+- **Suchweiche** mit zwei Bereichen (Leistungen, Informationen) und Overlay „Was suchen Sie?“ bei unklaren Anfragen
+- **Wohnort erst bei Bedarf**: Leistungen der Gemeinden fragen nach Postleitzahl oder Ort und nennen die zuständige Stelle
+- **Chat-Assistent** als Seite und als kleines Fenster, auf Basis derselben Suche
+- **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
+- **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“
 
 ## Starten
 
@@ -19,14 +21,18 @@ npm install
 npm run dev
 ```
 
-Danach `http://localhost:3000` öffnen. `npm run build` prüft Typen und rendert die Beispielmandanten vor.
+Danach `http://localhost:3000` öffnen. `npm run build` prüft Typen und rendert alle Seiten vor.
+Mit der Umgebungsvariable `DEMO_PASSWORD` schützt ein Passwort-Gate alle Seiten (siehe `src/proxy.ts`).
 
 ## Aufbau
 
-- `src/data/` Mandanten, Leistungskatalog, Meldungen und Inhaltsseiten (Konfiguration, kein Code pro Mandant)
-- `src/lib/` Typen, Kontrastberechnung, localStorage-Store mit `themeStyle()`, Suche
-- `src/components/` Shell, Demo-Leiste, Kopf, Fuß, Brotkrumen, Illustrationen
-- `src/components/pages/` Seiten als Client-Komponenten, `src/app/` nur dünne Routen
-- `src/app/globals.css` Plattform-Klassen mit `pf-`, Mandanten-Klassen mit `t-`
+- `src/data/` Portal (`site.ts`), Leistungskatalog, Meldungen und Seiten, Orte, Organisation, Projekte,
+  Anliegen und gepflegte Suchbegriffe, Antragsformulare
+- `src/lib/` Suche (`smart-search.ts`), Suchweiche (`search-router.ts`), Assistent, Zuständigkeit (`offices.ts`),
+  Speicher im Browser für Wohnort, Konto und Chat
+- `src/components/` Rahmen (Kopf, Fuß, Chatfenster), Suche, Overlay, Karten; `src/components/pages/` die Seiten
+- `src/app/(portal)/` Routen ohne Präfix, `src/app/zugang/` Passwort-Gate
+- `src/app/globals.css` ein Stylesheet, Klassen mit `t-`, Farben als CSS-Variablen
 
-Gestaltung, Theme-Mechanik und Abnahmekriterien stehen in [docs/BAUPLAN.md](docs/BAUPLAN.md).
+Umbauplan und Stand: [docs/BAUPLAN-SUCHE.md](docs/BAUPLAN-SUCHE.md). Vorgeschichte als mandantenfähiger Klick-Dummy:
+[docs/BAUPLAN.md](docs/BAUPLAN.md). Fotos: [docs/BILDER.md](docs/BILDER.md).

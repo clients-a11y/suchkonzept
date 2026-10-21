@@ -1,5 +1,8 @@
 # Bauplan: Klick-Dummy „Portalbaukasten“
 
+> Vorgeschichte. Dieser Plan beschreibt den mandantenfähigen Klick-Dummy vor dem Fork. Für das Suchkonzept
+> gilt [BAUPLAN-SUCHE.md](BAUPLAN-SUCHE.md); Mandanten, Demo-Leiste und Assistent zum Anlegen gibt es hier nicht mehr.
+
 Stand 19.10.2026. Klick-Dummy für eine mandantenfähige Portalplattform, ohne Backend.
 Neutral: kein Bezug zu einem Arbeitgeber, kein fremder Code, kein fremdes Designsystem (kein MUSE),
 nur fiktive Mandanten und Beispieldaten. Ein Backend (Payload) folgt später.

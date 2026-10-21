@@ -89,3 +89,47 @@ Kontraste AA, Tastaturbedienung für Suche, Overlay, Akkordeons, Chat und Formul
 5. `npm run build`, alle Seiten auf Desktop und 390 px prüfen, mit Screenshots.
 6. Kleine Commits auf `main`. Vor Push, GitHub-Repo oder Railway-Deploy fragen; für ein Deploy einen eigenen
    Railway-Dienst nutzen, nicht den des Klick-Dummys.
+
+## Stand 21.10.2026: umgesetzt
+
+Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px durchgeklickt.
+
+**Ein Portal**
+- `src/data/site.ts` (Name, Navigation, Fuß, Schnellzugriff, Kontakt, Assistent) ersetzt `tenants.ts`.
+  `NEWS`, Seiten, `ORG_GROUPS` (Landesregierung und Stadt Beispielstadt), `PROJECTS` und `PLACES` sind je eine Liste.
+  Ämter der Stadt heißen jetzt „… Beispielstadt“, ihre Meldungen auch.
+- Zuständigkeit (`src/lib/offices.ts`): Landesleistungen nennen das Ministerium. Gemeindeleistungen brauchen den
+  Ort; Beispielstadt hat eigene Ämter je Leistung (`localUnitFor`), die anderen Orte ihre allgemeine Stelle. Keine
+  Übergabe mehr an andere Portale, weder auf der Leistungsseite noch in Suche oder Chat.
+- Der Online-Antrag nimmt den gemerkten Ort oder die Postleitzahl aus der Anschrift, um die Stelle zu nennen.
+- Speicherschlüssel beginnen mit `suchkonzept.`, das Cookie des Gates heißt `suchkonzept_zugang`.
+
+**Ergänzt**
+- `/leistungen`: Leistungen A bis Z mit Filter „Für Privatpersonen“ und „Für Unternehmen“ (`audience` je Leistung),
+  Ziel der beiden Einstiegskarten und der Brotkrumen auf Leistungsseiten.
+- Zwei Leistungen für Unternehmen: „Gewerbe anmelden“ (Gemeinde) und „Förderung für Dorfläden beantragen“ (Land),
+  mit Formular und Anliegen in `intents.ts`. „förderung“ allein zeigt nicht mehr auf die Vereinsförderung.
+- Seiten für den Fuß: Über dieses Portal, Kontakt, Hilfe, Impressum, Datenschutz, Barrierefreiheit (Beispieltexte).
+- Gleiche Punktzahl in der Suche: Top-Aufgaben (`TOP_TASKS`) zuerst.
+
+**Gestaltung** (`src/app/globals.css`, neu geschrieben)
+- Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.
+- Fokus: doppelter Ring (dunkel außen, weiß innen), auf dunklem Grund umgekehrt.
+- Kopf: schmale Leiste mit Hinweis „Prototyp“, Testfall und „Demo zurücksetzen“ links, Gebärdensprache, Leichte
+  Sprache und Sprache rechts; darunter Wortmarke (eigenes Bildzeichen: Bogen als offene Tür), Suche, Konto, Menü;
+  ab 64rem die Hauptnavigation sichtbar. Unter 30rem nur Symbole mit verstecktem Namen.
+- Startseite: Rathaus-Foto graustufig, blau überlagert, darauf H1, Suche im weißen Feld, Beispiele und zwei
+  Einstiegskarten; danach Häufig gesucht, Lebenslagen mit Piktogrammen, Aktuelle Themen, Großprojekte, Hilfe-Band.
+- Rot nur für die Hauptaktion (Suchen, Online beantragen, Weiter, Absenden). Im Chat sind Senden und Links blau.
+- Unterseiten mit hellblauem Seitenkopf (Brotkrumen, H1, Einleitung), Leistungsseite mit Seitenbox rechts und
+  Akkordeons, Suchergebnisse als hellblaue Karten unter den Reitern Leistungen und Informationen.
+
+**Technik**
+- Dynamische Routen lesen `params` in einer Suspense-Grenze (sonst meldet Next 16 „URL data outside of Suspense“),
+  Titel kommen aus `generateMetadata`. Unbekannte Adressen zeigen die 404-Seite im Portalrahmen.
+
+## Offen
+
+- Echte Inhalte für Gebärdensprache, Leichte Sprache und Englisch (Platzhalter)
+- Meldungen haben keine eigenen Seiten, die Links springen in die Liste
+- Unbekannte Leistung unter einer gültigen Route liefert die 404-Seite mit Status 200 (Streaming)

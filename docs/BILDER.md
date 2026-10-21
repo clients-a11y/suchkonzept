@@ -1,8 +1,9 @@
 # Bilder: KI-generierte Beispielfotos
 
-Die Beispielmandanten Musterland und Beispielstadt zeigen KI-generierte Fotos (erzeugt mit Higgsfield).
-Jedes Bild ist im Portal als „Beispielbild, KI-generiert“ gekennzeichnet. Alle abgebildeten Personen sind
-fiktiv. Mandanten aus dem Assistenten haben keine Fotos und zeigen die Token-Illustrationen (`NewsArt`, `Portrait`).
+Das Verwaltungsportal Musterland zeigt KI-generierte Fotos (erzeugt mit Higgsfield). Jedes Bild ist im Portal als
+„Beispielbild, KI-generiert“ gekennzeichnet. Alle abgebildeten Personen sind fiktiv. Seit dem Fork für das
+Suchkonzept gibt es keine gezeichneten Ersatzbilder mehr: Jede Meldung, jede Stelle und jedes Projekt hat ein Foto.
+Die Startseite nutzt `b1-rathaus` als Hintergrund der Stage, in Graustufen und blau überlagert.
 
 Stand 19.10.2026: alle 31 Bilder erzeugt mit Higgsfield, Modell GPT Image 2.5 (Variante „flare“), Qualität
 „medium“, Auflösung 1k, 0,5 Credits je Bild. Meldungen im Format 3:2 (1024 × 688), Porträts 4:5, auf
