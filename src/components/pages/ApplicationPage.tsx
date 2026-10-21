@@ -3,19 +3,18 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
 import { DEMO_PERSON, SERVICE_FORMS } from "@/data/forms";
 import type { FormField } from "@/data/forms";
-import { officeNameFor } from "@/data/organisation";
 import { findService } from "@/data/services";
+import { SITE } from "@/data/site";
 import { signIn, submitApplication, useAccount } from "@/lib/account-store";
 import type { Application } from "@/lib/account-store";
 import { formatDate } from "@/lib/format";
+import { responsibleOffice } from "@/lib/offices";
+import { findPlaces, usePlace } from "@/lib/place-store";
+import type { Place } from "@/data/places";
 import type { Service } from "@/lib/types";
-import { useDocumentTitle } from "@/lib/use-document-title";
-import { origin } from "@/lib/origin";
 import { checkValue } from "@/lib/validate";
 
 const STEPS = ["Anmelden", "Angaben", "Unterlagen", "Prüfen und absenden"];
@@ -109,9 +108,17 @@ function validate(fields: FormField[], values: Values): Errors {
   return errors;
 }
 
+// Who receives the application: the Land office, or the office of the remembered place. Without a
+// remembered place the postcode in the address decides.
+function officeName(service: Service, place: Place | undefined, address: string): string {
+  const fromAddress = address.match(/\b\d{5}\b/)?.[0];
+  const where = place ?? (fromAddress ? findPlaces(fromAddress)[0] : undefined);
+  return responsibleOffice(service, where)?.office ?? `${SITE.contact.office} (leitet weiter an Ihre Gemeinde)`;
+}
+
 function ApplicationFlow({ service }: { service: Service }) {
-  const { tenant, base } = useCurrentTenant();
   const account = useAccount();
+  const place = usePlace();
   const serviceFields = SERVICE_FORMS[service.slug] ?? [];
   const [step, setStep] = useState<number | null>(null);
   const [values, setValues] = useState<Values>({});
@@ -167,9 +174,7 @@ function ApplicationFlow({ service }: { service: Service }) {
       const all = [...PERSON_FIELDS, ...serviceFields];
       const application = submitApplication(
         {
-          tenantId: tenant.id,
-          tenantName: tenant.name,
-          office: officeNameFor(tenant, service.slug),
+          office,
           service: service.slug,
           serviceTitle: service.title,
           answers: all.map((f) => ({ label: f.label, value: display(f, valuesNow[f.id] ?? "") })),
@@ -183,6 +188,7 @@ function ApplicationFlow({ service }: { service: Service }) {
   };
 
   const setValue = (id: string, v: string) => setValues((old) => ({ ...old, [id]: v }));
+  const office = officeName(service, place, valuesNow["person-anschrift"] ?? "");
   const errorList = Object.entries(errors);
   const fieldOf = (id: string) => [...PERSON_FIELDS, ...serviceFields].find((f) => f.id === id);
 
@@ -198,14 +204,14 @@ function ApplicationFlow({ service }: { service: Service }) {
         <p>
           Zuständig ist {done.office}. {account.signedIn ? "Die Eingangsbestätigung liegt in Ihrem Postfach." : "Ohne Konto gibt es keine Nachrichten im Postfach. Notieren Sie sich die Vorgangsnummer."}
         </p>
-        <p className="t-box__note">Klick-Dummy: Der Antrag wird nicht übermittelt, er bleibt nur in diesem Browser.</p>
+        <p className="t-box__note">Prototyp: Der Antrag wird nicht übermittelt, er bleibt nur in diesem Browser.</p>
         <p className="t-actions">
           {account.signedIn && (
-            <Link href={`${base}/konto`} className="t-btn t-btn--primary">
+            <Link href="/konto" className="t-btn t-btn--primary">
               Zum Postfach
             </Link>
           )}
-          <Link href={`${base}/leistungen/${service.slug}`} className="t-btn">
+          <Link href={`/leistungen/${service.slug}`} className="t-btn">
             Zurück zur Leistung
           </Link>
         </p>
@@ -229,7 +235,7 @@ function ApplicationFlow({ service }: { service: Service }) {
         ))}
       </ol>
 
-      <form className="t-applyform" onSubmit={submit} noValidate {...origin("zentral", "Zentral · Plattform: Antragsstrecke")}>
+      <form className="t-applyform" onSubmit={submit} noValidate>
         <h2 className="t-h2" ref={headingRef} tabIndex={-1}>
           <span className="t-applyform__step">Schritt {current + 1} von 4</span> {STEPS[current]}
         </h2>
@@ -249,10 +255,7 @@ function ApplicationFlow({ service }: { service: Service }) {
 
         {current === 0 && (
           <div className="t-signin">
-            <p>
-              Mit dem Nutzerkonto sind Ihre Daten schon eingetragen, und Bescheide kommen in Ihr Postfach. Das Konto gilt für alle
-              Portale auf dieser Plattform.
-            </p>
+            <p>Mit dem Nutzerkonto sind Ihre Daten schon eingetragen, und Bescheide kommen in Ihr Postfach.</p>
             <p className="t-actions">
               <button
                 type="button"
@@ -268,7 +271,7 @@ function ApplicationFlow({ service }: { service: Service }) {
                 Ohne Konto weiter
               </button>
             </p>
-            <p className="t-box__note">Klick-Dummy: Es wird kein Passwort abgefragt. Das Demo-Konto gehört der fiktiven Person {DEMO_PERSON.name}.</p>
+            <p className="t-box__note">Prototyp: Es wird kein Passwort abgefragt. Das Demo-Konto gehört der fiktiven Person {DEMO_PERSON.name}.</p>
           </div>
         )}
 
@@ -295,7 +298,7 @@ function ApplicationFlow({ service }: { service: Service }) {
         {current === 2 && (
           <fieldset className="t-fieldset">
             <legend className="t-fieldset__legend">Unterlagen hochladen</legend>
-            <p className="t-box__note">Sie können Unterlagen auch später über das Postfach nachreichen. Im Klick-Dummy werden keine Dateien übertragen.</p>
+            <p className="t-box__note">Sie können Unterlagen auch später über das Postfach nachreichen. Im Prototyp werden keine Dateien übertragen.</p>
             {service.documents.map((doc, i) => (
               <div key={doc} className="t-formfield">
                 <label htmlFor={`datei-${i}`} className="t-formfield__label">
@@ -329,7 +332,7 @@ function ApplicationFlow({ service }: { service: Service }) {
               </div>
               <div>
                 <dt>Zuständig</dt>
-                <dd>{officeNameFor(tenant, service.slug)}</dd>
+                <dd>{office}</dd>
               </div>
             </dl>
             <p>
@@ -374,31 +377,35 @@ function ApplicationFlow({ service }: { service: Service }) {
 }
 
 export function ApplicationPage({ slug }: { slug: string }) {
-  const { tenant, base } = useCurrentTenant();
   const service = findService(slug);
-  useDocumentTitle(`Online-Antrag: ${service?.title ?? "Leistung"} · ${tenant.name}`);
-  if (!service) return <NotFoundBlock what="Leistung" />;
+  if (!service) return null;
 
   return (
-    <div className="t-container t-page">
-      <Breadcrumb
-        items={[
-          { label: tenant.type === "service" ? "Leistungen A bis Z" : "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
-          { label: service.title, href: `/leistungen/${service.slug}` },
-          { label: "Online-Antrag", href: `/antrag/${service.slug}` },
-        ]}
-      />
-      <h1 className="t-h1">Online-Antrag: {service.title}</h1>
-      {service.online ? (
-        <ApplicationFlow service={service} />
-      ) : (
-        <div className="t-empty">
-          <p>Für diese Leistung gibt es keinen Online-Antrag. Bitte vereinbaren Sie einen Termin vor Ort.</p>
-          <Link href={`${base}/leistungen/${service.slug}`} className="t-btn">
-            Zurück zur Leistung
-          </Link>
+    <>
+      <div className="t-pagehead">
+        <div className="t-container">
+          <Breadcrumb
+            items={[
+              { label: "Leistungen", href: "/leistungen" },
+              { label: service.title, href: `/leistungen/${service.slug}` },
+              { label: "Online-Antrag", href: `/antrag/${service.slug}` },
+            ]}
+          />
+          <h1 className="t-h1">Online-Antrag: {service.title}</h1>
         </div>
-      )}
-    </div>
+      </div>
+      <div className="t-container t-page t-narrow">
+        {service.online ? (
+          <ApplicationFlow service={service} />
+        ) : (
+          <div className="t-empty">
+            <p>Für diese Leistung gibt es keinen Online-Antrag. Bitte vereinbaren Sie einen Termin vor Ort.</p>
+            <Link href={`/leistungen/${service.slug}`} className="t-btn">
+              Zurück zur Leistung
+            </Link>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -1,19 +1,16 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { AssistantChat } from "@/components/AssistantChat";
 import type { ChatRequest } from "@/components/AssistantChat";
 import { IconBubble, IconClose } from "@/components/Icons";
 import { DOCK_MEDIA, registerDock } from "@/lib/assistant-dock";
-import { clearHandoff, parseHandoff, readHandoffRaw, subscribeChat } from "@/lib/chat-store";
 
 // Small chat window at the bottom right. It does not block the page (non-modal dialog), keeps the
 // conversation while the person moves through the portal and closes with Escape.
 export function AssistantDock() {
-  const { tenant, base } = useCurrentTenant();
   const pathname = usePathname();
   const router = useRouter();
   const ids = { panel: useId(), title: useId() };
@@ -22,43 +19,26 @@ export function AssistantDock() {
   const [open, setOpen] = useState(false);
   const [used, setUsed] = useState(false);
   const [request, setRequest] = useState<ChatRequest | undefined>();
-  const [seenHandoff, setSeenHandoff] = useState<string | null>(null);
-  const waiting = useSyncExternalStore(subscribeChat, readHandoffRaw, () => null);
 
-  const enabled = tenant.assistant?.enabled !== false;
   // On the assistant page the chat is already there.
-  const onPage = pathname === `${base}/assistent`;
-
-  // Another portal handed a conversation over: open the window with it.
-  if (waiting && waiting !== seenHandoff && enabled && !onPage) {
-    setSeenHandoff(waiting);
-    const handoff = parseHandoff(waiting);
-    if (handoff?.tenantId === tenant.id && window.matchMedia(DOCK_MEDIA).matches) {
-      setUsed(true);
-      setOpen(true);
-      setRequest((last) => ({ handoff: { question: handoff.question, from: handoff.from, place: handoff.place }, nonce: (last?.nonce ?? 0) + 1 }));
-    }
-  }
-  useEffect(() => {
-    if (seenHandoff && parseHandoff(seenHandoff)?.tenantId === tenant.id) clearHandoff();
-  }, [seenHandoff, tenant.id]);
+  const onPage = pathname === "/assistent";
 
   useEffect(() => {
-    if (!enabled || onPage) return;
+    if (onPage) return;
     registerDock((question, place) => {
       setUsed(true);
       setOpen(true);
       if (question) setRequest((last) => ({ question, place, nonce: (last?.nonce ?? 0) + 1 }));
     });
     return () => registerDock(null);
-  }, [enabled, onPage]);
+  }, [onPage]);
 
   // Opening moves the focus into the window, to the message field.
   useEffect(() => {
     if (open) panelRef.current?.querySelector<HTMLInputElement>(".t-chat__composer input")?.focus();
   }, [open, request]);
 
-  if (!enabled || onPage) return null;
+  if (onPage) return null;
 
   const close = () => {
     setOpen(false);
@@ -67,7 +47,7 @@ export function AssistantDock() {
 
   const toggle = () => {
     if (open) return close();
-    if (!window.matchMedia(DOCK_MEDIA).matches) return router.push(`${base}/assistent`);
+    if (!window.matchMedia(DOCK_MEDIA).matches) return router.push("/assistent");
     setUsed(true);
     setOpen(true);
   };

@@ -5,12 +5,6 @@ export function formatDate(iso: string): string {
   return DATE.format(new Date(`${iso}T00:00:00Z`));
 }
 
-export function formatClock(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
 export function pluralize(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
 }

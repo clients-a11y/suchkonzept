@@ -2,36 +2,48 @@
 
 import { useState } from "react";
 import { resetAccount } from "@/lib/account-store";
-import { clearChats } from "@/lib/chat-store";
-import { setShowOrigin } from "@/lib/origin";
+import { clearChat } from "@/lib/chat-store";
 import { setPlaceId } from "@/lib/place-store";
 
-// Before a demo: every run starts the same. Tenants created in the wizard stay.
-export function DemoReset() {
+function reset() {
+  setPlaceId("");
+  resetAccount();
+  clearChat();
+}
+
+// Before a demo: every run starts the same. Small in the header, with an explanation on the test case page.
+export function DemoReset({ explained = false }: { explained?: boolean }) {
   const [status, setStatus] = useState("");
+  const button = (
+    <button
+      type="button"
+      className={explained ? "t-btn" : "t-topbar__link t-topbar__reset"}
+      onClick={() => {
+        reset();
+        setStatus(explained ? "Zurückgesetzt. Die Vorführung startet wie beim ersten Besuch." : "Zurückgesetzt.");
+      }}
+    >
+      Demo zurücksetzen
+    </button>
+  );
+  if (!explained) {
+    return (
+      <>
+        {button}
+        <span role="status" className="t-topbar__status">
+          {status}
+        </span>
+      </>
+    );
+  }
   return (
-    <div className="pf-reset">
+    <div className="t-reset">
       <div>
-        <h2 className="pf-h3">Vor der Vorführung</h2>
-        <p className="pf-muted">
-          Löscht den gemerkten Ort, das Demo-Konto mit Anträgen und Postfach, die Chatverläufe und den Schalter „Herkunft
-          anzeigen“. Eigene Mandanten bleiben erhalten.
-        </p>
+        <h2 className="t-h3">Vor der Vorführung</h2>
+        <p>Löscht den gemerkten Wohnort, das Demo-Konto mit Anträgen und Postfach und den Chatverlauf.</p>
       </div>
-      <button
-        type="button"
-        className="pf-btn pf-btn--primary"
-        onClick={() => {
-          setPlaceId("");
-          resetAccount();
-          setShowOrigin(false);
-          clearChats();
-          setStatus("Zurückgesetzt. Die Vorführung startet wie beim ersten Besuch.");
-        }}
-      >
-        Demo zurücksetzen
-      </button>
-      <p role="status" className="pf-reset__status">
+      {button}
+      <p role="status" className="t-reset__status">
         {status}
       </p>
     </div>

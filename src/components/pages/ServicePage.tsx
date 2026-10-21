@@ -1,22 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
+import { useId, useState } from "react";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { IconArrow } from "@/components/Icons";
-import { PlaceFinder } from "@/components/PlaceFinder";
+import { ChatButton } from "@/components/ChatButton";
 import { HomePlace } from "@/components/HomePlace";
-import { NotFoundBlock } from "@/components/pages/NotFoundBlock";
-import type { Place } from "@/data/content";
-import { unitForService } from "@/data/organisation";
+import { IconArrow, IconCheck, IconPin } from "@/components/Icons";
+import { landUnitFor, localUnitFor } from "@/data/organisation";
 import { findService } from "@/data/services";
-import { allPlaces, usePlaceId } from "@/lib/place-store";
-import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
-import { type Office, officeForPlace, officeOf } from "@/lib/offices";
-import type { Service, Tenant } from "@/lib/types";
-import { useDocumentTitle } from "@/lib/use-document-title";
-import { CATALOGUE, origin } from "@/lib/origin";
+import { SITE } from "@/data/site";
+import { type Office, responsibleOffice } from "@/lib/offices";
+import { usePlace } from "@/lib/place-store";
+import type { Service } from "@/lib/types";
+
+// Information pages that belong to a service.
+const MORE_INFO: Record<string, { label: string; href: string }[]> = {
+  "kindergeld-beantragen": [{ label: "Kindergeld: Das Wichtigste für Familien", href: "/seite/kindergeld" }],
+  "personalausweis-beantragen": [{ label: "Rathaus Beispielstadt: Öffnungszeiten", href: "/seite/rathaus-beispielstadt" }],
+};
 
 function OfficeLines({ office }: { office: Office }) {
   return (
@@ -36,168 +37,158 @@ function OfficeLines({ office }: { office: Office }) {
   );
 }
 
-// Points from one portal to another: a city with its own portal, or the Land portal.
-function Referral({ place, service, tenants, current }: { place: Place; service: Service; tenants: Tenant[]; current: Tenant }) {
-  const target = place.tenant && place.tenant !== current.id ? place.tenant : !place.tenant && current.type === "service" ? place.land : undefined;
-  const other = target ? tenants.find((t) => t.id === target) : undefined;
-  if (!other) return null;
-  const text =
-    other.type === "service"
-      ? `${other.name} hat ein eigenes Serviceportal mit Ansprechpersonen und Online-Antrag.`
-      : `${place.name} gehört nicht zu ${current.name}. Die zuständige Stelle finden Sie im ${other.tagline} ${other.name}.`;
-  return (
-    <div className="t-referral">
-      <p>{text}</p>
-      <Link href={`/${other.id}/leistungen/${service.slug}`} className="t-more">
-        {service.title} bei {other.name} <IconArrow size={18} />
-      </Link>
-    </div>
-  );
-}
-
-function Responsible({ tenant, service }: { tenant: Tenant; service: Service }) {
-  const { base } = useCurrentTenant();
-  const tenants = useAllTenants();
-  const places = allPlaces(useCustomTenants() ?? []);
-  const placeId = usePlaceId();
-  const place = places.find((p) => p.id === placeId);
-  const unit = unitForService(tenant, service.slug);
-
-  // Services of the Land itself have one office; a city portal presets its own.
-  const landService = service.level === "land";
-  const cityPortal = tenant.type === "service";
-  const outside = cityPortal && place && place.tenant !== tenant.id ? place : undefined;
-
-  let office: Office | undefined;
-  let note: string;
-  if (landService) {
-    office = officeOf(tenant, service);
-    note = "Diese Leistung bietet das Land selbst an.";
-  } else if (cityPortal) {
-    office = officeOf(tenant, service);
-    note = `Voreingestellt für ${tenant.name}.`;
-  } else if (place) {
-    office = officeForPlace(place, service, tenants);
-    note = `Zuständig für ${place.name}.`;
-  } else {
-    note = "Hängt von Ihrem Wohnort ab. Geben Sie oben Postleitzahl oder Ort ein. Alle Informationen zur Leistung gelten auch ohne Angabe.";
-  }
+// Side box: who is in charge. Land services have one office; municipal ones need the place.
+function Responsible({ service }: { service: Service }) {
+  const place = usePlace();
+  const office = responsibleOffice(service, place);
+  const land = service.level === "land";
+  const local = place ? localUnitFor(place.id, service.slug) : undefined;
+  const ministry = landUnitFor(service.slug);
+  const titleId = useId();
 
   return (
-    <section className="t-box" {...origin("mandant", "Mandant · Zuständigkeit")}>
-      <h2 className="t-box__title">Zuständige Stelle</h2>
-      {office && <OfficeLines office={office} />}
-      <p className="t-box__note">{note}</p>
-      {unit && (
-        <p className="t-box__link">
-          {cityPortal || landService ? "Mehr zur Stelle: " : "Im Land zuständig: "}
-          <Link href={`${base}/organisation/${unit.id}`}>{unit.name}</Link>
+    <section className="t-box t-box--accent" aria-labelledby={titleId}>
+      <h2 id={titleId} className="t-box__title">
+        Zuständige Stelle
+      </h2>
+      {office ? (
+        <>
+          <OfficeLines office={office} />
+          <p className="t-box__note">{land ? "Diese Leistung bietet das Land selbst an." : `Zuständig für ${place?.name}.`}</p>
+        </>
+      ) : (
+        <p className="t-box__note">
+          Hängt von Ihrem Wohnort ab. Geben Sie Postleitzahl oder Ort ein. Alle Informationen zur Leistung gelten auch ohne Angabe.
         </p>
       )}
-      {cityPortal && !landService && (
-        <details className="t-elsewhere" open={Boolean(outside)}>
-          <summary>Wohnen Sie nicht in {tenant.name}?</summary>
-          <PlaceFinder places={places} label="Postleitzahl oder Ort" />
-          {outside && (
-            <>
-              <p className="t-box__note">
-                Für {outside.name} ist zuständig: <strong>{officeForPlace(outside, service, tenants).office}</strong>
-              </p>
-              <Referral place={outside} service={service} tenants={tenants} current={tenant} />
-            </>
+      {(local || ministry) && (
+        <ul className="t-box__links">
+          {local && (
+            <li>
+              <Link href={`/organisation/${local.id}`}>Mehr zur Stelle: {local.name}</Link>
+            </li>
           )}
-        </details>
+          {ministry && (
+            <li>
+              <Link href={`/organisation/${ministry.id}`}>
+                {land ? "Mehr zur Stelle" : "Fachlich zuständig im Land"}: {ministry.name}
+              </Link>
+            </li>
+          )}
+        </ul>
       )}
     </section>
   );
 }
 
-function ServiceView({ service }: { service: Service }) {
-  const { tenant, base } = useCurrentTenant();
-  const tenants = useAllTenants();
-  const places = allPlaces(useCustomTenants() ?? []);
-  const placeId = usePlaceId();
-  const place = places.find((p) => p.id === placeId);
+function Facts({ service }: { service: Service }) {
   const [notice, setNotice] = useState("");
-  const choosePlace = tenant.type === "info" && service.level === "kommune";
-  const action = service.online ? "Online beantragen" : "Termin vereinbaren";
+  const titleId = useId();
+  return (
+    <section className="t-facts" aria-labelledby={titleId}>
+      <h2 id={titleId} className="t-facts__title">
+        Das Wichtigste
+      </h2>
+      <dl className="t-facts__list">
+        <div>
+          <dt>Kosten</dt>
+          <dd>{service.costs}</dd>
+        </div>
+        <div>
+          <dt>Dauer</dt>
+          <dd>{service.duration}</dd>
+        </div>
+        <div>
+          <dt>Online möglich</dt>
+          <dd>
+            {service.online ? (
+              <span className="t-facts__online">
+                <IconCheck size={18} />
+                Ja
+              </span>
+            ) : (
+              "Nein, nur vor Ort"
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>Unterlagen</dt>
+          <dd>
+            <ul>
+              {service.documents.map((doc) => (
+                <li key={doc}>{doc}</li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+      <div className="t-facts__action">
+        {service.online ? (
+          <Link href={`/antrag/${service.slug}`} className="t-btn t-btn--primary t-btn--large">
+            Online beantragen
+            <IconArrow size={20} />
+          </Link>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="t-btn t-btn--primary t-btn--large"
+              onClick={() => setNotice("Termin vereinbaren: Im Prototyp ohne Funktion. Hier startet später die Terminbuchung.")}
+            >
+              Termin vereinbaren
+            </button>
+            <p role="status" className="t-notice">
+              {notice}
+            </p>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ServiceView({ service }: { service: Service }) {
   const sections = service.sections.filter((s) => s.body.length > 0);
+  const more = MORE_INFO[service.slug] ?? [];
+  const ids = { more: useId(), info: useId(), questions: useId() };
 
   return (
-    <div className="t-container t-page">
-      <Breadcrumb
-        items={[
-          { label: tenant.type === "service" ? "Leistungen A bis Z" : "Verwaltungsleistungen", href: "/suche?tab=leistungen" },
-          { label: service.title, href: `/leistungen/${service.slug}` },
-        ]}
-      />
-      <h1 className="t-h1">{service.title}</h1>
-      <p className="t-lead">{service.summary}</p>
-
-      {choosePlace && (
-        <div className="t-place" {...origin("zentral", "Zentral · Plattform: Zuständigkeitsfinder")}>
-          <HomePlace />
-          {place && <Referral place={place} service={service} tenants={tenants} current={tenant} />}
+    <>
+      <div className="t-pagehead">
+        <div className="t-container">
+          <Breadcrumb
+            items={[
+              { label: "Leistungen", href: "/leistungen" },
+              { label: service.title, href: `/leistungen/${service.slug}` },
+            ]}
+          />
+          <p className="t-pagehead__kind">Leistung · {service.level === "land" ? "Land Musterland" : "Ihre Gemeinde"}</p>
+          <h1 className="t-h1">{service.title}</h1>
+          <p className="t-lead">{service.summary}</p>
         </div>
-      )}
+      </div>
 
-      <div className="t-service">
-        <div className="t-service__main">
-          <section className="t-facts" {...CATALOGUE}>
-            <h2 className="t-facts__title">Das Wichtigste</h2>
-            <dl>
-              <div>
-                <dt>Kosten</dt>
-                <dd>{service.costs}</dd>
-              </div>
-              <div>
-                <dt>Dauer</dt>
-                <dd>{service.duration}</dd>
-              </div>
-              <div>
-                <dt>Online möglich</dt>
-                <dd>{service.online ? "Ja" : "Nein, nur vor Ort"}</dd>
-              </div>
-              <div>
-                <dt>Unterlagen</dt>
-                <dd>
-                  <ul>
-                    {service.documents.map((doc) => (
-                      <li key={doc}>{doc}</li>
-                    ))}
-                  </ul>
-                </dd>
-              </div>
-            </dl>
-            <div className="t-facts__action">
-              {service.online ? (
-                <Link href={`${base}/antrag/${service.slug}`} className="t-btn t-btn--primary t-btn--large">
-                  {action}
-                </Link>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="t-btn t-btn--primary t-btn--large"
-                    onClick={() => setNotice(`${action}: Im Klick-Dummy ohne Funktion. Hier startet später die Terminbuchung.`)}
-                  >
-                    {action}
-                  </button>
-                  <p role="status" className="t-notice">
-                    {notice}
-                  </p>
-                </>
-              )}
+      <div className="t-container t-page t-layout">
+        <div className="t-layout__main">
+          {/* Asked here, not on the start page: only municipal services need the place. Nothing is locked. */}
+          {service.level === "kommune" && (
+            <div className="t-place">
+              <IconPin size={24} />
+              <HomePlace />
             </div>
-          </section>
+          )}
+
+          <Facts service={service} />
 
           {sections.length > 0 && (
-            <section className="t-details" {...CATALOGUE}>
-              <h2 className="t-h2">Mehr zur Leistung</h2>
+            <section className="t-accordions" aria-labelledby={ids.more}>
+              <h2 id={ids.more} className="t-h2">
+                Mehr zur Leistung
+              </h2>
               {sections.map((section) => (
-                <details key={section.title} className="t-detail">
+                <details key={section.title} className="t-accordion">
                   <summary>{section.title}</summary>
-                  <div className="t-detail__body">
+                  <div className="t-accordion__body">
                     {section.body.length > 1 ? (
                       <ol>
                         {section.body.map((line) => (
@@ -214,28 +205,48 @@ function ServiceView({ service }: { service: Service }) {
           )}
         </div>
 
-        <div className="t-service__side">
-          <Responsible tenant={tenant} service={service} />
-          <section className="t-box t-box--quiet" {...origin("mandant", "Mandant · Einstellung: Kontakt")}>
-            <h2 className="t-box__title">Fragen zur Leistung</h2>
-            <p>
-              {tenant.contact.office}
-              <br />
-              Telefon {tenant.contact.phone}
-              <br />
-              {tenant.contact.hours}
-            </p>
+        <aside className="t-layout__side" aria-label="Weitere Informationen">
+          <Responsible service={service} />
+          <section className="t-box" aria-labelledby={ids.info}>
+            <h2 id={ids.info} className="t-box__title">
+              Weitere Informationen
+            </h2>
+            <ul className="t-box__links">
+              {more.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>{link.label}</Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/seite/lebenslagen">Leistungen nach Lebenslagen</Link>
+              </li>
+              <li>
+                <Link href="/seite/hilfe">Hilfe zum Portal</Link>
+              </li>
+            </ul>
           </section>
-        </div>
+          <section className="t-box" aria-labelledby={ids.questions}>
+            <h2 id={ids.questions} className="t-box__title">
+              Fragen zur Leistung
+            </h2>
+            <p>
+              {SITE.contact.office}
+              <br />
+              Telefon {SITE.contact.phone}
+              <br />
+              {SITE.contact.hours}
+            </p>
+            <ChatButton question={service.title} className="t-btn t-btn--small">
+              Im Chat fragen
+            </ChatButton>
+          </section>
+        </aside>
       </div>
-    </div>
+    </>
   );
 }
 
 export function ServicePage({ slug }: { slug: string }) {
-  const { tenant } = useCurrentTenant();
   const service = findService(slug);
-  useDocumentTitle(`${service?.title ?? "Leistung nicht gefunden"} · ${tenant.name}`);
-  if (!service) return <NotFoundBlock what="Leistung" />;
-  return <ServiceView service={service} />;
+  return service ? <ServiceView service={service} /> : null;
 }

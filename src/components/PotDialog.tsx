@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { IconArrow, IconBubble, IconClose } from "@/components/Icons";
 import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/components/PotIcons";
-import { origin } from "@/lib/origin";
 
 // The two answers to "Was suchen Sie?": in the overlay and on the search page.
 export function PotChoices({ query, onChoose }: { query: string; onChoose?: () => void }) {
-  const { base } = useCurrentTenant();
-  const href = (pot: string) => `${base}/suche?${new URLSearchParams({ q: query, in: pot }).toString()}`;
+  const href = (pot: string) => `/suche?${new URLSearchParams({ q: query, in: pot }).toString()}`;
   const choices = [
     { pot: "leistungen", title: "Etwas beantragen oder erledigen", text: "Leistungen wie Ausweis, Ummeldung oder Förderung", icon: <PictogramApplication size={36} /> },
     { pot: "informationen", title: "Informationen und Meldungen", text: "Nachrichten, Projekte, Ansprechpersonen und Seiten", icon: <PictogramNews size={36} /> },
@@ -70,7 +67,7 @@ export function PotDialog({ query, onClose, onChat }: { query: string | null; on
       }}
     >
       {query && (
-        <div className="t-potdialog__box" {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
+        <div className="t-potdialog__box">
           <div className="t-potdialog__head">
             <span className="t-potdialog__mark">
               <PictogramSwitch size={28} />

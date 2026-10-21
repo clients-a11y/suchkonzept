@@ -2,15 +2,15 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { IconCheck } from "@/components/Icons";
-import type { Place } from "@/data/content";
-import { allPlaces, findPlaces, setPlaceId, usePlaceId } from "@/lib/place-store";
+import { PLACES } from "@/data/places";
+import type { Place } from "@/data/places";
+import { SITE } from "@/data/site";
+import { findPlaces, setPlaceId, usePlaceId } from "@/lib/place-store";
 import { normalize } from "@/lib/smart-search";
-import { useCustomTenants } from "@/lib/tenant-store";
 
-// Place of residence, asked only where it matters (a municipal service in a Land portal). Checked
-// as it is typed, without a database: the postcode ranges are static data. Known places show instead.
+// Place of residence, asked only where it matters (a municipal service). Checked as it is typed,
+// without a database: the postcode ranges are static data. A known place shows instead.
 export function HomePlace({
   label = "Wo wohnen Sie?",
   hint = "Dann zeigen wir die zuständige Stelle. Bleibt nur in diesem Browser.",
@@ -20,8 +20,7 @@ export function HomePlace({
   hint?: string;
   onChosen?: (place: Place) => void;
 }) {
-  const { tenant } = useCurrentTenant();
-  const places = allPlaces(useCustomTenants() ?? []);
+  const places = PLACES;
   const placeId = usePlaceId();
   const ids = { input: useId(), hint: useId(), status: useId() };
   const [editing, setEditing] = useState(false);
@@ -39,7 +38,6 @@ export function HomePlace({
     onChosen?.(place);
   };
 
-  // A city with its own portal is pointed out by the page underneath (Referral), not here again.
   if (stored && !editing) {
     return (
       <p className="t-homeplace t-homeplace--known">
@@ -72,7 +70,7 @@ export function HomePlace({
   if (current) {
     status = `${digits ? `${text} · ` : ""}${current.name}. Gemerkt.`;
   } else if (ready && matches.length === 0) {
-    status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${tenant.name}.` : `Einen Ort „${text}“ kennen wir in ${tenant.name} nicht.`;
+    status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${text}“ kennen wir in ${SITE.region} nicht.`;
   } else if (matches.length > 1) {
     status = `Zu „${text}“ passen mehrere Orte. Wählen Sie Ihren Ort.`;
   }

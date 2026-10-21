@@ -1,21 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import type { ReactNode, RefObject } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
-import { Emblem } from "@/components/Emblem";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import type { RefObject } from "react";
+import { DemoReset } from "@/components/DemoReset";
 import { IconBook, IconBubble, IconClose, IconGlobe, IconHand, IconMenu, IconSearch, IconUser } from "@/components/Icons";
-import { useAccount } from "@/lib/account-store";
+import { Wordmark } from "@/components/Wordmark";
+import { SITE } from "@/data/site";
 import { languageSlug } from "@/data/content";
-import type { NavItem } from "@/lib/types";
-import { origin } from "@/lib/origin";
+import { useAccount } from "@/lib/account-store";
 
-// Escape closes, focus goes back to the button. A hidden route resets to closed.
+// Escape closes, focus goes back to the button. A new page closes it too.
 function useDisclosure(buttonRef: RefObject<HTMLButtonElement | null>) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  useLayoutEffect(() => () => setOpen(false), []);
+  const [openedOn, setOpenedOn] = useState(pathname);
+  if (openedOn !== pathname) {
+    setOpenedOn(pathname);
+    setOpen(false);
+  }
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -30,66 +34,13 @@ function useDisclosure(buttonRef: RefObject<HTMLButtonElement | null>) {
   return [open, setOpen] as const;
 }
 
-type NavListProps = {
-  items: NavItem[];
-  chat: boolean;
-  base: string;
-  id: string;
-  open: boolean;
-  onNavigate: () => void;
-  isCurrent?: (href: string) => boolean;
-};
-
-function NavList({ items, chat, base, id, open, onNavigate, isCurrent }: NavListProps) {
-  return (
-    <ul id={id} className="t-nav__list" data-open={open}>
-      {items.map((item) => (
-        <li key={item.href}>
-          <Link
-            href={base + item.href}
-            className="t-nav__link"
-            aria-current={isCurrent?.(item.href) ? "page" : undefined}
-            onClick={onNavigate}
-          >
-            {item.label}
-          </Link>
-        </li>
-      ))}
-      {/* On phones the floating chat button would cover the page: the chat sits in the menu. */}
-      {chat && (
-        <li className="t-nav__chat">
-          <Link
-            href={`${base}/assistent`}
-            className="t-nav__link"
-            aria-current={isCurrent?.("/assistent") ? "page" : undefined}
-            onClick={onNavigate}
-          >
-            <IconBubble size={18} />
-            Chat-Assistent
-          </Link>
-        </li>
-      )}
-    </ul>
-  );
-}
-
-// Reads the query string, so it sits in its own Suspense boundary and the rest stays static.
-function CurrentNavList(props: Omit<NavListProps, "isCurrent">) {
-  const pathname = usePathname();
-  const params = useSearchParams();
-  const isCurrent = (href: string) => {
-    const url = new URL(props.base + href, "http://x");
-    if (url.pathname !== pathname) return false;
-    for (const [key, value] of url.searchParams) {
-      if (params.get(key) !== value) return false;
-    }
-    return true;
-  };
-  return <NavList {...props} isCurrent={isCurrent} />;
+// The page itself, or a page below it ("Leistungen" stays marked on a service page).
+function current(pathname: string, href: string): "page" | "true" | undefined {
+  if (pathname === href) return "page";
+  return href !== "/" && pathname.startsWith(`${href}/`) ? "true" : undefined;
 }
 
 function LanguageSwitch() {
-  const { tenant, base } = useCurrentTenant();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const listId = useId();
@@ -104,7 +55,6 @@ function LanguageSwitch() {
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open, setOpen]);
 
-  const others = tenant.languages.filter((name) => name !== "Deutsch");
   return (
     <div className="t-lang" ref={wrapRef}>
       <button
@@ -122,22 +72,24 @@ function LanguageSwitch() {
       </button>
       <ul id={listId} className="t-lang__list" hidden={!open}>
         <li>
-          <Link href={base} aria-current="true" onClick={() => setOpen(false)}>
+          <Link href="/" aria-current="true" onClick={() => setOpen(false)}>
             Deutsch
           </Link>
         </li>
-        {others.map((name) => {
-          const slug = languageSlug(name);
-          if (!slug) return null;
-          const code = slug.replace("sprache-", "");
-          return (
-            <li key={name}>
-              <Link href={`${base}/seite/${slug}`} lang={code} hrefLang={code} onClick={() => setOpen(false)}>
-                {name}
-              </Link>
-            </li>
-          );
-        })}
+        {SITE.languages
+          .filter((name) => name !== "Deutsch")
+          .map((name) => {
+            const slug = languageSlug(name);
+            if (!slug) return null;
+            const code = slug.replace("sprache-", "");
+            return (
+              <li key={name}>
+                <Link href={`/seite/${slug}`} lang={code} hrefLang={code} onClick={() => setOpen(false)}>
+                  {name}
+                </Link>
+              </li>
+            );
+          })}
       </ul>
     </div>
   );
@@ -145,12 +97,11 @@ function LanguageSwitch() {
 
 // Account link: "Anmelden" or the mailbox with the number of unread messages.
 function AccountLink() {
-  const { base } = useCurrentTenant();
   const account = useAccount();
   const unread = account?.messages.filter((m) => !m.read).length ?? 0;
   const signedIn = Boolean(account?.signedIn);
   return (
-    <Link href={`${base}/konto`} className="t-tool">
+    <Link href="/konto" className="t-tool">
       <IconUser />
       <span className="t-tool__text">{signedIn ? "Postfach" : "Anmelden"}</span>
       {signedIn && unread > 0 && (
@@ -163,51 +114,48 @@ function AccountLink() {
   );
 }
 
+const META_ICON = { hand: <IconHand size={18} />, book: <IconBook size={18} /> };
+
 export function Header() {
-  const { tenant, base } = useCurrentTenant();
+  const pathname = usePathname();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const [open, setOpen] = useDisclosure(buttonRef);
-
-  const meta: { href: string; label: string; icon: ReactNode }[] = [];
-  if (tenant.meta.dgs) meta.push({ href: "/seite/gebaerdensprache", label: "Gebärdensprache", icon: <IconHand size={18} /> });
-  if (tenant.meta.ls) meta.push({ href: "/seite/leichte-sprache", label: "Leichte Sprache", icon: <IconBook size={18} /> });
-  if (tenant.meta.es) meta.push({ href: "/seite/einfache-sprache", label: "Einfache Sprache", icon: <IconBubble size={18} /> });
-  const multilingual = tenant.languages.length > 1;
-
-  const listProps = { items: tenant.nav, chat: tenant.assistant?.enabled !== false, base, id: menuId, open, onNavigate: () => setOpen(false) };
+  const close = () => setOpen(false);
 
   return (
-    <header className="t-header" {...origin("mandant", "Mandant · Einstellung: Name, Emblem, Menü")}>
-      {(meta.length > 0 || multilingual) && (
-        <div className="t-topbar">
-          <div className="t-container t-topbar__inner">
-            {meta.length > 0 && (
-              <ul className="t-topbar__list">
-                {meta.map((item) => (
-                  <li key={item.href}>
-                    <Link href={base + item.href} className="t-topbar__link">
-                      {item.icon}
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {multilingual && <LanguageSwitch />}
+    <header className="t-header">
+      <div className="t-topbar">
+        <div className="t-container t-topbar__inner">
+          <div className="t-topbar__demo">
+            <span className="t-tag">Prototyp</span>
+            <span className="t-topbar__note">Nur Beispieldaten</span>
+            <Link href="/testfall" className="t-topbar__link">
+              Testfall Kindergeld
+            </Link>
+            <DemoReset />
           </div>
+          <ul className="t-topbar__list">
+            {SITE.meta.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="t-topbar__link">
+                  {META_ICON[item.icon]}
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <LanguageSwitch />
+            </li>
+          </ul>
         </div>
-      )}
+      </div>
       <div className="t-container t-masthead">
-        <Link href={base} className="t-brand">
-          <Emblem tenant={tenant} />
-          <span className="t-brand__text">
-            <span className="t-brand__name">{tenant.name}</span>
-            <span className="t-brand__tagline">{tenant.tagline}</span>
-          </span>
+        <Link href="/" className="t-brand" aria-label={`${SITE.name}, zur Startseite`}>
+          <Wordmark />
         </Link>
         <div className="t-masthead__tools">
-          <Link href={`${base}/suche`} className="t-tool">
+          <Link href="/suche" className="t-tool">
             <IconSearch />
             <span className="t-tool__text">Suche</span>
           </Link>
@@ -216,21 +164,33 @@ export function Header() {
             ref={buttonRef}
             type="button"
             className="t-tool t-menu-button"
-            aria-label="Menü"
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen(!open)}
           >
             {open ? <IconClose /> : <IconMenu />}
-            <span className="t-tool__text" aria-hidden="true">Menü</span>
+            <span className="t-tool__text">Menü</span>
           </button>
         </div>
       </div>
       <nav aria-label="Hauptnavigation" className="t-nav">
         <div className="t-container">
-          <Suspense fallback={<NavList {...listProps} />}>
-            <CurrentNavList {...listProps} />
-          </Suspense>
+          <ul id={menuId} className="t-nav__list" data-open={open}>
+            {SITE.nav.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="t-nav__link" aria-current={current(pathname, item.href)} onClick={close}>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            {/* On phones the floating chat button would cover the page: the chat sits in the menu. */}
+            <li className="t-nav__chat">
+              <Link href="/assistent" className="t-nav__link" aria-current={current(pathname, "/assistent")} onClick={close}>
+                <IconBubble size={18} />
+                Chat-Assistent
+              </Link>
+            </li>
+          </ul>
         </div>
       </nav>
     </header>

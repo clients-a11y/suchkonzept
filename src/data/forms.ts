@@ -1,7 +1,7 @@
 import type { Check } from "@/lib/validate";
 
 // Fields of the online application per service. Configuration like the service catalogue:
-// shared by all tenants, a later backend would deliver it from the form management.
+// a later backend would deliver it from the form management.
 
 export type FormField = {
   id: string;
@@ -54,7 +54,7 @@ export const SERVICE_FORMS: Record<string, FormField[]> = {
     { id: "kind", label: "Vor- und Nachname des Kindes", type: "text", required: true },
     { id: "geburt", label: "Geburtsdatum des Kindes", type: "date", required: true },
     { id: "verhaeltnis", label: "Sie sind", type: "select", required: true, options: ["Mutter", "Vater", "Pflegeelternteil", "Großelternteil"] },
-    { id: "steuerid", label: "Steuer-Identifikationsnummer des Kindes", type: "text", required: true, check: "steuerid", hint: "Elf Ziffern. Im Klick-Dummy genügt eine erfundene Nummer, zum Beispiel 12345678901." },
+    { id: "steuerid", label: "Steuer-Identifikationsnummer des Kindes", type: "text", required: true, check: "steuerid", hint: "Elf Ziffern. Im Prototyp genügt eine erfundene Nummer, zum Beispiel 12345678901." },
     { id: "konto", label: "IBAN für die Auszahlung", type: "text", required: true, check: "iban", hint: "Bitte keine echte Kontonummer eingeben. Zum Testen: DE36 0000 0000 0000 0000 00." },
   ],
   "vereinsfoerderung-beantragen": [
@@ -62,6 +62,18 @@ export const SERVICE_FORMS: Record<string, FormField[]> = {
     { id: "projekt", label: "Projekttitel", type: "text", required: true },
     { id: "summe", label: "Beantragte Summe in Euro", type: "number", required: true },
     { id: "beschreibung", label: "Kurzbeschreibung des Projekts", type: "textarea", required: true },
+  ],
+  "gewerbe-anmelden": [
+    { id: "taetigkeit", label: "Tätigkeit", type: "text", required: true, hint: "Zum Beispiel Lebensmittelhandel oder Grafikdesign" },
+    { id: "beginn", label: "Beginn der Tätigkeit", type: "date", required: true },
+    { id: "betriebsstaette", label: "Anschrift der Betriebsstätte", type: "text", required: true },
+    { id: "art", label: "Art des Betriebs", type: "select", required: true, options: ["Hauptbetrieb", "Zweigniederlassung", "Unselbstständige Zweigstelle"] },
+  ],
+  "dorfladen-foerderung-beantragen": [
+    { id: "laden", label: "Name des Ladens", type: "text", required: true },
+    { id: "ort", label: "Ort des Ladens", type: "text", required: true },
+    { id: "summe", label: "Beantragte Summe in Euro", type: "number", required: true },
+    { id: "vorhaben", label: "Was soll gefördert werden?", type: "textarea", required: true },
   ],
 };
 

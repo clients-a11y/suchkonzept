@@ -5,7 +5,6 @@ import Form from "next/form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useId, useState } from "react";
 import { PotChoices, PotDialog } from "@/components/PotDialog";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
@@ -14,35 +13,32 @@ import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
 import type { Pot, Route } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
-import { useDocumentTitle } from "@/lib/use-document-title";
-import { origin } from "@/lib/origin";
-import { officeForPlace } from "@/lib/offices";
-import { allPlaces, usePlaceId } from "@/lib/place-store";
-import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
+import { responsibleOffice } from "@/lib/offices";
+import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
 import { openAssistant } from "@/lib/assistant-dock";
 
 const OTHER: Record<Pot, Pot> = { leistungen: "informationen", informationen: "leistungen" };
+const POTS: Pot[] = ["leistungen", "informationen"];
 
-function searchHref(base: string, q: string, pot?: Pot): string {
+function searchHref(q: string, pot?: Pot): string {
   const params = new URLSearchParams();
   if (q) params.set("q", q);
   if (pot) params.set("in", pot);
-  return `${base}/suche?${params.toString()}`;
+  return `/suche?${params.toString()}`;
 }
 
 function SearchForm({ q }: { q: string }) {
-  const { tenant, base } = useCurrentTenant();
   const router = useRouter();
   const inputId = useId();
   const [asking, setAsking] = useState<string | null>(null);
   const askChat = (text: string) => {
-    if (!openAssistant(text)) router.push(`${base}/assistent?frage=${encodeURIComponent(text)}`);
+    if (!openAssistant(text)) router.push(`/assistent?frage=${encodeURIComponent(text)}`);
   };
   return (
     <>
       <Form
-        action={`${base}/suche`}
+        action="/suche"
         role="search"
         className="t-searchform"
         onSubmit={(event) => {
@@ -54,7 +50,9 @@ function SearchForm({ q }: { q: string }) {
           }
         }}
       >
-        <label htmlFor={inputId}>Suchbegriff</label>
+        <label htmlFor={inputId} className="t-searchform__label">
+          Suchbegriff
+        </label>
         <div className="t-searchform__row">
           <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
           <button type="submit" className="t-btn t-btn--primary">
@@ -69,21 +67,52 @@ function SearchForm({ q }: { q: string }) {
           setAsking(null);
           if (dismissed) document.getElementById(inputId)?.focus();
         }}
-        onChat={tenant.assistant?.enabled === false ? undefined : askChat}
+        onChat={askChat}
       />
     </>
   );
 }
 
-function HitList({ hits }: { hits: Hit[] }) {
-  const { base } = useCurrentTenant();
+// Page head with breadcrumb, the one H1 and the search field.
+function SearchHead({ q }: { q: string }) {
   return (
-    <ol className="t-hits" {...origin("zentral", "Zentral · Plattform: Suche")}>
+    <div className="t-pagehead">
+      <div className="t-container">
+        <Breadcrumb items={[{ label: "Suche", href: "/suche" }]} />
+        <h1 className="t-h1">Suche</h1>
+        <SearchForm q={q} />
+      </div>
+    </div>
+  );
+}
+
+// The two pots as a filter on top. Only the chosen one is searched; the other is a new request.
+function PotTabs({ q, pot }: { q: string; pot?: Pot }) {
+  return (
+    <nav aria-label="Suchbereich" className="t-pottabs">
+      <ul>
+        {POTS.map((p) => (
+          <li key={p}>
+            <Link href={searchHref(q, p)} className="t-pottab" aria-current={p === pot ? "page" : undefined}>
+              {POT_LABEL[p]}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function HitList({ hits }: { hits: Hit[] }) {
+  return (
+    <ol className="t-hits">
       {hits.map((hit) => (
         <li key={hit.key} className="t-hit">
           <p className="t-hit__kind">{hit.kind}</p>
           <h3 className="t-hit__title">
-            <Link href={base + hit.href}>{hit.title}</Link>
+            <Link href={hit.href} className="t-cardlink">
+              {hit.title}
+            </Link>
           </h3>
           <p className="t-hit__text">{hit.text}</p>
         </li>
@@ -94,13 +123,11 @@ function HitList({ hits }: { hits: Hit[] }) {
 
 // When the result is unclear, the guided assistant can narrow it down by asking.
 function AssistantHint({ q }: { q: string }) {
-  const { tenant, base } = useCurrentTenant();
-  if (tenant.assistant?.enabled === false) return null;
   return (
-    <div className="t-assisthint" {...origin("zentral", "Zentral · Plattform: Assistent")}>
+    <div className="t-assisthint">
       <p>Nicht das Richtige dabei? Im Chat fragt der Assistent nach und grenzt Ihr Anliegen ein.</p>
       <Link
-        href={`${base}/assistent?frage=${encodeURIComponent(q)}`}
+        href={`/assistent?frage=${encodeURIComponent(q)}`}
         className="t-more"
         onClick={(event) => {
           if (openAssistant(q)) event.preventDefault();
@@ -125,78 +152,66 @@ function RequestLine({ q, pot }: { q: string; pot?: Pot }) {
   return (
     <p className="t-route__request">
       Anfrage an das Backend: <code className="t-route__code">GET /api/{pot}{query ? `?${query}` : ""}</code>. Genau eine
-      Anfrage, nur an den Topf {POT_LABEL[pot]}.
+      Anfrage, nur an den Bereich {POT_LABEL[pot]}.
     </p>
   );
 }
 
 // Makes the decision of the search switch visible, for demos and for curious visitors.
 function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }) {
-  const pots: Pot[] = ["leistungen", "informationen"];
   if (!route) {
     return (
       <details className="t-route__why">
         <summary>So läuft die Suche</summary>
-        <p className="t-route__rule">Sie haben den Bereich selbst gewählt, die Weiche hat nicht entschieden.</p>
-        <RequestLine q={q} pot={pot} />
+        <div className="t-route__body">
+          <p className="t-route__rule">Sie haben den Bereich selbst gewählt, die Weiche hat nicht entschieden.</p>
+          <RequestLine q={q} pot={pot} />
+        </div>
       </details>
     );
   }
   return (
     <details className="t-route__why">
       <summary>So hat die Suche entschieden</summary>
-      <div className="t-route__points">
-        {pots.map((pot) => {
-          const signals = route.signals.filter((s) => s.pot === pot);
-          return (
-            <div key={pot}>
-              <p className="t-route__pot">
-                {POT_LABEL[pot]}: {pluralize(route.points[pot], "Punkt", "Punkte")}
-              </p>
-              {signals.length > 0 ? (
-                <ul>
-                  {signals.map((s) => (
-                    <li key={s.label + s.word}>
-                      „{s.word}“: {s.label}, +{s.points}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="t-route__none">Keine Hinweise</p>
-              )}
-            </div>
-          );
-        })}
+      <div className="t-route__body">
+        <div className="t-route__points">
+          {POTS.map((p) => {
+            const signals = route.signals.filter((s) => s.pot === p);
+            return (
+              <div key={p}>
+                <p className="t-route__pot">
+                  {POT_LABEL[p]}: {pluralize(route.points[p], "Punkt", "Punkte")}
+                </p>
+                {signals.length > 0 ? (
+                  <ul>
+                    {signals.map((s) => (
+                      <li key={s.label + s.word}>
+                        „{s.word}“: {s.label}, +{s.points}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="t-route__none">Keine Hinweise</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <p className="t-route__rule">{RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.</p>
+        <RequestLine q={q} pot={pot} />
       </div>
-      <p className="t-route__rule">
-        {RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.
-      </p>
-      <RequestLine q={q} pot={pot} />
     </details>
   );
 }
 
-// In a Land portal the remembered place shows right away who is in charge, or which portal.
+// A remembered place shows right away who is in charge. Land services have one office anyway.
 function AnswerPlace({ service }: { service: Service }) {
-  const { tenant } = useCurrentTenant();
-  const tenants = useAllTenants();
-  const placeId = usePlaceId();
-  const place = allPlaces(useCustomTenants() ?? []).find((p) => p.id === placeId);
-  if (tenant.type !== "info" || service.level !== "kommune" || !place) return null;
-  const portal = place.tenant && place.tenant !== tenant.id ? tenants.find((t) => t.id === place.tenant) : undefined;
-  if (portal) {
-    return (
-      <p className="t-answer__place">
-        Ihr Wohnort {place.name} hat ein eigenes {portal.tagline}:{" "}
-        <Link href={`/${portal.id}/leistungen/${service.slug}`}>
-          {service.title} bei {portal.name}
-        </Link>
-      </p>
-    );
-  }
+  const place = usePlace();
+  const office = responsibleOffice(service, place);
+  if (!office) return null;
   return (
     <p className="t-answer__place">
-      Zuständig für {place.name}: <strong>{officeForPlace(place, service, tenants).office}</strong>
+      {service.level === "land" ? "Zuständig" : `Zuständig für ${place?.name}`}: <strong>{office.office}</strong>
     </p>
   );
 }
@@ -205,7 +220,7 @@ function AnswerPlace({ service }: { service: Service }) {
 function PotQuestion({ q, route }: { q: string; route?: Route }) {
   const titleId = useId();
   return (
-    <section className="t-route" aria-labelledby={titleId} {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
+    <section className="t-route" aria-labelledby={titleId}>
       <h2 id={titleId} className="t-h2">
         Was suchen Sie?
       </h2>
@@ -217,26 +232,28 @@ function PotQuestion({ q, route }: { q: string; route?: Route }) {
 }
 
 function SearchResults() {
-  const { tenant, base } = useCurrentTenant();
   const params = useSearchParams();
 
   const q = (params.get("q") ?? "").trim();
-  // "tab" is the older name and still used by links such as "Leistungen A bis Z".
+  // "tab" is the older name of the parameter.
   const requested = params.get("in") ?? params.get("tab");
   const chosen: Pot | undefined = requested === "leistungen" || requested === "informationen" ? requested : undefined;
   const route = q && !chosen ? routeQuery(q) : undefined;
-  const portalDefault: Pot = tenant.type === "service" ? "leistungen" : "informationen";
-  const pot: Pot | undefined = chosen ?? (q ? route?.pot : portalDefault);
+  // Without a search term the page lists all services, A to Z.
+  const pot: Pot | undefined = chosen ?? (q ? route?.pot : "leistungen");
 
   if (!pot) {
     return (
       <>
-        <SearchForm q={q} />
-        <p className="t-search__summary" role="status">
-          Für „{q}“ bitte einen Suchbereich wählen.
-        </p>
-        <PotQuestion q={q} route={route} />
-        <AssistantHint q={q} />
+        <SearchHead q={q} />
+        <div className="t-container t-page">
+          <PotTabs q={q} />
+          <p className="t-search__summary" role="status">
+            Für „{q}“ bitte einen Suchbereich wählen.
+          </p>
+          <PotQuestion q={q} route={route} />
+          <AssistantHint q={q} />
+        </div>
       </>
     );
   }
@@ -249,97 +266,98 @@ function SearchResults() {
         ? services.services.map((h) => serviceHit(h.service))
         : allServices()
       : q
-        ? searchInformation(tenant, q)
-        : allInformation(tenant);
+        ? searchInformation(q)
+        : allInformation();
   const answer = services?.answer;
   const other = OTHER[pot];
 
   return (
     <>
-      <SearchForm q={q} />
-      <p className="t-search__summary" role="status">
-        {q
-          ? `${pluralize(hits.length, "Treffer", "Treffer")} für „${q}“ in ${POT_LABEL[pot]}`
-          : `Kein Suchbegriff: Sie sehen alle ${POT_LABEL[pot]}.`}
-      </p>
-      {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
-        <p className="t-correction">
-          Meinten Sie: <Link href={searchHref(base, services.correction, pot)}>{services.correction}</Link>?
-        </p>
-      )}
-
-      <div className="t-route__bar" {...origin("zentral", "Zentral · Plattform: Suchweiche")}>
-        <p>
-          Gesucht in <strong>{POT_LABEL[pot]}</strong>
-          {route?.pot ? ", automatisch gewählt." : "."}
-        </p>
-        <Link href={searchHref(base, q, other)} className="t-btn">
-          {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
-        </Link>
-        {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
-      </div>
-
-      {answer && (
-        <div className="t-answer">
-          <p className="t-answer__eyebrow">
-            <IconSparkle size={18} />
-            Das passt am besten zu Ihrer Anfrage
+      <SearchHead q={q} />
+      <div className="t-container t-page">
+        <PotTabs q={q} pot={pot} />
+        <div className="t-route__bar">
+          <p className="t-search__summary" role="status">
+            {q
+              ? `${pluralize(hits.length, "Treffer", "Treffer")} für „${q}“ in ${POT_LABEL[pot]}${route?.pot ? ", automatisch gewählt" : ""}.`
+              : `Kein Suchbegriff: Sie sehen alle ${POT_LABEL[pot]}.`}
           </p>
-          <h2 className="t-answer__title">
-            <Link href={`${base}/leistungen/${answer.slug}`}>{answer.title}</Link>
-          </h2>
-          <p>{answer.summary}</p>
-          <AnswerPlace service={answer} />
-          <ul className="t-facts-line t-answer__facts">
-            <li className={answer.online ? "t-facts-line__online" : undefined}>
-              {answer.online && <IconCheck size={16} />}
-              {answer.online ? "Online möglich" : "Termin vor Ort"}
-            </li>
-            <li>Kosten: {answer.costs}</li>
-            <li>Dauer: {answer.duration}</li>
-          </ul>
-          {services.related.length > 0 && (
-            <p className="t-answer__related">
-              Das brauchen Sie oft auch:{" "}
-              {services.related.map((s, i) => (
-                <span key={s.slug}>
-                  {i > 0 && ", "}
-                  <Link href={`${base}/leistungen/${s.slug}`}>{s.title}</Link>
-                </span>
-              ))}
-            </p>
-          )}
-          <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Klick-Dummy lokal simuliert, ohne echte KI.</p>
-        </div>
-      )}
-
-      <h2 className="visually-hidden">{POT_LABEL[pot]}</h2>
-      {hits.length > 0 ? (
-        <HitList hits={hits} />
-      ) : (
-        <div className="t-empty">
-          <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
-          <Link href={searchHref(base, q, other)} className="t-btn">
-            In {POT_LABEL[other]} suchen
+          <Link href={searchHref(q, other)} className="t-btn t-btn--small">
+            {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
           </Link>
-          <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
         </div>
-      )}
-      {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
+        {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
+        {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
+          <p className="t-correction">
+            Meinten Sie: <Link href={searchHref(services.correction, pot)}>{services.correction}</Link>?
+          </p>
+        )}
+
+        {answer && (
+          <div className="t-answer">
+            <p className="t-answer__eyebrow">
+              <IconSparkle size={18} />
+              Das passt am besten zu Ihrer Anfrage
+            </p>
+            <h2 className="t-answer__title">
+              <Link href={`/leistungen/${answer.slug}`}>{answer.title}</Link>
+            </h2>
+            <p>{answer.summary}</p>
+            <AnswerPlace service={answer} />
+            <ul className="t-facts-line t-answer__facts">
+              <li className={answer.online ? "t-facts-line__online" : undefined}>
+                {answer.online && <IconCheck size={16} />}
+                {answer.online ? "Online möglich" : "Termin vor Ort"}
+              </li>
+              <li>Kosten: {answer.costs}</li>
+              <li>Dauer: {answer.duration}</li>
+            </ul>
+            {services.related.length > 0 && (
+              <p className="t-answer__related">
+                Das brauchen Sie oft auch:{" "}
+                {services.related.map((s, i) => (
+                  <span key={s.slug}>
+                    {i > 0 && ", "}
+                    <Link href={`/leistungen/${s.slug}`}>{s.title}</Link>
+                  </span>
+                ))}
+              </p>
+            )}
+            <p className="t-answer__note">Vorschlag aus Ihren Worten. Im Prototyp lokal simuliert, ohne echte KI.</p>
+          </div>
+        )}
+
+        <h2 className="visually-hidden">{POT_LABEL[pot]}</h2>
+        {hits.length > 0 ? (
+          <HitList hits={hits} />
+        ) : (
+          <div className="t-empty">
+            <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
+            <Link href={searchHref(q, other)} className="t-btn">
+              In {POT_LABEL[other]} suchen
+            </Link>
+            <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
+          </div>
+        )}
+        {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
+      </div>
     </>
   );
 }
 
 export function SearchPage() {
-  const { tenant } = useCurrentTenant();
-  useDocumentTitle(`Suche · ${tenant.name}`);
   return (
-    <div className="t-container t-page">
-      <Breadcrumb items={[{ label: "Suche", href: "/suche" }]} />
-      <h1 className="t-h1">Suche</h1>
-      <Suspense fallback={<p className="t-search__summary">Suche wird geladen …</p>}>
-        <SearchResults />
-      </Suspense>
-    </div>
+    <Suspense
+      fallback={
+        <div className="t-pagehead">
+          <div className="t-container">
+            <h1 className="t-h1">Suche</h1>
+            <p className="t-search__summary">Suche wird geladen …</p>
+          </div>
+        </div>
+      }
+    >
+      <SearchResults />
+    </Suspense>
   );
 }

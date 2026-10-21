@@ -1,4 +1,4 @@
-import { PlatformMark } from "@/components/PlatformShell";
+import { Wordmark } from "@/components/Wordmark";
 
 export type AccessState = "start" | "falsch" | "fehlt";
 
@@ -7,34 +7,31 @@ export type AccessState = "start" | "falsch" | "fehlt";
 export function AccessGate({ state }: { state: AccessState }) {
   const failed = state === "falsch";
   return (
-    <div className="pf-root">
-      <header className="pf-access__bar">
-        <div className="pf-container">
-          <p className="pf-access__mark">
-            <PlatformMark />
-            <span>Portalbaukasten</span>
-          </p>
+    <div className="t-shell t-access">
+      <header className="t-access__bar">
+        <div className="t-container">
+          <Wordmark />
         </div>
       </header>
-      <main id="inhalt" className="pf-main pf-access__main">
-        <div className="pf-container">
-          <div className="pf-access__inner">
-            <h1 className="pf-h1 pf-h1--page">Zugang zum Klick-Dummy</h1>
+      <main id="inhalt" className="t-main">
+        <div className="t-container t-page">
+          <div className="t-access__inner">
+            <h1 className="t-h1">Zugang zum Prototyp</h1>
             {state === "fehlt" ? (
               <>
-                <p className="pf-lead">Für diese Vorschau ist noch kein Passwort hinterlegt. Bis dahin bleibt sie geschlossen.</p>
-                <p className="pf-hint pf-access__setup">Für die Einrichtung: Variable DEMO_PASSWORD im Hosting setzen.</p>
+                <p className="t-lead">Für diese Vorschau ist noch kein Passwort hinterlegt. Bis dahin bleibt sie geschlossen.</p>
+                <p className="t-box__note">Für die Einrichtung: Variable DEMO_PASSWORD im Hosting setzen.</p>
               </>
             ) : (
               <>
-                <p className="pf-lead">Diese Vorschau ist nicht öffentlich. Geben Sie das Passwort ein, das Sie erhalten haben.</p>
-                <form method="post" className="pf-access__form">
-                  <div className="pf-field">
-                    <label htmlFor="zugang-passwort" className="pf-label">
+                <p className="t-lead">Diese Vorschau ist nicht öffentlich. Geben Sie das Passwort ein, das Sie erhalten haben.</p>
+                <form method="post" className="t-access__form">
+                  <div className="t-formfield">
+                    <label htmlFor="zugang-passwort" className="t-formfield__label">
                       Passwort
                     </label>
                     {failed && (
-                      <p id="zugang-fehler" className="pf-error">
+                      <p id="zugang-fehler" className="t-formfield__error">
                         Das Passwort stimmt nicht. Prüfen Sie die Eingabe und versuchen Sie es noch einmal.
                       </p>
                     )}
@@ -45,13 +42,13 @@ export function AccessGate({ state }: { state: AccessState }) {
                       autoComplete="current-password"
                       required
                       autoFocus
-                      className="pf-input"
+                      className="t-input"
                       aria-invalid={failed || undefined}
                       aria-describedby={failed ? "zugang-fehler" : undefined}
                     />
                   </div>
-                  <button type="submit" className="pf-btn pf-btn--primary">
-                    Klick-Dummy öffnen
+                  <button type="submit" className="t-btn t-btn--primary">
+                    Prototyp öffnen
                   </button>
                 </form>
               </>
@@ -59,9 +56,11 @@ export function AccessGate({ state }: { state: AccessState }) {
           </div>
         </div>
       </main>
-      <footer className="pf-footer">
-        <div className="pf-container pf-footer__inner">
-          <p>Klick-Dummy mit Beispieldaten. Alle Mandanten, Namen und Inhalte sind fiktiv.</p>
+      <footer className="t-footer">
+        <div className="t-footer__bottom">
+          <div className="t-container t-footer__bottom-inner">
+            <p className="t-footer__note">Prototyp mit Beispieldaten. Musterland und alle Inhalte sind fiktiv.</p>
+          </div>
         </div>
       </footer>
     </div>

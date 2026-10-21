@@ -1,7 +1,5 @@
-import type { PortalType } from "@/lib/types";
-
 // Anliegen in eigenen Worten: Redewendungen, die auf Leistungen zeigen.
-// Die Suche im Klick-Dummy simuliert damit eine KI-gestützte Suche, ganz ohne Backend.
+// Die Suche im Prototyp simuliert damit eine KI-gestützte Suche, ganz ohne Backend.
 // Wörter in normalisierter Form: klein, ä → ae, ö → oe, ü → ue, ß → ss.
 export type Intent = {
   phrases: string[];
@@ -52,7 +50,7 @@ export const INTENTS: Intent[] = [
     related: [],
   },
   {
-    phrases: ["verein", "ehrenamt", "foerderung", "zuschuss verein", "vereinsprojekt", "jugendarbeit", "sportverein"],
+    phrases: ["verein", "ehrenamt", "zuschuss verein", "vereinsprojekt", "jugendarbeit", "sportverein"],
     services: ["vereinsfoerderung-beantragen"],
     related: ["fuehrungszeugnis-beantragen"],
   },
@@ -65,6 +63,16 @@ export const INTENTS: Intent[] = [
     phrases: ["angeln", "angelschein", "fischen", "angler"],
     services: ["fischereischein-beantragen"],
     related: [],
+  },
+  {
+    phrases: ["gewerbe", "selbststaendig", "selbststaendigkeit", "firma gruenden", "unternehmen gruenden", "existenzgruendung", "eigenes geschaeft", "laden eroeffnen"],
+    services: ["gewerbe-anmelden"],
+    related: ["dorfladen-foerderung-beantragen"],
+  },
+  {
+    phrases: ["dorfladen", "nahversorgung", "laden im dorf", "einkaufen im dorf"],
+    services: ["dorfladen-foerderung-beantragen"],
+    related: ["gewerbe-anmelden"],
   },
 ];
 
@@ -79,7 +87,4 @@ export const STOPWORDS = new Set([
 ]);
 
 // Beispiele unter dem Suchfeld: zeigen, dass Anliegen in eigenen Worten funktionieren.
-export const EXAMPLE_QUERIES: Record<PortalType, string[]> = {
-  info: ["Kindergeld beantragen", "Ich möchte eine Garage bauen", "Zuschuss für unseren Sportverein"],
-  service: ["Ich bin umgezogen", "Mein Ausweis läuft ab", "Wir bekommen ein Kind"],
-};
+export const EXAMPLE_QUERIES = ["Kindergeld beantragen", "Ich bin umgezogen", "Ich möchte eine Garage bauen"];

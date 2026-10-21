@@ -1,42 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import type { FormEvent, MouseEvent } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
+import type { FormEvent } from "react";
 import { IconArrow } from "@/components/Icons";
 import { respond, startConversation } from "@/lib/assistant";
 import type { AssistantEnv, BotMessage, Choice, Conversation, Effects } from "@/lib/assistant";
 import { signIn, useAccount } from "@/lib/account-store";
-import { allPlaces, setPlaceId, usePlaceId } from "@/lib/place-store";
-import { useAllTenants, useCustomTenants } from "@/lib/tenant-store";
-import { origin } from "@/lib/origin";
-import { loadChat, onChatChange, saveChat, saveHandoff } from "@/lib/chat-store";
+import { setPlaceId, usePlace, usePlaceId } from "@/lib/place-store";
+import { loadChat, onChatChange, saveChat } from "@/lib/chat-store";
 
 function apply(effects: Effects) {
   if (effects.placeId) setPlaceId(effects.placeId);
   if (effects.signIn) signIn();
 }
 
-function BotItem({
-  message,
-  active,
-  onChoose,
-  onLink,
-  greeting,
-  maxChoices,
-}: {
-  message: BotMessage;
-  active: boolean;
-  onChoose: (choice: Choice) => void;
-  onLink: (href: string, event: MouseEvent) => void;
-  greeting: object;
-  maxChoices: number;
-}) {
+function BotItem({ message, active, onChoose, maxChoices }: { message: BotMessage; active: boolean; onChoose: (choice: Choice) => void; maxChoices: number }) {
   const { office, list, facts, links, source, choices } = message;
   return (
-    <li className="t-chat__msg t-chat__msg--bot" {...(message.greeting ? greeting : {})}>
+    <li className="t-chat__msg t-chat__msg--bot">
       <p className="t-chat__who">Assistent</p>
       <div className="t-chat__bubble">
         {message.text.map((text) => (
@@ -78,7 +60,7 @@ function BotItem({
           <ul className="t-chat__links">
             {links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className={link.primary ? "t-btn t-btn--primary" : "t-more"} onClick={(event) => onLink(link.href, event)}>
+                <Link href={link.href} className={link.primary ? "t-btn t-btn--primary t-btn--small" : "t-more"}>
                   {link.label}
                   {!link.primary && <IconArrow size={16} />}
                 </Link>
@@ -108,18 +90,15 @@ function BotItem({
   );
 }
 
-export type Handoff = { question?: string; from?: string; place?: string };
-export type ChatRequest = { question?: string; place?: string; restart?: boolean; handoff?: Handoff; nonce: number };
+export type Handoff = { question?: string; place?: string };
+export type ChatRequest = { question?: string; place?: string; restart?: boolean; nonce: number };
 
 // The conversation itself: on its own page or in the small window (dock). The dock passes new
-// questions as requests, the page passes what the search or another portal handed over.
+// questions as requests, the page passes what the search handed over.
 export function AssistantChat({ variant, handoff, request }: { variant: "page" | "dock"; handoff?: Handoff; request?: ChatRequest }) {
-  const { tenant, base } = useCurrentTenant();
-  const router = useRouter();
   const instance = useId();
-  const tenants = useAllTenants();
-  const custom = useCustomTenants();
   const placeId = usePlaceId();
+  const place = usePlace();
   const account = useAccount();
   const ids = { log: useId(), input: useId(), hint: useId() };
   const inputRef = useRef<HTMLInputElement>(null);
@@ -135,14 +114,13 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
   const [draft, setDraft] = useState("");
   const dock = variant === "dock";
 
-  const places = allPlaces(custom ?? []);
-  const env: AssistantEnv = { tenant, base, tenants, places, placeId, account };
+  const env: AssistantEnv = { placeId, account };
 
-  // Start once the browser data is read (place, account). The search or another portal can hand
-  // over a question, the place it already knows and where it came from.
-  if (conv === null && account !== null && custom !== null) {
+  // Start once the browser data is read (place, account). The search can hand over a question and
+  // the place it already knows.
+  if (conv === null && account !== null) {
     // A conversation from before (reload, the other view) continues, unless a new question comes in.
-    const stored = handoff?.question ? null : loadChat(tenant.id);
+    const stored = handoff?.question ? null : loadChat();
     if (stored) {
       setConv(stored);
     } else {
@@ -152,14 +130,10 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
       setChanges((n) => n + 1);
     }
   } else if (conv && request && request.nonce !== handled) {
-    // From outside: a new question (for example the search), a handover or a fresh start.
+    // From outside: a new question (for example from the search) or a fresh start.
     setHandled(request.nonce);
     const base = request.place ? { ...conv, place: request.place } : conv;
-    const next = request.handoff
-      ? startConversation(env, request.handoff)
-      : request.restart
-        ? startConversation(env, {})
-        : respond(base, { value: request.question ?? "" }, env);
+    const next = request.restart ? startConversation(env, {}) : respond(base, { value: request.question ?? "" }, env);
     setConv(next.conv);
     setEffects(next.effects);
     setChanges((n) => n + 1);
@@ -172,35 +146,19 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
   useEffect(() => {
     if (!conv || changes === saved.current) return;
     saved.current = changes;
-    saveChat(tenant.id, conv, instance);
-  }, [conv, changes, tenant.id, instance]);
+    saveChat(conv, instance);
+  }, [conv, changes, instance]);
 
   useEffect(
     () =>
       onChatChange((change) => {
         if (change.reset) return setConv(null);
-        if (change.tenantId !== tenant.id || change.source === instance) return;
-        const stored = loadChat(tenant.id);
+        if (change.source === instance) return;
+        const stored = loadChat();
         if (stored) setConv(stored);
       }),
-    [tenant.id, instance],
+    [instance],
   );
-
-  // In the window, a handover to another portal opens the window there instead of a new page.
-  const followLink = (href: string, event: MouseEvent) => {
-    if (!dock) return;
-    const match = href.match(/^\/([^/?]+)\/assistent\?(.*)$/);
-    if (!match || match[1] === tenant.id) return;
-    event.preventDefault();
-    const params = new URLSearchParams(match[2]);
-    saveHandoff({
-      tenantId: match[1],
-      question: params.get("frage") ?? "",
-      from: params.get("von") ?? undefined,
-      place: params.get("ort") ?? undefined,
-    });
-    router.push(`/${match[1]}`);
-  };
 
   const count = conv?.messages.length ?? 0;
   useEffect(() => {
@@ -241,11 +199,10 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
     interacted.current = false;
     setConv(started.conv);
     setChanges((n) => n + 1);
-    if (!dock) window.history.replaceState(null, "", `${base}/assistent`);
+    if (!dock) window.history.replaceState(null, "", "/assistent");
     inputRef.current?.focus();
   };
 
-  const place = places.find((p) => p.id === placeId);
   const askingPlace = conv?.pending.kind === "place" || conv?.pending.kind === "pick";
   const last = conv?.messages[conv.messages.length - 1];
   const changePlace = (
@@ -253,12 +210,9 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
       {place ? "Ort ändern" : "Ort angeben"}
     </button>
   );
-  const greeting = tenant.assistant?.greeting
-    ? origin("mandant", "Mandant · Einstellung: Begrüßung und Einstiege")
-    : origin("vorlage", "Vorlage · Begrüßung und Einstiege");
 
   return (
-    <div className={dock ? "t-chat t-chat--dock" : "t-chat"} {...origin("zentral", "Zentral · Plattform: Assistent")}>
+    <div className={dock ? "t-chat t-chat--dock" : "t-chat"}>
       {!dock && (
         <p className="t-chat__place">
           <span>
@@ -281,15 +235,7 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
                 <p className="t-chat__bubble">{message.text}</p>
               </li>
             ) : (
-              <BotItem
-                key={message.id}
-                message={message}
-                active={message === last}
-                onChoose={choose}
-                onLink={followLink}
-                greeting={greeting}
-                maxChoices={dock ? 3 : 5}
-              />
+              <BotItem key={message.id} message={message} active={message === last} onChoose={choose} maxChoices={dock ? 3 : 5} />
             ),
           )}
         </ol>
@@ -334,13 +280,13 @@ export function AssistantChat({ variant, handoff, request }: { variant: "page" |
 
       {!dock && (
         <div className="t-chat__tools">
-          <button type="button" className="t-btn" onClick={() => choose({ label: "Einfacher erklären", value: "#einfach" })} disabled={!conv}>
+          <button type="button" className="t-btn t-btn--small" onClick={() => choose({ label: "Einfacher erklären", value: "#einfach" })} disabled={!conv}>
             Einfacher erklären
           </button>
-          <button type="button" className="t-btn" onClick={restart} disabled={!conv}>
+          <button type="button" className="t-btn t-btn--small" onClick={restart} disabled={!conv}>
             Neues Gespräch
           </button>
-          <button type="button" className="t-btn" onClick={() => window.print()}>
+          <button type="button" className="t-btn t-btn--small" onClick={() => window.print()}>
             Verlauf drucken
           </button>
         </div>

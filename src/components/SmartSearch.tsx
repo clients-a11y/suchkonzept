@@ -4,15 +4,13 @@ import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { IconArrow, IconBubble, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
 import { EXAMPLE_QUERIES } from "@/data/intents";
-import { FEATURED_SERVICES } from "@/data/content";
+import { TOP_TASKS } from "@/data/content";
 import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
-import { origin } from "@/lib/origin";
 import { openAssistant } from "@/lib/assistant-dock";
 import { routeQuery } from "@/lib/search-router";
 import { PotDialog } from "@/components/PotDialog";
@@ -36,7 +34,6 @@ function ServiceFacts({ service }: { service: Service }) {
 // (phrases, typo tolerance, best match) and the hint under the field says so. Suggestions come
 // only from the service catalogue, a static file: information needs a request to its own pot.
 export function SmartSearch({ label }: { label: string }) {
-  const { tenant, base } = useCurrentTenant();
   const router = useRouter();
   const ids = { input: useId(), list: useId(), hint: useId(), examples: useId() };
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,20 +49,18 @@ export function SmartSearch({ label }: { label: string }) {
 
   const result = useMemo(() => searchServices(query, true), [query]);
   const trimmed = query.trim();
-  const chatEnabled = tenant.assistant?.enabled !== false;
 
-  // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
   // The chat takes the words typed so far: in the small window on wide screens, otherwise on its page.
   const askChat = (text: string) => {
     setOpen(false);
     if (openAssistant(text || undefined)) return;
-    router.push(text ? `${base}/assistent?frage=${encodeURIComponent(text)}` : `${base}/assistent`);
+    router.push(text ? `/assistent?frage=${encodeURIComponent(text)}` : "/assistent");
   };
 
   const items = useMemo<Item[]>(() => {
     const list: Item[] = [];
     if (!trimmed) {
-      for (const slug of FEATURED_SERVICES[tenant.type].slice(0, 5)) {
+      for (const slug of TOP_TASKS.slice(0, 5)) {
         const s = findService(slug);
         if (s)
           list.push({
@@ -131,22 +126,20 @@ export function SmartSearch({ label }: { label: string }) {
         </>
       ),
     });
-    if (chatEnabled) {
-      list.push({
-        key: "chat",
-        group: "",
-        chat: true,
-        label: `„${trimmed}“ im Chat fragen`,
-        node: (
-          <>
-            <span className="t-smart__chatoption">
-              <IconBubble size={16} />„{trimmed}“ im Chat fragen
-            </span>
-            <IconArrow size={16} />
-          </>
-        ),
-      });
-    }
+    list.push({
+      key: "chat",
+      group: "",
+      chat: true,
+      label: `„${trimmed}“ im Chat fragen`,
+      node: (
+        <>
+          <span className="t-smart__chatoption">
+            <IconBubble size={16} />„{trimmed}“ im Chat fragen
+          </span>
+          <IconArrow size={16} />
+        </>
+      ),
+    });
     list.push({
       key: "info",
       group: "",
@@ -159,7 +152,7 @@ export function SmartSearch({ label }: { label: string }) {
       ),
     });
     return list;
-  }, [result, trimmed, tenant.type, chatEnabled]);
+  }, [result, trimmed]);
 
   const visible = open && items.length > 0;
   const optionId = (i: number) => `${ids.list}-opt-${i}`;
@@ -192,7 +185,7 @@ export function SmartSearch({ label }: { label: string }) {
     if (item.chat) return askChat(trimmed);
     setOpen(false);
     if (item.key === "all" && !routeQuery(trimmed).pot) return setAsking(trimmed);
-    if (item.href) router.push(base + item.href);
+    if (item.href) router.push(item.href);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -250,9 +243,9 @@ export function SmartSearch({ label }: { label: string }) {
   );
 
   return (
-    <div className="t-smart" {...origin("zentral", "Zentral · Plattform: Suche")}>
+    <div className="t-smart">
       <Form
-        action={`${base}/suche`}
+        action="/suche"
         role="search"
         className="t-smart__form"
         onSubmit={(event) => {
@@ -334,12 +327,10 @@ export function SmartSearch({ label }: { label: string }) {
           <button type="submit" className="t-btn t-btn--primary t-smart__submit">
             Suchen
           </button>
-          {chatEnabled && (
-            <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
-              <IconBubble size={20} />
-              Im Chat fragen
-            </button>
-          )}
+          <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
+            <IconBubble size={20} />
+            Im Chat fragen
+          </button>
         </div>
         <p id={ids.hint} className="t-smart__hint">
           Schreiben Sie in eigenen Worten, was Sie vorhaben, zum Beispiel „Garage bauen“. „Suchen“ zeigt eine
@@ -356,7 +347,7 @@ export function SmartSearch({ label }: { label: string }) {
           setAsking(null);
           if (dismissed) inputRef.current?.focus();
         }}
-        onChat={chatEnabled ? askChat : undefined}
+        onChat={askChat}
       />
 
       <div className="t-smart__examples">
@@ -364,7 +355,7 @@ export function SmartSearch({ label }: { label: string }) {
           Probieren Sie:
         </p>
         <ul aria-labelledby={ids.examples}>
-          {EXAMPLE_QUERIES[tenant.type].map((example) => (
+          {EXAMPLE_QUERIES.map((example) => (
             <li key={example}>
               <button
                 type="button"
@@ -382,7 +373,6 @@ export function SmartSearch({ label }: { label: string }) {
           ))}
         </ul>
       </div>
-
     </div>
   );
 }

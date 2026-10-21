@@ -2,68 +2,70 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useCurrentTenant } from "@/components/TenantContext";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DEMO_PERSON } from "@/data/forms";
 import { STATUS_LABEL, advanceApplication, markRead, resetAccount, signIn, signOut, useAccount } from "@/lib/account-store";
 import type { ApplicationStatus } from "@/lib/account-store";
 import { formatDate, pluralize } from "@/lib/format";
-import { useDocumentTitle } from "@/lib/use-document-title";
-import { origin } from "@/lib/origin";
 
 const ORDER: ApplicationStatus[] = ["eingegangen", "in-bearbeitung", "erledigt"];
 
-// One account for every portal on the platform: applications from all tenants show up here.
+function Head({ title, lead }: { title: string; lead: string }) {
+  return (
+    <div className="t-pagehead">
+      <div className="t-container">
+        <Breadcrumb items={[{ label: "Nutzerkonto", href: "/konto" }]} />
+        <h1 className="t-h1">{title}</h1>
+        <p className="t-lead">{lead}</p>
+      </div>
+    </div>
+  );
+}
+
+// One account for applications to the Land and to the municipalities.
 export function AccountPage() {
-  const { tenant, base } = useCurrentTenant();
   const account = useAccount();
   const [status, setStatus] = useState("");
-  useDocumentTitle(`Nutzerkonto · ${tenant.name}`);
 
-  if (account === null) return <p className="t-container t-loading">Konto wird geladen …</p>;
-
-  const crumbs = <Breadcrumb items={[{ label: "Nutzerkonto", href: "/konto" }]} />;
+  if (account === null) return <p className="t-container t-page t-loading">Konto wird geladen …</p>;
 
   if (!account.signedIn) {
     return (
-      <div className="t-container t-page">
-        {crumbs}
-        <h1 className="t-h1">Nutzerkonto</h1>
-        <p className="t-lead">
-          Ein Konto für alle Portale auf dieser Plattform: Anträge stellen, Status verfolgen und Bescheide im Postfach
-          empfangen, egal ob beim Land oder bei der Stadt.
-        </p>
-        <p className="t-actions">
-          <button type="button" className="t-btn t-btn--primary t-btn--large" onClick={() => signIn()}>
-            Mit Demo-Konto anmelden
-          </button>
-        </p>
-        <p className="t-box__note">Klick-Dummy: Es wird kein Passwort abgefragt. Das Demo-Konto gehört der fiktiven Person {DEMO_PERSON.name}.</p>
-      </div>
+      <>
+        <Head
+          title="Nutzerkonto"
+          lead="Mit dem Nutzerkonto stellen Sie Anträge, verfolgen den Stand und bekommen Bescheide ins Postfach, egal ob das Land oder Ihre Gemeinde zuständig ist."
+        />
+        <div className="t-container t-page">
+          <p className="t-actions">
+            <button type="button" className="t-btn t-btn--primary t-btn--large" onClick={() => signIn()}>
+              Mit Demo-Konto anmelden
+            </button>
+          </p>
+          <p className="t-box__note">Prototyp: Es wird kein Passwort abgefragt. Das Demo-Konto gehört der fiktiven Person {DEMO_PERSON.name}.</p>
+        </div>
+      </>
     );
   }
 
   const unread = account.messages.filter((m) => !m.read).length;
 
   return (
-    <div className="t-container t-page">
-      {crumbs}
-      <h1 className="t-h1">Mein Konto</h1>
-      <p className="t-lead">
-        Angemeldet als {DEMO_PERSON.name}. Hier sehen Sie Anträge aus allen Portalen der Plattform, nicht nur aus {tenant.name}.
-      </p>
+    <>
+      <Head title="Mein Konto" lead={`Angemeldet als ${DEMO_PERSON.name}. Hier sehen Sie Ihre Anträge und Nachrichten.`} />
+      <div className="t-container t-page">
       <p role="status" className="t-notice">
         {status}
       </p>
 
-      <div className="t-service" {...origin("zentral", "Zentral · Plattform: Nutzerkonto")}>
-        <div>
+      <div className="t-layout">
+        <div className="t-layout__main">
           <section className="t-unit-section">
             <h2 className="t-h2">Meine Anträge</h2>
             {account.applications.length === 0 ? (
               <div className="t-empty">
                 <p>Noch keine Anträge. Viele Leistungen lassen sich online beantragen.</p>
-                <Link href={`${base}/suche?tab=leistungen`} className="t-btn">
+                <Link href="/leistungen" className="t-btn">
                   Leistungen ansehen
                 </Link>
               </div>
@@ -74,7 +76,6 @@ export function AccountPage() {
                   return (
                     <li key={app.id} className="t-app">
                       <p className="t-meta">
-                        <span>{app.tenantName}</span>
                         <time dateTime={app.submittedAt}>eingereicht am {formatDate(app.submittedAt)}</time>
                         <span>
                           Vorgang <code>{app.id}</code>
@@ -130,7 +131,7 @@ export function AccountPage() {
                           {m.subject}
                         </span>
                         <span className="t-inbox__meta">
-                          {m.from} · {m.tenantName} · {formatDate(m.date)}
+                          {m.from} · {formatDate(m.date)}
                         </span>
                       </summary>
                       <p className="t-inbox__body">{m.body}</p>
@@ -142,7 +143,7 @@ export function AccountPage() {
           </section>
         </div>
 
-        <div className="t-service__side">
+        <div className="t-layout__side">
           <section className="t-box t-box--quiet">
             <h2 className="t-box__title">Persönliche Daten</h2>
             <dl className="t-person">
@@ -163,7 +164,7 @@ export function AccountPage() {
                 <dd>{DEMO_PERSON.email}</dd>
               </div>
             </dl>
-            <p className="t-box__note">Fiktive Person für den Klick-Dummy.</p>
+            <p className="t-box__note">Fiktive Person für den Prototyp.</p>
           </section>
           <section className="t-box">
             <h2 className="t-box__title">Konto</h2>
@@ -185,6 +186,7 @@ export function AccountPage() {
           </section>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

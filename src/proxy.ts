@@ -2,12 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Simple password gate for shared previews. Active as soon as DEMO_PASSWORD is set. In production
 // without a password nobody gets in; locally without a password the gate stays off.
-const COOKIE = "klickdummy_zugang";
+const COOKIE = "suchkonzept_zugang";
 const FIELD = "passwort";
 const STATE = "zugang";
 
 async function digest(value: string): Promise<string> {
-  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`klickdummy:${value}`));
+  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`suchkonzept:${value}`));
   return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 

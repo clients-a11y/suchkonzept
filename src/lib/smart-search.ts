@@ -1,9 +1,9 @@
 import { SERVICES, findService } from "@/data/services";
-import { newsFor, pagesFor } from "@/data/content";
+import { NEWS, SEARCHABLE_PAGES, TOP_TASKS } from "@/data/content";
 import { INTENTS, STOPWORDS } from "@/data/intents";
-import { organisationFor } from "@/data/organisation";
-import { PROJECT_STATUS, projectsFor } from "@/data/projects";
-import type { Service, Tenant } from "@/lib/types";
+import { ORG_UNITS, groupOf } from "@/data/organisation";
+import { PROJECTS, PROJECT_STATUS } from "@/data/projects";
+import type { Service } from "@/lib/types";
 
 // Local stand-in for an AI-assisted search: understands phrases in plain words,
 // tolerates typos and picks a best match. No network, no model, only the data in src/data.
@@ -130,6 +130,12 @@ export function intentPhrases(input: string): string[] {
   return INTENTS.flatMap((intent) => intent.phrases.filter((p) => phraseMatches(p, query, queryTokens, false)));
 }
 
+// Equal scores: the most frequent tasks first.
+function topRank(service: Service): number {
+  const i = TOP_TASKS.indexOf(service.slug);
+  return i < 0 ? TOP_TASKS.length : i;
+}
+
 // Pot 1: services. Uses only the catalogue, which can ship with the page as a static file.
 export function searchServices(input: string, typing = false): ServiceResult {
   const query = normalize(input);
@@ -186,7 +192,7 @@ export function searchServices(input: string, typing = false): ServiceResult {
   const services = [...scores]
     .map(([slug, score]) => ({ service: findService(slug)!, score }))
     .filter((h) => h.service)
-    .sort((a, b) => b.score - a.score || a.service.title.localeCompare(b.service.title, "de"));
+    .sort((a, b) => b.score - a.score || topRank(a.service) - topRank(b.service) || a.service.title.localeCompare(b.service.title, "de"));
 
   const [top, second] = services;
   const answer = top && top.score >= 5 && (!second || top.score >= second.score + 3) ? top.service : undefined;
@@ -202,20 +208,19 @@ export function searchServices(input: string, typing = false): ServiceResult {
 }
 
 // Pot 2: information. In a real portal this is the editorial database.
-export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
+export function searchInformation(input: string): InfoHit[] {
   const queryTokens = tokens(input);
   if (!queryTokens.length) return [];
-  const org = organisationFor(tenant);
   const hits: InfoHit[] = [
-    ...org.units.map((u) => ({
+    ...ORG_UNITS.map((u) => ({
       key: `stelle-${u.id}`,
-      kind: `${org.unitLabel} · ${u.head.role} ${u.head.name}`,
+      kind: `${groupOf(u).unitLabel} · ${u.head.role} ${u.head.name}`,
       title: u.name,
       text: u.lead,
       href: `/organisation/${u.id}`,
       score: scoreText(queryTokens, `${u.name} ${u.head.name}`, [u.lead, u.head.role, ...u.tasks].join(" ")),
     })),
-    ...projectsFor(tenant).projects.map((p) => ({
+    ...PROJECTS.map((p) => ({
       key: `projekt-${p.id}`,
       kind: `Projekt · ${PROJECT_STATUS[p.status]}`,
       title: p.title,
@@ -223,7 +228,7 @@ export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
       href: `/projekte/${p.id}`,
       score: scoreText(queryTokens, p.title, [p.teaser, ...p.description, p.location].join(" ")),
     })),
-    ...pagesFor(tenant).map((p) => ({
+    ...SEARCHABLE_PAGES.map((p) => ({
       key: `seite-${p.slug}`,
       kind: "Seite",
       title: p.title,
@@ -231,7 +236,7 @@ export function searchInformation(tenant: Tenant, input: string): InfoHit[] {
       href: `/seite/${p.slug}`,
       score: scoreText(queryTokens, p.title, [p.lead, ...p.sections.flatMap((s) => [s.title, ...s.body])].join(" ")),
     })),
-    ...newsFor(tenant).map((n) => ({
+    ...NEWS.map((n) => ({
       key: `meldung-${n.id}`,
       kind: `Meldung · ${n.source}`,
       title: n.title,

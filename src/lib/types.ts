@@ -1,38 +1,12 @@
-export type PortalType = "info" | "service";
-
-export type FontKey = "serif" | "sans" | "hyper";
-
-export type Tokens = {
-  primary: string;
-  accent: string;
-  surface: string;
-  headingFont: FontKey;
-  bodyFont: FontKey;
-  radius: number;
-};
-
 export type NavItem = { label: string; href: string };
 
 export type FooterColumn = { title: string; links: NavItem[] };
 
-export type Tenant = {
-  id: string;
-  name: string;
-  kind: string;
-  type: PortalType;
-  tagline: string;
-  region: string;
-  tokens: Tokens;
-  nav: NavItem[];
-  footer: FooterColumn[];
-  meta: { dgs: boolean; ls: boolean; es: boolean };
-  languages: string[];
-  contact: { office: string; address: string; phone: string; hours: string };
-  // Chat assistant: on unless switched off. Without greeting and starters the template applies.
-  assistant?: { enabled: boolean; greeting?: string; starters?: string[] };
-  custom?: boolean;
-  createdInSeconds?: number;
-};
+// Who offers a service or publishes a text: the Land itself or a municipality.
+export type Level = "kommune" | "land";
+
+// Who a service is for. The start page has one entry for each.
+export type Audience = "privat" | "unternehmen";
 
 export type ServiceSection = { title: string; body: string[] };
 
@@ -41,7 +15,8 @@ export type Service = {
   title: string;
   summary: string;
   keywords: string[];
-  level: "kommune" | "land";
+  level: Level;
+  audience: Audience[];
   online: boolean;
   costs: string;
   duration: string;
@@ -49,23 +24,21 @@ export type Service = {
   sections: ServiceSection[];
 };
 
-// Every news item has an illustrated scene from the theme tokens (see NewsArt).
-// Seeded tenants can add an AI-generated photo; it is always labelled as such.
-export type NewsImage = { scene: string; alt: string; credit: string; photo?: string };
+// Every picture is an AI-generated sample photo and is labelled as such.
+export type Photo = { src: string; alt: string };
 
 export type NewsItem = {
   id: string;
-  tenant: string;
+  level: Level;
   title: string;
   teaser: string;
   date: string;
   topic: string;
   source: string;
-  image?: NewsImage;
+  image: Photo;
 };
 
 export type ContentPage = {
-  tenant: string;
   slug: string;
   title: string;
   lead: string;

@@ -1,19 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { useCurrentTenant } from "@/components/TenantContext";
 
-export function NotFoundBlock({ what }: { what: string }) {
-  const { base } = useCurrentTenant();
+export function NotFoundBlock() {
   return (
     <div className="t-container t-page t-notfound">
-      <h1 className="t-h1">{what} nicht gefunden</h1>
-      <p className="t-lead">Die Adresse ist falsch oder die Seite gibt es in diesem Portal nicht.</p>
+      <h1 className="t-h1">Seite nicht gefunden</h1>
+      <p className="t-lead">Die Adresse ist falsch, oder die Seite gibt es nicht mehr.</p>
       <p className="t-actions">
-        <Link href={base} className="t-btn t-btn--primary">
+        <Link href="/" className="t-btn t-btn--primary">
           Zur Startseite
         </Link>
-        <Link href={`${base}/suche`} className="t-btn">
+        <Link href="/suche" className="t-btn">
           Suche öffnen
         </Link>
       </p>

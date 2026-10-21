@@ -2,17 +2,15 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 
-// One demo account for all portals of the platform, kept in this browser only.
-// Applications from Musterland and Beispielstadt end up in the same mailbox.
-const KEY = "klickdummy.konto.v1";
-const EVENT = "klickdummy-konto";
+// One demo account, kept in this browser only. Applications to the Land and to the
+// municipalities end up in the same mailbox.
+const KEY = "suchkonzept.konto.v1";
+const EVENT = "suchkonzept-konto";
 
 export type ApplicationStatus = "eingegangen" | "in-bearbeitung" | "erledigt";
 
 export type Application = {
   id: string;
-  tenantId: string;
-  tenantName: string;
   office: string;
   service: string;
   serviceTitle: string;
@@ -25,7 +23,6 @@ export type Application = {
 export type Message = {
   id: string;
   applicationId: string;
-  tenantName: string;
   from: string;
   subject: string;
   body: string;
@@ -96,21 +93,20 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function caseNumber(tenantId: string): string {
-  const prefix = tenantId.slice(0, 2).toUpperCase();
+// "MU-2026-123456": two letters for Musterland, the year and a running number.
+function caseNumber(): string {
   const n = Math.floor(100000 + Math.random() * 900000);
-  return `${prefix}-${new Date().getFullYear()}-${n}`;
+  return `MU-${new Date().getFullYear()}-${n}`;
 }
 
 export function submitApplication(input: Omit<Application, "id" | "submittedAt" | "status">, keep: boolean): Application {
-  const application: Application = { ...input, id: caseNumber(input.tenantId), submittedAt: today(), status: "eingegangen" };
+  const application: Application = { ...input, id: caseNumber(), submittedAt: today(), status: "eingegangen" };
   // Without an account nothing is stored: there is only the confirmation page.
   if (!keep) return application;
   const account = parse(readRaw());
   const message: Message = {
     id: `${application.id}-1`,
     applicationId: application.id,
-    tenantName: input.tenantName,
     from: input.office,
     subject: `Eingangsbestätigung: ${input.serviceTitle}`,
     body: `Ihr Antrag ist bei uns eingegangen. Vorgangsnummer ${application.id}. Wir melden uns, sobald er bearbeitet ist.`,
@@ -133,17 +129,15 @@ export function advanceApplication(id: string) {
       ? {
           id: `${id}-3`,
           applicationId: id,
-          tenantName: app.tenantName,
           from: app.office,
           subject: `Bescheid: ${app.serviceTitle}`,
-          body: "Ihr Antrag ist bearbeitet und wurde bewilligt. Der Bescheid hängt als PDF an (im Klick-Dummy nicht enthalten).",
+          body: "Ihr Antrag ist bearbeitet und wurde bewilligt. Der Bescheid hängt als PDF an (im Prototyp nicht enthalten).",
           date: today(),
           read: false,
         }
       : {
           id: `${id}-2`,
           applicationId: id,
-          tenantName: app.tenantName,
           from: app.office,
           subject: `In Bearbeitung: ${app.serviceTitle}`,
           body: "Ihr Antrag wird jetzt bearbeitet. Falls Unterlagen fehlen, melden wir uns hier.",
