@@ -3,6 +3,7 @@ import type { Contact } from "@/data/site";
 import type { Place } from "@/data/places";
 import { groupOf, landUnitFor, localUnitFor } from "@/data/organisation";
 import type { OrgUnit } from "@/data/organisation";
+import { searchServices } from "@/lib/smart-search";
 import type { Service } from "@/lib/types";
 
 // Who handles a service: shared by the service page, the search, the application and the assistant.
@@ -22,6 +23,12 @@ export function landOffice(service: Service): Office {
 export function officeForPlace(place: Place, service: Service): Office {
   const unit = localUnitFor(place.id, service.slug);
   return unit ? ofUnit(unit) : place;
+}
+
+// The place is asked before every search, so the results can name the office in charge. Not when the
+// search clearly leads to a service with one office for everyone (a service of the Land, like Kindergeld).
+export function placeMatters(query: string): boolean {
+  return searchServices(query).answer?.level !== "land";
 }
 
 // The office in charge. Municipal services need the place; without it there is no answer yet.

@@ -2205,6 +2205,46 @@ main:focus {
   color: var(--c-white);
 }
 
+/* "Meinen Standort verwenden": a quiet text button, the demo note next to it. */
+.t-locate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.75rem;
+}
+
+.t-locate__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-blue);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.t-locate__button:hover {
+  color: var(--c-blue-dark);
+  text-decoration-thickness: 2px;
+}
+
+.t-locate__button[aria-disabled="true"] {
+  color: var(--c-muted);
+  text-decoration: none;
+  cursor: progress;
+}
+
+.t-locate__note {
+  color: var(--c-muted);
+  font-size: 0.8125rem;
+}
+
 button.t-route__choice {
   width: 100%;
   font: inherit;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { IconArrow, IconBubble, IconCheck, IconClose, IconPin } from "@/components/Icons";
+import { LocateButton } from "@/components/LocateButton";
 import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/components/PotIcons";
 import type { Place } from "@/data/places";
 import { SITE } from "@/data/site";
@@ -64,7 +65,10 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
   const [editing, setEditing] = useState(!stored);
   const [value, setValue] = useState("");
   const [tried, setTried] = useState(false);
+  // Filled in by "Meinen Standort verwenden" (demo); typing clears it.
+  const [located, setLocated] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const ids = { input: useId(), hint: useId(), status: useId() };
 
   // "Anderen Ort angeben" and the step change from the first question move the focus into the field.
@@ -102,7 +106,7 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
 
   let status = "";
   let problem = false;
-  if (place) status = `${digits ? `${text} · ` : ""}${place.name}`;
+  if (place) status = `${digits ? `${text} · ` : ""}${place.name}${located ? ", ermittelt über Ihren Standort" : ""}`;
   else if (ready && matches.length === 0) {
     problem = true;
     status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${text}“ kennen wir in ${SITE.region} nicht.`;
@@ -137,9 +141,10 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
           aria-invalid={problem || undefined}
           onChange={(event) => {
             setValue(event.target.value);
+            setLocated(false);
           }}
         />
-        <button type="submit" className="t-btn t-btn--primary">
+        <button ref={submitRef} type="submit" className="t-btn t-btn--primary">
           Weiter
           <IconArrow size={18} />
         </button>
@@ -147,6 +152,14 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
       <p id={ids.hint} className="t-stepplace__hint">
         Zum Beispiel 10200 oder Seehausen. Die Angabe bleibt nur in diesem Browser.
       </p>
+      <LocateButton
+        onFound={(postcode) => {
+          setValue(postcode);
+          setLocated(true);
+          // The place is filled in; "Weiter" is the next thing to do.
+          submitRef.current?.focus();
+        }}
+      />
       <p id={ids.status} role="status" className={place ? "t-stepplace__status t-stepplace__status--ok" : problem ? "t-stepplace__status t-stepplace__status--problem" : "t-stepplace__status"}>
         {place && <IconCheck size={16} />}
         {status}
@@ -168,11 +181,12 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
 }
 
 // What the person asked for: a search the switch has placed (href), a search it could not place (no href:
-// the question comes first) or a page picked from the suggestions (href and title).
-export type SearchRequest = { query: string; href?: string; title?: string };
+// the question comes first) or a page picked from the suggestions (href and title). place: whether the
+// place is asked; not for a service with one office for everyone, such as Kindergeld.
+export type SearchRequest = { query: string; href?: string; title?: string; place: boolean };
 
-// Steps before every search: "Was suchen Sie?" when the switch is unsure, then always the place, so the
-// results can name the office in charge. A native modal dialog keeps the focus inside and closes with Escape.
+// Steps before a search: "Was suchen Sie?" when the switch is unsure, then the place, so the results can
+// name the office in charge. A native modal dialog keeps the focus inside and closes with Escape.
 export function SearchSteps({
   request,
   onClose,
@@ -188,7 +202,7 @@ export function SearchSteps({
   // Closed by finishing the steps or the chat, or dismissed (Escape, close button, dimmed area).
   const chosen = useRef(false);
   const titleId = useId();
-  const twoSteps = Boolean(request && !request.href);
+  const twoSteps = Boolean(request && !request.href && request.place);
   const [shownFor, setShownFor] = useState<SearchRequest | null>(null);
   const [step, setStep] = useState<"pot" | "place">("place");
   const [pot, setPot] = useState<Pot | undefined>();
@@ -211,12 +225,16 @@ export function SearchSteps({
 
   const close = () => ref.current?.close();
 
+  const finish = (href: string) => {
+    chosen.current = true;
+    close();
+    onDone(href);
+  };
+
   const confirm = (place: Place) => {
     if (!request) return;
     setPlaceId(place.id);
-    chosen.current = true;
-    close();
-    onDone(request.href ?? searchHref(request.query, pot));
+    finish(request.href ?? searchHref(request.query, pot));
   };
 
   const query = request?.query ?? "";
@@ -273,6 +291,7 @@ export function SearchSteps({
             <PotChoices
               query={query}
               onPick={(next) => {
+                if (!request.place) return finish(searchHref(query, next));
                 setPot(next);
                 setStep("place");
               }}

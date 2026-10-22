@@ -9,7 +9,7 @@ export type Intent = {
 
 export const INTENTS: Intent[] = [
   {
-    phrases: ["haus bauen", "bauen", "neubau", "anbau", "umbau", "garage", "carport", "dachausbau", "wintergarten", "bauantrag", "terrasse ueberdachen"],
+    phrases: ["haus bauen", "bauen", "neubau", "anbau", "umbau", "garage", "carport", "dachausbau", "wintergarten", "bauantrag", "terrasse ueberdachen", "gartenlaube", "gartenhaus", "laube"],
     services: ["baugenehmigung-beantragen"],
     related: ["wohngeld-beantragen"],
   },

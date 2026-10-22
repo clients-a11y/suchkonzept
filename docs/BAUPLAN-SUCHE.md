@@ -127,6 +127,13 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   `PotDialog.tsx`): „Was suchen Sie?“, dann „Wo wohnen Sie?“. Ein gemerkter Ort braucht nur „Weiter mit …“, bei
   mehreren Orten zu einer Postleitzahl schließt der Klick auf den Ort den Schritt ab. Auf der Suchseite steht der
   Wohnort über den Treffern, ohne Overlay. Wer eine Leistungsseite direkt öffnet, gibt den Ort weiterhin dort an.
+- Ausnahme Leistungen mit einer Stelle für alle (auf Wunsch, 22.10.2026): Führt die Suche klar zu einer Leistung des
+  Landes (`placeMatters` in `src/lib/offices.ts`), entfällt die Frage nach dem Wohnort, ebenso bei einem solchen
+  Vorschlag. Vergleich im Testfall: Kindergeld ohne Postleitzahl, „Gartenlaube“ (neue Redewendung für die
+  Baugenehmigung) mit Postleitzahl und Bauordnungsamt.
+- „Meinen Standort verwenden“ (`LocateButton`) bei jeder Ortseingabe, als Demo: Nach kurzer Wartezeit steht immer
+  20100 (Beispielstadt) im Feld, ein echter Standort wird nicht abgefragt. Im Betrieb: `navigator.geolocation` nach
+  Erlaubnis, Postleitzahl über einen Geodienst, gemerkt wird nur der Ort.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

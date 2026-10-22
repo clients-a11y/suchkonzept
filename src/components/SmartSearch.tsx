@@ -11,6 +11,7 @@ import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { openAssistant } from "@/lib/assistant-dock";
+import { placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
@@ -20,8 +21,9 @@ function isLead(item: { key: string }): boolean {
   return item.key.startsWith("answer") || item.key === "info-top";
 }
 
-// title: the service a suggestion opens, named again when the place is asked for.
-type Item = { key: string; group: string; href?: string; title?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
+// title: the service a suggestion opens, named again when the place is asked for. central: one office for
+// everyone, so the place is not asked.
+type Item = { key: string; group: string; href?: string; title?: string; central?: boolean; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
 function ServiceFacts({ service }: { service: Service }) {
   return (
@@ -86,6 +88,7 @@ export function SmartSearch({ label }: { label: string }) {
             group: "Häufige Anliegen",
             href: `/leistungen/${s.slug}`,
             title: s.title,
+            central: s.level === "land",
             label: s.title,
             node: s.title,
           });
@@ -125,7 +128,8 @@ export function SmartSearch({ label }: { label: string }) {
         key: `answer-${answer.slug}`,
         group: "Das passt am besten",
         href: `/leistungen/${answer.slug}`,
-            title: answer.title,
+        title: answer.title,
+        central: answer.level === "land",
         label: `Das passt am besten: ${answer.title}. ${answer.online ? "Online möglich" : "Termin vor Ort"}`,
         node: (
           <span className="t-smart__answer">
@@ -138,14 +142,15 @@ export function SmartSearch({ label }: { label: string }) {
     }
     for (const hit of result.services.filter((h) => h.service.slug !== answer?.slug).slice(0, 4)) {
       const s = hit.service;
-      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, title: s.title, label: s.title, node: s.title });
+      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, title: s.title, central: s.level === "land", label: s.title, node: s.title });
     }
     for (const s of result.related) {
       list.push({
         key: `rel-${s.slug}`,
         group: "Das brauchen Sie oft auch",
         href: `/leistungen/${s.slug}`,
-            title: s.title,
+        title: s.title,
+        central: s.level === "land",
         label: s.title,
         node: s.title,
       });
@@ -221,8 +226,21 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
-    if (item.key === "all") return setRequest(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed });
-    if (item.href) setRequest({ query: trimmed, href: item.href, title: item.title });
+    if (item.key === "all") return start(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed });
+    if (!item.href) return;
+    // A service decides by its own office, a search by the service it clearly leads to.
+    start({ query: trimmed, href: item.href, title: item.title }, item.title ? !item.central : placeMatters(trimmed));
+  };
+
+  const go = (href: string) => {
+    if (href.startsWith("/suche")) setSearching(true);
+    router.push(href);
+  };
+
+  // Every search asks for the place first, unless it clearly leads to a service with one office for everyone.
+  const start = (next: Omit<SearchRequest, "place">, place = placeMatters(next.query)) => {
+    if (next.href && !place) return go(next.href);
+    setRequest({ ...next, place });
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -286,11 +304,11 @@ export function SmartSearch({ label }: { label: string }) {
         role="search"
         className="t-smart__form"
         onSubmit={(event) => {
-          // Every search first asks for the place; an unclear one asks "Was suchen Sie?" before that.
+          // A search asks for the place first; an unclear one asks "Was suchen Sie?" before that.
           event.preventDefault();
           setOpen(false);
-          if (!trimmed) return setRequest({ query: "", href: "/suche" });
-          setRequest(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed });
+          if (!trimmed) return start({ query: "", href: "/suche" });
+          start(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed });
         }}
       >
         <div className="t-smart__head">
@@ -379,10 +397,7 @@ export function SmartSearch({ label }: { label: string }) {
           setRequest(null);
           if (dismissed) inputRef.current?.focus();
         }}
-        onDone={(href) => {
-          if (href.startsWith("/suche")) setSearching(true);
-          router.push(href);
-        }}
+        onDone={go}
         onChat={askChat}
       />
     </div>

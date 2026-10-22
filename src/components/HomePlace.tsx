@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { IconCheck } from "@/components/Icons";
+import { LocateButton } from "@/components/LocateButton";
 import { PLACES } from "@/data/places";
 import type { Place } from "@/data/places";
 import { SITE } from "@/data/site";
@@ -116,6 +117,7 @@ export function HomePlace({
       <p id={ids.hint} className="t-homeplace__hint">
         {hint}
       </p>
+      <LocateButton onFound={update} />
       <p id={ids.status} role="status" className={current ? "t-homeplace__status t-homeplace__status--ok" : "t-homeplace__status"}>
         {current && <IconCheck size={16} />}
         {status}

@@ -16,7 +16,7 @@ import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
 import type { Pot, Route } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
-import { responsibleOffice } from "@/lib/offices";
+import { placeMatters, responsibleOffice } from "@/lib/offices";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
 import { openAssistant } from "@/lib/assistant-dock";
@@ -287,8 +287,9 @@ function SearchResults() {
   const results = (
     <div className="t-results">
       {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
-      {/* The place belongs to every search, so the hits can name the office in charge. */}
-      {q && (
+      {/* The place belongs to every search, so the hits can name the office in charge. Not for a service
+          with one office for everyone, such as Kindergeld. */}
+      {q && placeMatters(q) && (
         <div className="t-place t-place--search">
           <IconPin size={24} />
           <HomePlace hint="Dann nennen wir bei jeder Leistung die zuständige Stelle. Die Angabe bleibt nur in diesem Browser." />

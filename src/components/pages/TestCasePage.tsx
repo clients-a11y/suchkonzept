@@ -31,7 +31,7 @@ const PARTS: Part[] = [
       },
       {
         input: "Kindergeld",
-        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“ Auf der Startseite getippt, ist das Schritt 1 von 2 über der Seite, danach folgt der Wohnort.",
+        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“ Auf der Startseite getippt, erscheint die Frage über der Seite.",
         href: `/suche?q=${q("Kindergeld")}`,
         action: "Suche öffnen",
       },
@@ -74,12 +74,24 @@ const PARTS: Part[] = [
     ],
   },
   {
-    title: "Wohnort bei jeder Suche",
-    intro: "Wer auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an. So nennt jedes Ergebnis die zuständige Stelle. Die Eingabe wird sofort geprüft, ohne Datenbank, und gemerkt. Vorher „Demo zurücksetzen“, sonst ist der Ort schon bekannt.",
+    title: "Wohnort: Kindergeld und Gartenlaube im Vergleich",
+    intro: "Wer auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an, damit das Portal die zuständige Stelle nennt. Ausnahme: Die Suche führt klar zu einer Leistung, für die überall dieselbe Stelle zuständig ist. Vorher „Demo zurücksetzen“, sonst ist der Ort schon bekannt.",
     steps: [
       {
         input: "Kindergeld, dann „Suchen“",
-        expect: "Schritt 1 von 2: „Was suchen Sie?“. Nach „Etwas beantragen“ folgt Schritt 2: „Wo wohnen Sie?“. Mit 10200 erscheint sofort „10200 · Seehausen“, „Weiter“ öffnet die Treffer in Leistungen.",
+        expect: "Nur eine Frage: „Was suchen Sie?“. Nach „Etwas beantragen“ geht es ohne Postleitzahl zu den Treffern, denn für Kindergeld ist überall das Ministerium für Gesundheit und Familie zuständig. Auch der Vorschlag „Kindergeld beantragen“ öffnet die Leistungsseite direkt.",
+        href: "/",
+        action: "Startseite öffnen",
+      },
+      {
+        input: "Gartenlaube, dann „Suchen“",
+        expect: "Schritt 1 von 2: „Was suchen Sie?“, nach „Etwas beantragen“ Schritt 2: „Wo wohnen Sie?“. Wer die Baugenehmigung erteilt, hängt vom Ort ab. Mit 20100 nennt die Kurzantwort das Bauordnungsamt Beispielstadt.",
+        href: "/",
+        action: "Startseite öffnen",
+      },
+      {
+        way: "Bei „Wo wohnen Sie?“: „Meinen Standort verwenden“",
+        expect: "Demo: Nach einem Moment „Standort wird ermittelt …“ steht 20100 im Feld, darunter „Beispielstadt, ermittelt über Ihren Standort“. Ein echter Standort wird nicht abgefragt. Im Betrieb würde der Browser vorher um Erlaubnis fragen.",
         href: "/",
         action: "Startseite öffnen",
       },
