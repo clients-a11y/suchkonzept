@@ -134,6 +134,10 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - „Meinen Standort verwenden“ (`LocateButton`) bei jeder Ortseingabe, als Demo: Nach kurzer Wartezeit steht immer
   20100 (Beispielstadt) im Feld, ein echter Standort wird nicht abgefragt. Im Betrieb: `navigator.geolocation` nach
   Erlaubnis, Postleitzahl über einen Geodienst, gemerkt wird nur der Ort.
+- Chat: unklare Anliegen aus dem Alltag (auf Wunsch, 22.10.2026). Vorher zeigte „Ich komme mit dem Geld nicht mehr aus“
+  zufällige Treffer. Jetzt erkennt der Assistent Lagen ohne Leistung (`src/data/situations.ts`: Zuwachs, Portemonnaie
+  weg, Geld reicht nicht, Brief vom Amt) und fragt einmal gezielt nach, mit Antwortknöpfen oder freier Antwort. Nach
+  zwei Rückfragen ohne Leistung nennt er den Bürgerservice. Eigener Teil im Testfall.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

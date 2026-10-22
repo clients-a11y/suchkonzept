@@ -2,6 +2,7 @@ import { PLACES, findPlace } from "@/data/places";
 import type { Place } from "@/data/places";
 import { INTENTS } from "@/data/intents";
 import { findService } from "@/data/services";
+import { SITUATIONS, findSituation, type Situation } from "@/data/situations";
 import { SITE } from "@/data/site";
 import { STATUS_LABEL, type Account, type Application } from "@/lib/account-store";
 import { formatDate, pluralize } from "@/lib/format";
@@ -37,13 +38,15 @@ type Pending =
   | { kind: "none" }
   | { kind: "place"; service?: string }
   | { kind: "pick"; service?: string; places: string[] }
-  | { kind: "confirm"; service: string; place: string };
+  | { kind: "confirm"; service: string; place: string }
+  | { kind: "situation"; id: string };
 
 export type Conversation = {
   messages: ChatMessage[];
   pending: Pending;
   service?: string; // service of the last answer, for follow-up questions
   place?: string; // place confirmed in this conversation
+  unclear?: number; // questions in a row that led to no service; after two, people take over
   next: number;
 };
 
@@ -112,6 +115,19 @@ function placesIn(text: string, loose: boolean): Place[] {
   return query.length >= 3 ? findPlaces(query) : [];
 }
 
+// An everyday situation that names no service yet ("Mein Portemonnaie ist weg").
+function situationIn(text: string): Situation | undefined {
+  return SITUATIONS.find((s) => mentions(text, s.stems));
+}
+
+// A typed answer to the question of a situation; "other" for "Etwas anderes".
+function situationAnswerIn(situation: Situation, text: string): number | "other" | undefined {
+  const index = situation.answers.findIndex((a) => saysWord(text, a.words ?? []) || mentions(text, a.stems ?? []));
+  if (index >= 0) return index;
+  if (situation.other && mentions(text, ["etwas anderes", "anderes", "sonst"])) return "other";
+  return undefined;
+}
+
 function starters(): Choice[] {
   return SITE.assistant.starters.map((text) => ({ label: text, value: text }));
 }
@@ -168,6 +184,7 @@ class Turn {
   service(service: Service) {
     this.c.service = service.slug;
     this.c.pending = { kind: "none" };
+    this.c.unclear = 0;
     if (service.level === "land") return this.landService(service);
 
     const known = findPlace(this.c.place);
@@ -256,6 +273,9 @@ class Turn {
   simple() {
     const service = this.c.service ? findService(this.c.service) : undefined;
     if (!service) {
+      // After two questions that led nowhere, people take over instead of a third question.
+      if ((this.c.unclear ?? 0) >= 2) return this.fallback("");
+      this.c.unclear = (this.c.unclear ?? 0) + 1;
       return this.say({ text: ["Gerne einfacher. Schreiben Sie in wenigen Worten, was Sie brauchen.", "Zum Beispiel: „Ausweis“ oder „Umzug“."] });
     }
     const office = responsibleOffice(service, findPlace(this.c.place));
@@ -376,6 +396,42 @@ class Turn {
     });
   }
 
+  // ---------- Everyday situations ----------
+
+  // One question with answers to click, instead of a guess. Typed answers work as well.
+  situation(situation: Situation, skip?: number) {
+    this.c.pending = { kind: "situation", id: situation.id };
+    this.c.unclear = (this.c.unclear ?? 0) + 1;
+    this.say({ text: situation.question, choices: this.situationChoices(situation, skip) });
+  }
+
+  situationChoices(situation: Situation, skip?: number): Choice[] {
+    return [
+      ...situation.answers.map((a, i) => ({ label: a.label, value: `#lage:${situation.id}:${i}` })).filter((_, i) => i !== skip),
+      ...(situation.other ? [{ label: "Etwas anderes", value: `#lage:${situation.id}:other` }] : []),
+      TALK_TO_HUMAN,
+    ];
+  }
+
+  situationAnswer(situation: Situation, answer: number | "other") {
+    if (answer === "other") {
+      this.c.pending = { kind: "none" };
+      this.c.unclear = (this.c.unclear ?? 0) + 1;
+      return this.say({ text: ["Beschreiben Sie in einem Satz, worum es geht. Dann suche ich weiter."], choices: [TALK_TO_HUMAN] });
+    }
+    const chosen = situation.answers[answer];
+    const service = chosen?.service ? findService(chosen.service) : undefined;
+    if (!chosen) return this.help();
+    if (service) {
+      if (chosen.text) this.say({ text: chosen.text });
+      return this.service(service);
+    }
+    // An answer without a service: say what helps. A question with several answers stays open.
+    const open = situation.other && !chosen.contact ? this.situationChoices(situation, answer).filter((c) => c.value !== `#lage:${situation.id}:other`) : [];
+    this.c.pending = open.length > 1 ? { kind: "situation", id: situation.id } : { kind: "none" };
+    this.say({ text: chosen.text ?? [], office: chosen.contact ? SITE.contact : undefined, choices: open.length > 1 ? open : undefined });
+  }
+
   // ---------- Everything else ----------
 
   human() {
@@ -430,6 +486,15 @@ class Turn {
   }
 
   fallback(text: string) {
+    // Two questions led nowhere: people help on from here instead of more guessing.
+    if ((this.c.unclear ?? 0) >= 2) {
+      this.c.unclear = 0;
+      return this.say({
+        text: ["Das kann ich leider nicht zuordnen. Am besten hilft Ihnen der Bürgerservice weiter. Schildern Sie dort, was Sie mir geschrieben haben:"],
+        office: SITE.contact,
+      });
+    }
+    this.c.unclear = (this.c.unclear ?? 0) + 1;
     // Information only as a second request, when no service fits.
     const info = searchInformation(text).slice(0, 3);
     if (info.length) {
@@ -478,6 +543,11 @@ function handleToken(turn: Turn, token: string) {
     return service ? turn.service(service) : turn.help();
   }
   if (token.startsWith("#detail:") && current) return turn.detail(current, token.slice(8) as Detail);
+  if (token.startsWith("#lage:")) {
+    const [, id, answer] = token.split(":");
+    const situation = findSituation(id);
+    if (situation) return turn.situationAnswer(situation, answer === "other" ? "other" : Number(answer));
+  }
   if (token.startsWith("#info:")) {
     const query = token.slice(6);
     return turn.information(query, searchServices(query).answer);
@@ -501,6 +571,11 @@ function handleText(turn: Turn, text: string) {
   const found = serviceIn(text);
 
   // Answers to the last question first.
+  if (pending.kind === "situation") {
+    const situation = findSituation(pending.id);
+    const answer = situation ? situationAnswerIn(situation, text) : undefined;
+    if (situation && answer !== undefined) return turn.situationAnswer(situation, answer);
+  }
   if (pending.kind === "confirm") {
     const named = placesIn(text, false);
     if (named.length === 1 && pendingService) return turn.forPlace(pendingService, named[0]);
@@ -511,11 +586,14 @@ function handleText(turn: Turn, text: string) {
     if (mentions(text, NO_PLACE)) return handleToken(turn, "#ohne-ort");
     if (turn.placeAnswer(text, pendingService)) return;
     // Not a place: either a new topic, or a place this portal does not know.
-    const otherTopic = found.service || found.options.length || mentions(text, [...STATUS, ...HUMAN]);
+    const otherTopic = found.service || found.options.length || mentions(text, [...STATUS, ...HUMAN]) || situationIn(text);
     if (!otherTopic) return turn.unknownPlace(text, pendingService);
   }
 
   c.pending = { kind: "none" };
+  // Everyday situations that name no service yet: one question instead of a guess.
+  const situation = found.service || CASE_NUMBER.test(text) ? undefined : situationIn(text);
+  if (situation) return turn.situation(situation);
   const strongStatus = mentions(text, STATUS) || CASE_NUMBER.test(text);
   if (strongStatus || (mentions(text, MY_APPLICATION) && !found.service)) return turn.status(text);
   if (mentions(text, SIMPLE)) return turn.simple();

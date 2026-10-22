@@ -182,6 +182,42 @@ const PARTS: Part[] = [
     ],
   },
   {
+    title: "Chat: unklare Anliegen aus dem Alltag",
+    intro: "Wer nur seine Lage schildert, bekommt eine gezielte Rückfrage mit Antwortknöpfen statt einer Trefferliste. Frei antworten geht auch. Führen zwei Rückfragen zu keiner Leistung, nennt der Assistent den Bürgerservice.",
+    steps: [
+      {
+        input: "Bei uns gibt es bald Zuwachs",
+        expect: "„Wer kommt dazu?“ mit „Ein Kind“, „Ein Hund“ und „Ein anderes Haustier“. Ein Kind: Kindergeld ohne Postleitzahl, dazu „Auch: Kitaplatz beantragen“. Ein Hund, oder getippt „einen Welpen“: Hund anmelden mit Frage nach der Postleitzahl.",
+        href: `/assistent?frage=${q("Bei uns gibt es bald Zuwachs")}`,
+        action: "Im Chat fragen",
+      },
+      {
+        input: "Mein Portemonnaie ist weg, da war alles drin",
+        expect: "„Was war darin?“ Bank- oder Kreditkarten: Die sperrt die Bank, das Portal kann nicht helfen, dann „War noch etwas darin?“. Der Personalausweis: zuerst den Verlust melden, dann der neue Ausweis beim Bürgeramt am Wohnort.",
+        href: `/assistent?frage=${q("Mein Portemonnaie ist weg, da war alles drin")}`,
+        action: "Im Chat fragen",
+      },
+      {
+        input: "Ich komme mit dem Geld nicht mehr aus",
+        expect: "„Wofür reicht das Geld vor allem nicht?“ Für die Miete: Wohngeld, mit Frage nach der Postleitzahl. Für die Kinder: Kindergeld, ohne.",
+        href: `/assistent?frage=${q("Ich komme mit dem Geld nicht mehr aus")}`,
+        action: "Im Chat fragen",
+      },
+      {
+        input: "Ich habe einen Brief vom Amt bekommen und verstehe ihn nicht",
+        expect: "„Steht im Brief eine Vorgangsnummer?“ Ja: Nummer schreiben, zum Beispiel die aus dem Kindergeld-Antrag in Teil 4. Nach der Anmeldung mit dem Demo-Konto nennt der Assistent den Stand. Nein: Hinweis auf den Briefkopf und der Bürgerservice.",
+        href: `/assistent?frage=${q("Ich habe einen Brief vom Amt bekommen und verstehe ihn nicht")}`,
+        action: "Im Chat fragen",
+      },
+      {
+        input: "Ich komme mit dem Geld nicht mehr aus, dann „Etwas anderes“ und „Es geht um meine Rente“",
+        expect: "Zur Rente gibt es keine Leistung im Katalog. Nach zwei Rückfragen rät der Assistent nicht weiter, sondern nennt den Bürgerservice.",
+        href: `/assistent?frage=${q("Ich komme mit dem Geld nicht mehr aus")}`,
+        action: "Im Chat fragen",
+      },
+    ],
+  },
+  {
     title: "Inhalte zum Nachsehen",
     intro: "Diese Inhalte findet die Suche im Bereich Informationen.",
     steps: [

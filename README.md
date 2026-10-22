@@ -12,7 +12,8 @@ Was der Prototyp zeigt:
 - **Wohnort vor der Suche**: vor den Treffern oder der Leistungsseite Postleitzahl oder Ort, damit das Portal die
   zuständige Stelle nennt; bei unklarer Weiche zwei Schritte („Was suchen Sie?“, „Wo wohnen Sie?“). Entfällt bei
   Leistungen mit einer Stelle für alle, etwa Kindergeld. „Meinen Standort verwenden“ als Demo
-- **Chat-Assistent** als Seite und als kleines Fenster, auf Basis derselben Suche
+- **Chat-Assistent** als Seite und als kleines Fenster, auf Basis derselben Suche; fragt bei unklaren Anliegen aus dem
+  Alltag gezielt nach („Mein Portemonnaie ist weg“) und verweist nach zwei Rückfragen an den Bürgerservice
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“
 - **So entscheidet die Suche** unter `/so-entscheidet-die-suche`: Diagramme und Punkteregeln für Stakeholder

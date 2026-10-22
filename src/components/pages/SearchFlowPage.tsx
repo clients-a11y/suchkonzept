@@ -520,6 +520,11 @@ export function SearchFlowPage() {
               unklar, fragt er „Möchten Sie etwas erledigen oder sich informieren?“. Passen mehrere Leistungen, etwa bei „Wir haben
               ein Baby bekommen“, fragt er, welche gemeint ist.
             </p>
+            <p>
+              Schildert jemand nur seine Lage, etwa „Mein Portemonnaie ist weg“ oder „Ich komme mit dem Geld nicht mehr aus“,
+              stellt er eine gezielte Rückfrage mit Antwortknöpfen. Die Lagen und ihre Antworten stehen als feste Liste in{" "}
+              <code>src/data/situations.ts</code>. Führen zwei Rückfragen zu keiner Leistung, nennt er den Bürgerservice.
+            </p>
           </div>
         </section>
 
