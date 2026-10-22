@@ -39,9 +39,9 @@ function FlowDiagram() {
   return (
     <svg
       className="t-flow__dia"
-      viewBox="0 0 1000 730"
+      viewBox="0 0 1000 1052"
       role="img"
-      aria-label="Ablauf: Eingabe, Vorschläge aus dem Leistungskatalog ohne Anfrage, Absenden, dann vergibt die Suchweiche Punkte. Mit genug Punkten für Leistungen geht genau eine Anfrage an Leistungen, mit genug Punkten für Informationen genau eine an Informationen, sonst fragt das Portal nach und erst die Wahl der Person löst die Anfrage aus."
+      aria-label="Ablauf: Eingabe, Vorschläge aus dem Leistungskatalog ohne Anfrage. Ein angeklickter Vorschlag fragt nach dem Wohnort und öffnet dann die Leistungsseite mit der zuständigen Stelle. Nach dem Absenden vergibt die Suchweiche Punkte. Mit genug Punkten ist der Bereich Leistungen oder Informationen gesetzt, sonst fragt das Portal zuerst „Was suchen Sie?“. In jedem Fall folgt die Frage nach dem Wohnort, erst danach geht genau eine Anfrage an Leistungen oder an Informationen."
     >
       <Markers prefix="sk-a" />
 
@@ -55,11 +55,17 @@ function FlowDiagram() {
       <text className="s" x="500" y="160" textAnchor="middle">nur aus dem Leistungskatalog</text>
       <text className="s" x="500" y="177" textAnchor="middle">keine Anfrage an das Backend</text>
 
-      <g className="box l"><rect x="40" y="114" width="220" height="72" rx="8" /></g>
-      <text className="t" x="150" y="146" textAnchor="middle">Leistungsseite</text>
-      <text className="s" x="150" y="166" textAnchor="middle">Vorschlag direkt geöffnet</text>
+      <g className="box"><rect x="40" y="114" width="220" height="72" rx="8" /></g>
+      <text className="t" x="150" y="140" textAnchor="middle">Wohnort angeben</text>
+      <text className="s" x="150" y="160" textAnchor="middle">Postleitzahl oder Ort</text>
+      <text className="s" x="150" y="177" textAnchor="middle">schon gemerkt: ein Klick</text>
       <line className="edge l dash" x1="360" y1="150" x2="264" y2="150" markerEnd={a("l")} />
       <text className="el l" x="312" y="140" textAnchor="middle">anklicken</text>
+
+      <line className="edge l" x1="150" y1="186" x2="150" y2="220" markerEnd={a("l")} />
+      <g className="box l"><rect x="40" y="224" width="220" height="56" rx="8" /></g>
+      <text className="t" x="150" y="248" textAnchor="middle">Leistungsseite</text>
+      <text className="s" x="150" y="267" textAnchor="middle">mit zuständiger Stelle</text>
 
       <line className="edge" x1="500" y1="186" x2="500" y2="220" markerEnd={a()} />
 
@@ -73,52 +79,62 @@ function FlowDiagram() {
       <text className="s" x="500" y="377" textAnchor="middle">Punkte für Leistungen (L)</text>
       <text className="s" x="500" y="393" textAnchor="middle">und Informationen (I)</text>
 
-      <polyline className="edge l" points="320,368 150,368 150,466" markerEnd={a("l")} />
+      <polyline className="edge l" points="320,368 150,368 150,676" markerEnd={a("l")} />
       <text className="el l" x="235" y="358" textAnchor="middle">L ≥ 3 und L ≥ I + 1</text>
-      <polyline className="edge i" points="680,368 850,368 850,466" markerEnd={a("i")} />
+      <polyline className="edge i" points="680,368 850,368 850,676" markerEnd={a("i")} />
       <text className="el i" x="765" y="358" textAnchor="middle">I ≥ 2 und I ≥ L + 1</text>
       <line className="edge q" x1="500" y1="434" x2="500" y2="466" markerEnd={a("q")} />
       <text className="el q" x="510" y="455">sonst</text>
 
-      <g className="box l"><rect x="40" y="470" width="220" height="76" rx="8" /></g>
-      <text className="t" x="150" y="496" textAnchor="middle">Anfrage Leistungen</text>
-      <text className="m" x="150" y="516" textAnchor="middle">GET /api/leistungen</text>
-      <text className="s" x="150" y="534" textAnchor="middle">genau eine Anfrage</text>
-
       <g className="box q"><rect x="340" y="470" width="320" height="76" rx="8" /></g>
       <text className="t" x="500" y="494" textAnchor="middle">Rückfrage „Was suchen Sie?“</text>
-      <text className="s" x="500" y="513" textAnchor="middle">Startseite: Overlay · Suchseite: im Inhalt</text>
+      <text className="s" x="500" y="513" textAnchor="middle">Startseite: Schritt 1 von 2 · Suchseite: im Inhalt</text>
       <text className="s" x="500" y="531" textAnchor="middle">noch keine Anfrage</text>
 
-      <g className="box i"><rect x="740" y="470" width="220" height="76" rx="8" /></g>
-      <text className="t" x="850" y="496" textAnchor="middle">Anfrage Informationen</text>
-      <text className="m" x="850" y="516" textAnchor="middle">GET /api/informationen</text>
-      <text className="s" x="850" y="534" textAnchor="middle">genau eine Anfrage</text>
+      <line className="edge l dash" x1="340" y1="508" x2="154" y2="508" markerEnd={a("l")} />
+      <text className="el l" x="247" y="499" textAnchor="middle">beantragen</text>
+      <line className="edge i dash" x1="660" y1="508" x2="846" y2="508" markerEnd={a("i")} />
+      <text className="el i" x="753" y="499" textAnchor="middle">informieren</text>
 
-      <line className="edge l dash" x1="340" y1="508" x2="264" y2="508" markerEnd={a("l")} />
-      <text className="el l" x="302" y="499" textAnchor="middle">beantragen</text>
-      <line className="edge i dash" x1="660" y1="508" x2="736" y2="508" markerEnd={a("i")} />
-      <text className="el i" x="698" y="499" textAnchor="middle">informieren</text>
+      <line className="edge q dash" x1="500" y1="546" x2="500" y2="576" markerEnd={a("q")} />
+      <text className="el q" x="510" y="566">Im Chat fragen</text>
+      <g className="box"><rect x="380" y="580" width="240" height="56" rx="8" /></g>
+      <text className="t" x="500" y="603" textAnchor="middle">Chat-Assistent</text>
+      <text className="s" x="500" y="622" textAnchor="middle">fragt nach, nutzt dieselbe Weiche</text>
 
-      <line className="edge l" x1="150" y1="546" x2="150" y2="596" markerEnd={a("l")} />
-      <line className="edge i" x1="850" y1="546" x2="850" y2="596" markerEnd={a("i")} />
-      <line className="edge q dash" x1="500" y1="546" x2="500" y2="596" markerEnd={a("q")} />
-      <text className="el q" x="510" y="576">Im Chat fragen</text>
+      <g className="box"><rect x="40" y="680" width="920" height="68" rx="8" /></g>
+      <text className="t" x="500" y="706" textAnchor="middle">Wohnort angeben, bei jeder Suche</text>
+      <text className="s" x="500" y="725" textAnchor="middle">Postleitzahl oder Ort · schon gemerkt: ein Klick auf „Weiter mit …“ · Suchseite: über den Treffern</text>
+      <text className="s" x="500" y="742" textAnchor="middle">damit jedes Ergebnis die zuständige Stelle nennen kann</text>
 
-      <g className="box l"><rect x="40" y="600" width="220" height="64" rx="8" /></g>
-      <text className="t" x="150" y="626" textAnchor="middle">Ergebnis Leistungen</text>
-      <text className="s" x="150" y="646" textAnchor="middle">„Das passt am besten“ und Liste</text>
+      <line className="edge l" x1="150" y1="748" x2="150" y2="786" markerEnd={a("l")} />
+      <line className="edge i" x1="850" y1="748" x2="850" y2="786" markerEnd={a("i")} />
 
-      <g className="box"><rect x="360" y="600" width="280" height="64" rx="8" /></g>
-      <text className="t" x="500" y="626" textAnchor="middle">Chat-Assistent</text>
-      <text className="s" x="500" y="646" textAnchor="middle">fragt nach, nutzt dieselbe Weiche</text>
+      <g className="box l"><rect x="40" y="790" width="220" height="76" rx="8" /></g>
+      <text className="t" x="150" y="816" textAnchor="middle">Anfrage Leistungen</text>
+      <text className="m" x="150" y="836" textAnchor="middle">GET /api/leistungen</text>
+      <text className="s" x="150" y="854" textAnchor="middle">genau eine Anfrage</text>
 
-      <g className="box i"><rect x="740" y="600" width="220" height="64" rx="8" /></g>
-      <text className="t" x="850" y="626" textAnchor="middle">Ergebnis Informationen</text>
-      <text className="s" x="850" y="646" textAnchor="middle">Stellen, Seiten, Projekte, Meldungen</text>
+      <text className="el" x="500" y="832" textAnchor="middle">erst jetzt geht eine Anfrage los</text>
 
-      <polyline className="edge dash" points="150,668 150,700 850,700 850,668" markerStart={a()} markerEnd={a()} />
-      <text className="el" x="500" y="720" textAnchor="middle">Knopf „Stattdessen in … suchen“ wechselt den Bereich, mit einer neuen Anfrage</text>
+      <g className="box i"><rect x="740" y="790" width="220" height="76" rx="8" /></g>
+      <text className="t" x="850" y="816" textAnchor="middle">Anfrage Informationen</text>
+      <text className="m" x="850" y="836" textAnchor="middle">GET /api/informationen</text>
+      <text className="s" x="850" y="854" textAnchor="middle">genau eine Anfrage</text>
+
+      <line className="edge l" x1="150" y1="866" x2="150" y2="916" markerEnd={a("l")} />
+      <line className="edge i" x1="850" y1="866" x2="850" y2="916" markerEnd={a("i")} />
+
+      <g className="box l"><rect x="40" y="920" width="220" height="64" rx="8" /></g>
+      <text className="t" x="150" y="946" textAnchor="middle">Ergebnis Leistungen</text>
+      <text className="s" x="150" y="966" textAnchor="middle">„Das passt am besten“ und Liste</text>
+
+      <g className="box i"><rect x="740" y="920" width="220" height="64" rx="8" /></g>
+      <text className="t" x="850" y="946" textAnchor="middle">Ergebnis Informationen</text>
+      <text className="s" x="850" y="966" textAnchor="middle">Stellen, Seiten, Projekte, Meldungen</text>
+
+      <polyline className="edge dash" points="150,988 150,1020 850,1020 850,988" markerStart={a()} markerEnd={a()} />
+      <text className="el" x="500" y="1040" textAnchor="middle">Knopf „Stattdessen in … suchen“ wechselt den Bereich, mit einer neuen Anfrage</text>
     </svg>
   );
 }
@@ -187,47 +203,50 @@ function PlaceDiagram() {
       className="t-flow__dia"
       viewBox="0 0 1000 360"
       role="img"
-      aria-label="Leistung gewählt. Bietet das Land die Leistung an, nennt das Portal das Ministerium ohne Frage nach dem Wohnort. Bei einer Leistung der Gemeinde nennt es die zuständige Stelle sofort, wenn der Wohnort bekannt ist, sonst fragt es nach Postleitzahl oder Ort."
+      aria-label="Bei jeder Suche und bei jedem Vorschlag: Ist ein Wohnort gemerkt, reicht ein Klick zum Bestätigen, sonst gibt die Person Postleitzahl oder Ort ein. Danach nennt das Portal zu jeder Leistung die zuständige Stelle: das Ministerium, wenn das Land die Leistung anbietet, sonst die Stelle am Wohnort."
     >
       <Markers prefix="sk-c" />
 
-      <g className="box l"><rect x="10" y="140" width="170" height="64" rx="8" /></g>
-      <text className="t" x="95" y="166" textAnchor="middle">Leistung gewählt</text>
-      <text className="s" x="95" y="186" textAnchor="middle">aus Ergebnis oder Vorschlag</text>
+      <g className="box"><rect x="10" y="140" width="170" height="64" rx="8" /></g>
+      <text className="t" x="95" y="166" textAnchor="middle">Suchen</text>
+      <text className="s" x="95" y="186" textAnchor="middle">oder Vorschlag wählen</text>
       <line className="edge" x1="180" y1="172" x2="196" y2="172" markerEnd={c()} />
 
-      <polygon className="dmd" points="300,122 400,172 300,222 200,172" />
-      <text className="t" x="300" y="168" textAnchor="middle">Wer bietet</text>
-      <text className="t" x="300" y="186" textAnchor="middle">sie an?</text>
+      <polygon className="dmd" points="290,122 380,172 290,222 200,172" />
+      <text className="t" x="290" y="168" textAnchor="middle">Wohnort</text>
+      <text className="t" x="290" y="186" textAnchor="middle">gemerkt?</text>
 
-      <polyline className="edge l" points="300,122 300,52 736,52" markerEnd={c("l")} />
-      <text className="el l" x="312" y="92">Land</text>
-      <g className="box l"><rect x="740" y="20" width="250" height="64" rx="8" /></g>
-      <text className="t" x="865" y="46" textAnchor="middle">Ministerium nennen</text>
-      <text className="s" x="865" y="66" textAnchor="middle">kein Wohnort nötig, z. B. Kindergeld</text>
+      <polyline className="edge" points="290,122 290,52 446,52" markerEnd={c()} />
+      <text className="el" x="302" y="92">ja</text>
+      <g className="box"><rect x="450" y="20" width="230" height="64" rx="8" /></g>
+      <text className="t" x="565" y="46" textAnchor="middle">Ort bestätigen</text>
+      <text className="s" x="565" y="66" textAnchor="middle">ein Klick: „Weiter mit Seehausen“</text>
 
-      <line className="edge l" x1="400" y1="172" x2="466" y2="172" markerEnd={c("l")} />
-      <text className="el l" x="434" y="162" textAnchor="middle">Gemeinde</text>
+      <polyline className="edge" points="290,222 290,308 446,308" markerEnd={c()} />
+      <text className="el" x="302" y="256">nein</text>
+      <g className="box"><rect x="450" y="270" width="230" height="76" rx="8" /></g>
+      <text className="t" x="565" y="294" textAnchor="middle">Postleitzahl oder Ort</text>
+      <text className="s" x="565" y="313" textAnchor="middle">sofort geprüft, ohne Datenbank</text>
+      <text className="s" x="565" y="331" textAnchor="middle">10480: Neudorf oder Mühlengrund</text>
 
-      <polygon className="dmd" points="560,120 650,172 560,224 470,172" />
-      <text className="t" x="560" y="168" textAnchor="middle">Wohnort</text>
-      <text className="t" x="560" y="186" textAnchor="middle">bekannt?</text>
+      <line className="edge" x1="565" y1="84" x2="565" y2="123" markerEnd={c()} />
+      <line className="edge" x1="565" y1="270" x2="565" y2="221" markerEnd={c()} />
 
-      <line className="edge l" x1="650" y1="172" x2="736" y2="172" markerEnd={c("l")} />
-      <text className="el l" x="694" y="162" textAnchor="middle">ja</text>
-      <g className="box l"><rect x="740" y="140" width="250" height="64" rx="8" /></g>
-      <text className="t" x="865" y="166" textAnchor="middle">Zuständige Stelle nennen</text>
-      <text className="s" x="865" y="186" textAnchor="middle">20100: Bürgeramt Beispielstadt</text>
+      <polygon className="dmd" points="565,127 650,172 565,217 480,172" />
+      <text className="t" x="565" y="168" textAnchor="middle">Wer bietet die</text>
+      <text className="t" x="565" y="186" textAnchor="middle">Leistung an?</text>
 
-      <line className="edge l" x1="560" y1="224" x2="560" y2="266" markerEnd={c("l")} />
-      <text className="el l" x="570" y="250">nein</text>
-      <g className="box l"><rect x="440" y="270" width="240" height="76" rx="8" /></g>
-      <text className="t" x="560" y="294" textAnchor="middle">Postleitzahl oder Ort erfragen</text>
-      <text className="s" x="560" y="313" textAnchor="middle">Inhalte bleiben sichtbar</text>
-      <text className="s" x="560" y="331" textAnchor="middle">10480: Neudorf oder Mühlengrund wählen</text>
+      <polyline className="edge l" points="650,172 700,172 700,92 736,92" markerEnd={c("l")} />
+      <text className="el l" x="692" y="132" textAnchor="end">Land</text>
+      <g className="box l"><rect x="740" y="60" width="250" height="64" rx="8" /></g>
+      <text className="t" x="865" y="86" textAnchor="middle">Ministerium nennen</text>
+      <text className="s" x="865" y="106" textAnchor="middle">überall gleich, z. B. Kindergeld</text>
 
-      <polyline className="edge l" points="680,308 865,308 865,208" markerEnd={c("l")} />
-      <text className="el l" x="772" y="298" textAnchor="middle">Ort bestimmt</text>
+      <polyline className="edge l" points="700,172 700,252 736,252" markerEnd={c("l")} />
+      <text className="el l" x="692" y="226" textAnchor="end">Gemeinde</text>
+      <g className="box l"><rect x="740" y="220" width="250" height="64" rx="8" /></g>
+      <text className="t" x="865" y="246" textAnchor="middle">Stelle am Wohnort nennen</text>
+      <text className="s" x="865" y="266" textAnchor="middle">20100: Bürgeramt Beispielstadt</text>
     </svg>
   );
 }
@@ -271,7 +290,7 @@ const RECORD: { field: string; value: string; use: string; search?: boolean }[] 
   { field: "Titel", value: "Kindergeld beantragen", use: "Suche, 6 je Wort", search: true },
   { field: "Schlagwörter", value: "kindergeld, familienkasse, familie, eltern, geburt", use: "Suche, 4 je Wort", search: true },
   { field: "Kurzbeschreibung", value: "Monatliche Unterstützung für Familien, ab dem Monat der Geburt.", use: "Suche, 1 je Wort", search: true },
-  { field: "Zuständig", value: "Land", use: "Wohnort nötig?" },
+  { field: "Zuständig", value: "Land", use: "Welche Stelle?" },
   { field: "Für", value: "Privatpersonen", use: "Filter" },
   { field: "Online möglich", value: "ja", use: "Kurzantwort" },
   { field: "Kosten, Dauer", value: "kostenlos, etwa 4 bis 6 Wochen", use: "Kurzantwort" },
@@ -289,7 +308,8 @@ export function SearchFlowPage() {
           <p className="t-lead">
             Das Backend durchsucht pro Anfrage genau einen Bereich: Leistungen oder Informationen. Bevor die Anfrage losgeht,
             entscheidet eine Weiche, welcher Bereich gemeint ist. Sie braucht dafür keine Datenbank, nur den Leistungskatalog
-            und feste Signalwörter. Ist sie unsicher, fragt sie nach, statt zu raten.
+            und feste Signalwörter. Ist sie unsicher, fragt sie nach, statt zu raten. Vor jeder Anfrage fragt das Portal nach
+            dem Wohnort, damit es die zuständige Stelle nennen kann.
           </p>
           <nav aria-label="Auf dieser Seite" className="t-jumps">
             <ul>
@@ -322,8 +342,9 @@ export function SearchFlowPage() {
               Beim Tippen entsteht keine Anfrage: Die Vorschläge kommen aus dem Leistungskatalog, der als feste Datei im Browser
               liegt. Die Weiche rechnet dabei schon mit. Zeigt sie klar auf Informationen, etwa bei „Neuigkeiten Kindergeld“,
               steht die Suche in Informationen oben in der Liste und keine Leistung wird als beste Antwort genannt. Nach dem
-              Absenden schickt die Weiche genau eine Anfrage in einen Bereich oder, wenn sie unsicher ist, gar keine und fragt
-              zuerst.
+              Absenden fragt das Portal nach dem Wohnort, bei einer unsicheren Weiche als zweiten Schritt nach „Was suchen
+              Sie?“. Erst dann geht genau eine Anfrage in einen Bereich. Auch ein angeklickter Vorschlag fragt zuerst nach dem
+              Wohnort, damit die Leistungsseite gleich die zuständige Stelle nennt.
             </figcaption>
           </figure>
         </section>
@@ -449,10 +470,10 @@ export function SearchFlowPage() {
         </section>
 
         <section aria-labelledby="wohnort">
-          <h2 id="wohnort" className="t-h2">Nach der Weiche: Wohnort erst bei Bedarf</h2>
+          <h2 id="wohnort" className="t-h2">Wohnort bei jeder Suche</h2>
           <p>
-            Ist eine Leistung gefunden, fragt das Portal nur dann nach dem Wohnort, wenn eine Gemeinde zuständig ist. Die
-            Informationen zur Leistung bleiben dabei immer sichtbar.
+            Wer auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an. So nennt jedes Ergebnis
+            gleich die zuständige Stelle. Ist der Ort schon gemerkt, reicht ein Klick auf „Weiter mit …“.
           </p>
           <figure className="t-flow__figure">
             <div className="t-flow__scroll">
@@ -461,7 +482,8 @@ export function SearchFlowPage() {
             <figcaption>
               Auch diese Prüfung braucht keine Datenbank: Die Orte mit ihren Postleitzahl-Bereichen liegen ebenfalls als feste
               Datei vor. Der Ort wird nur im Browser gemerkt. Suche, Leistungsseite, Antrag und Chat nutzen denselben Ort, damit
-              niemand ihn zweimal eingeben muss.
+              niemand ihn zweimal eingeben muss. Wer eine Leistungsseite direkt öffnet, etwa über „Häufig gesucht“, gibt den Ort
+              dort an. Die Inhalte der Seite sind auch ohne Angabe sichtbar.
             </figcaption>
           </figure>
         </section>

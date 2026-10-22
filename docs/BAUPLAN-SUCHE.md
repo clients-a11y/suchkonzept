@@ -15,8 +15,8 @@ Alles, was zum Suchkonzept gehört, mit seinen Inhalten (Details in `docs/BAUPLA
   Informationen), Punkteregeln, gepflegte Suchbegriffe, Erklärung „So hat die Suche entschieden“ mit der einen
   Backend-Anfrage, Knopf „Stattdessen in … suchen“.
 - **Overlay „Was suchen Sie?“** (`PotDialog`, `PotIcons`) bei unklaren Anfragen.
-- **Wohnort erst, wenn er gebraucht wird** (`HomePlace`, `PlaceFinder`, `src/lib/place-store.ts`,
-  `src/lib/offices.ts`): PLZ oder Ort, Auswahl bei mehreren Orten, zuständige Stelle.
+- **Wohnort** (`HomePlace`, `PlaceFinder`, `src/lib/place-store.ts`, `src/lib/offices.ts`): PLZ oder Ort,
+  Auswahl bei mehreren Orten, zuständige Stelle. Seit 22.10.2026 bei jeder Suche, siehe unten.
 - **Chat-Assistent** (`src/lib/assistant.ts`, `AssistantChat`, `AssistantDock`, `AssistantPage`,
   `src/lib/chat-store.ts`) auf Basis derselben Suche und Weiche.
 - **Leistungsseiten, Online-Antrag, Konto mit Postfach** (`src/data/forms.ts`, `src/lib/validate.ts`,
@@ -121,6 +121,12 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Ein unklarer Begriff zeigt die Wahl im Inhalt unter den Reitern. Die Texte sprechen Bürgerinnen und Bürger an
   („Etwas beantragen“, „Sich informieren“), der technische Hinweis zur Backend-Anfrage steht nur noch in
   „So hat die Suche entschieden“ auf der Ergebnisseite.
+- Wohnort bei jeder Suche (auf Wunsch, 22.10.2026, ersetzt „Wohnort erst bei Bedarf“): Wer auf der Startseite
+  auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an, damit jedes Ergebnis die
+  zuständige Stelle nennt. Ist die Weiche unsicher, führen zwei Schritte durch das Overlay (`SearchSteps` in
+  `PotDialog.tsx`): „Was suchen Sie?“, dann „Wo wohnen Sie?“. Ein gemerkter Ort braucht nur „Weiter mit …“, bei
+  mehreren Orten zu einer Postleitzahl schließt der Klick auf den Ort den Schritt ab. Auf der Suchseite steht der
+  Wohnort über den Treffern, ohne Overlay. Wer eine Leistungsseite direkt öffnet, gibt den Ort weiterhin dort an.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

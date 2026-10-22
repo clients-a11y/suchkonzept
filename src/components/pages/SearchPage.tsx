@@ -8,7 +8,8 @@ import type { CSSProperties } from "react";
 import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DiagramLink } from "@/components/DiagramLink";
-import { IconArrow, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
+import { HomePlace } from "@/components/HomePlace";
+import { IconArrow, IconCheck, IconPin, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { searchInformation, searchServices } from "@/lib/smart-search";
 import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
@@ -286,6 +287,13 @@ function SearchResults() {
   const results = (
     <div className="t-results">
       {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
+      {/* The place belongs to every search, so the hits can name the office in charge. */}
+      {q && (
+        <div className="t-place t-place--search">
+          <IconPin size={24} />
+          <HomePlace hint="Dann nennen wir bei jeder Leistung die zuständige Stelle. Die Angabe bleibt nur in diesem Browser." />
+        </div>
+      )}
       {services?.correction && services.correction.toLowerCase() !== q.toLowerCase() && (
         <p className="t-correction">
           Meinten Sie: <Link href={searchHref(services.correction, pot)}>{services.correction}</Link>?

@@ -31,7 +31,7 @@ const PARTS: Part[] = [
       },
       {
         input: "Kindergeld",
-        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“ Auf der Startseite getippt, öffnet sich die Frage als Overlay über der Seite.",
+        expect: "Ein einzelnes Thema kann beides sein. Die Suche rät nicht, sondern fragt: „Was suchen Sie?“ Auf der Startseite getippt, ist das Schritt 1 von 2 über der Seite, danach folgt der Wohnort.",
         href: `/suche?q=${q("Kindergeld")}`,
         action: "Suche öffnen",
       },
@@ -74,38 +74,38 @@ const PARTS: Part[] = [
     ],
   },
   {
-    title: "Wohnort erst, wenn er gebraucht wird",
-    intro: "Das Portal fragt nach dem Wohnort nur auf der Seite einer Leistung der Gemeinde, zum Beispiel beim Personalausweis. Die Eingabe wird sofort geprüft, ohne Datenbank, und gemerkt. Die Inhalte der Seite sind auch ohne Angabe sichtbar.",
+    title: "Wohnort bei jeder Suche",
+    intro: "Wer auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an. So nennt jedes Ergebnis die zuständige Stelle. Die Eingabe wird sofort geprüft, ohne Datenbank, und gemerkt. Vorher „Demo zurücksetzen“, sonst ist der Ort schon bekannt.",
     steps: [
       {
-        input: "10200 (bei „Wo wohnen Sie?“)",
-        expect: "Sofort: „10200 · Seehausen. Gemerkt.“ Rechts steht die zuständige Stelle: Bürgerbüro Seehausen.",
-        href: "/leistungen/personalausweis-beantragen",
-        action: "Leistungsseite öffnen",
+        input: "Kindergeld, dann „Suchen“",
+        expect: "Schritt 1 von 2: „Was suchen Sie?“. Nach „Etwas beantragen“ folgt Schritt 2: „Wo wohnen Sie?“. Mit 10200 erscheint sofort „10200 · Seehausen“, „Weiter“ öffnet die Treffer in Leistungen.",
+        href: "/",
+        action: "Startseite öffnen",
       },
       {
-        input: "20100",
-        expect: "Beispielstadt: Rechts steht das Bürgeramt Beispielstadt mit Adresse und Öffnungszeiten, dazu ein Link zur Seite des Amts. Kein Wechsel in ein anderes Portal.",
-        href: "/leistungen/personalausweis-beantragen",
-        action: "Leistungsseite öffnen",
+        input: "Personalausweis, dann den Vorschlag wählen",
+        expect: "Nur ein Schritt: „Wo wohnen Sie?“, denn der Vorschlag ist eindeutig. Mit 20100 öffnet sich die Leistungsseite, rechts steht das Bürgeramt Beispielstadt mit Adresse und Öffnungszeiten.",
+        href: "/",
+        action: "Startseite öffnen",
       },
       {
-        input: "10480",
-        expect: "Zwei Orte teilen sich die Postleitzahl. Sie wählen zwischen Neudorf und Mühlengrund.",
-        href: "/leistungen/personalausweis-beantragen",
-        action: "Leistungsseite öffnen",
+        input: "10480 (bei „Wo wohnen Sie?“)",
+        expect: "Zwei Orte teilen sich die Postleitzahl. Ein Klick auf Neudorf oder Mühlengrund schließt den Schritt ab.",
+        href: "/",
+        action: "Startseite öffnen",
       },
       {
-        way: "Leistungsseite „Kindergeld beantragen“",
-        expect: "Keine Frage nach dem Wohnort: Für Kindergeld ist das Land zuständig.",
-        href: "/leistungen/kindergeld-beantragen",
-        action: "Leistungsseite öffnen",
+        way: "Noch einmal suchen, zum Beispiel „Hund anmelden“",
+        expect: "Der Ort ist gemerkt: „Ihr Wohnort: Beispielstadt“ mit „Weiter mit Beispielstadt“. Wer umgezogen ist, wählt „Anderen Ort angeben“.",
+        href: "/",
+        action: "Startseite öffnen",
       },
     ],
   },
   {
     title: "Beantragung bis zum Formular",
-    intro: "Kindergeld ist eine Leistung des Landes. Deshalb fragt das Portal hier nicht nach dem Wohnort.",
+    intro: "Kindergeld ist eine Leistung des Landes. Zuständig ist deshalb überall dasselbe Ministerium, egal welcher Ort gemerkt ist.",
     steps: [
       {
         way: "Leistungsseite",
@@ -226,7 +226,8 @@ export function TestCasePage() {
           <h1 className="t-h1">Testfall Kindergeld</h1>
           <p className="t-lead">
             So zeigen Sie, wie das Portal Leistungen und Informationen auseinanderhält: Die Suche schaut immer nur in einem
-            Bereich nach. Ist eine Anfrage unklar, fragt sie nach, statt zu raten.
+            Bereich nach. Ist eine Anfrage unklar, fragt sie nach, statt zu raten. Vor jeder Suche fragt das Portal nach dem
+            Wohnort, damit es die zuständige Stelle nennen kann.
           </p>
         </div>
       </div>

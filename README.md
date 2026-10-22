@@ -9,7 +9,8 @@ Was der Prototyp zeigt:
 
 - **Zentrale Suche** in eigenen Worten mit Vorschlägen, Tippfehlerkorrektur und Kurzantwort
 - **Suchweiche** mit zwei Bereichen (Leistungen, Informationen) und Overlay „Was suchen Sie?“ bei unklaren Anfragen
-- **Wohnort erst bei Bedarf**: Leistungen der Gemeinden fragen nach Postleitzahl oder Ort und nennen die zuständige Stelle
+- **Wohnort bei jeder Suche**: vor den Treffern oder der Leistungsseite Postleitzahl oder Ort, damit das Portal die
+  zuständige Stelle nennt; bei unklarer Weiche zwei Schritte („Was suchen Sie?“, „Wo wohnen Sie?“)
 - **Chat-Assistent** als Seite und als kleines Fenster, auf Basis derselben Suche
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“

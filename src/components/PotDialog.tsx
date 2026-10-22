@@ -1,22 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef } from "react";
-import { IconArrow, IconBubble, IconClose } from "@/components/Icons";
+import { useEffect, useId, useRef, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { IconArrow, IconBubble, IconCheck, IconClose, IconPin } from "@/components/Icons";
 import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/components/PotIcons";
+import type { Place } from "@/data/places";
+import { SITE } from "@/data/site";
+import { findPlaces, setPlaceId, usePlace } from "@/lib/place-store";
+import type { Pot } from "@/lib/search-router";
 
-// The two answers to "Was suchen Sie?": in the overlay and on the search page.
-export function PotChoices({ query, onChoose }: { query: string; onChoose?: () => void }) {
-  const href = (pot: string) => `/suche?${new URLSearchParams({ q: query, in: pot }).toString()}`;
-  const choices = [
-    { pot: "leistungen", title: "Etwas beantragen", text: "Zum Beispiel einen Ausweis, eine Ummeldung oder Kindergeld", icon: <PictogramApplication size={36} /> },
-    { pot: "informationen", title: "Sich informieren", text: "Neuigkeiten, Erklärungen, Projekte und Ansprechpersonen", icon: <PictogramNews size={36} /> },
-  ];
+const CHOICES: { pot: Pot; title: string; text: string; icon: ReactNode }[] = [
+  { pot: "leistungen", title: "Etwas beantragen", text: "Zum Beispiel einen Ausweis, eine Ummeldung oder Kindergeld", icon: <PictogramApplication size={36} /> },
+  { pot: "informationen", title: "Sich informieren", text: "Neuigkeiten, Erklärungen, Projekte und Ansprechpersonen", icon: <PictogramNews size={36} /> },
+];
+
+function searchHref(query: string, pot?: Pot): string {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (pot) params.set("in", pot);
+  return `/suche?${params.toString()}`;
+}
+
+// The two answers to "Was suchen Sie?": links on the search page, buttons in the steps of the overlay.
+export function PotChoices({ query, onPick }: { query: string; onPick?: (pot: Pot) => void }) {
   return (
     <ul className="t-route__choices">
-      {choices.map((choice) => (
-        <li key={choice.pot}>
-          <Link href={href(choice.pot)} className="t-route__choice" onClick={onChoose}>
+      {CHOICES.map((choice) => {
+        const inner = (
+          <>
             <span className="t-route__icon">{choice.icon}</span>
             <span className="t-route__title">{choice.title}</span>
             {/* Read as two sentences, not as one long word. */}
@@ -25,32 +37,194 @@ export function PotChoices({ query, onChoose }: { query: string; onChoose?: () =
             <span className="t-route__arrow" aria-hidden="true">
               <IconArrow size={18} />
             </span>
-          </Link>
-        </li>
-      ))}
+          </>
+        );
+        return (
+          <li key={choice.pot}>
+            {onPick ? (
+              <button type="button" className="t-route__choice" onClick={() => onPick(choice.pot)}>
+                {inner}
+              </button>
+            ) : (
+              <Link href={searchHref(query, choice.pot)} className="t-route__choice">
+                {inner}
+              </Link>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-// The search switch could not decide: the question opens over the page instead of a new page.
-// A native modal dialog moves the focus inside, locks the page behind it and closes with Escape.
-export function PotDialog({ query, onClose, onChat }: { query: string | null; onClose: (dismissed: boolean) => void; onChat?: (q: string) => void }) {
+// Postcode or place, checked as it is typed against the static list of places. A remembered place is
+// shown and confirmed with one click.
+function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
+  const stored = usePlace();
+  const [editing, setEditing] = useState(!stored);
+  const [value, setValue] = useState("");
+  const [tried, setTried] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const ids = { input: useId(), hint: useId(), status: useId() };
+
+  // "Anderen Ort angeben" and the step change from the first question move the focus into the field.
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  if (stored && !editing) {
+    return (
+      <div className="t-stepplace">
+        <p className="t-stepplace__known">
+          <IconCheck size={18} />
+          <span>
+            Ihr Wohnort: <strong>{stored.name}</strong>
+          </span>
+        </p>
+        <div className="t-stepplace__actions">
+          <button type="button" className="t-btn t-btn--primary" data-autofocus onClick={() => onConfirm(stored)}>
+            Weiter mit {stored.name}
+            <IconArrow size={18} />
+          </button>
+          <button type="button" className="t-btn" onClick={() => setEditing(true)}>
+            Anderen Ort angeben
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const text = value.trim();
+  const digits = /^\d+$/.test(text);
+  const ready = digits ? text.length === 5 : text.length >= 3;
+  const matches = ready ? findPlaces(text) : [];
+  const place = matches.length === 1 ? matches[0] : undefined;
+
+  let status = "";
+  let problem = false;
+  if (place) status = `${digits ? `${text} · ` : ""}${place.name}`;
+  else if (ready && matches.length === 0) {
+    problem = true;
+    status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${text}“ kennen wir in ${SITE.region} nicht.`;
+  } else if (matches.length > 1) status = `Zu „${text}“ passen mehrere Orte. Bitte wählen Sie Ihren Ort.`;
+  else if (tried) {
+    problem = true;
+    status = "Bitte geben Sie Ihre Postleitzahl oder Ihren Ort ein.";
+  }
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (place) return onConfirm(place);
+    setTried(true);
+    inputRef.current?.focus();
+  };
+
+  return (
+    <form className="t-stepplace" onSubmit={submit} noValidate>
+      <label htmlFor={ids.input} className="t-stepplace__label">
+        Postleitzahl oder Ort
+      </label>
+      <div className="t-stepplace__row">
+        <input
+          ref={inputRef}
+          id={ids.input}
+          className="t-input"
+          value={value}
+          data-autofocus
+          autoComplete="postal-code"
+          spellCheck={false}
+          aria-describedby={`${ids.hint} ${ids.status}`}
+          aria-invalid={problem || undefined}
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+        />
+        <button type="submit" className="t-btn t-btn--primary">
+          Weiter
+          <IconArrow size={18} />
+        </button>
+      </div>
+      <p id={ids.hint} className="t-stepplace__hint">
+        Zum Beispiel 10200 oder Seehausen. Die Angabe bleibt nur in diesem Browser.
+      </p>
+      <p id={ids.status} role="status" className={place ? "t-stepplace__status t-stepplace__status--ok" : problem ? "t-stepplace__status t-stepplace__status--problem" : "t-stepplace__status"}>
+        {place && <IconCheck size={16} />}
+        {status}
+      </p>
+      {matches.length > 1 && (
+        <ul className="t-homeplace__matches" aria-label="Passende Orte">
+          {matches.map((p) => (
+            <li key={p.id}>
+              {/* Picking the place finishes the step, one click less than picking and then "Weiter". */}
+              <button type="button" className="t-chip" onClick={() => onConfirm(p)}>
+                {p.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </form>
+  );
+}
+
+// What the person asked for: a search the switch has placed (href), a search it could not place (no href:
+// the question comes first) or a page picked from the suggestions (href and title).
+export type SearchRequest = { query: string; href?: string; title?: string };
+
+// Steps before every search: "Was suchen Sie?" when the switch is unsure, then always the place, so the
+// results can name the office in charge. A native modal dialog keeps the focus inside and closes with Escape.
+export function SearchSteps({
+  request,
+  onClose,
+  onDone,
+  onChat,
+}: {
+  request: SearchRequest | null;
+  onClose: (dismissed: boolean) => void;
+  onDone: (href: string) => void;
+  onChat?: (q: string) => void;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
-  // Closed by a choice (a pot or the chat) or dismissed (Escape, close button, dimmed area).
+  // Closed by finishing the steps or the chat, or dismissed (Escape, close button, dimmed area).
   const chosen = useRef(false);
   const titleId = useId();
+  const twoSteps = Boolean(request && !request.href);
+  const [shownFor, setShownFor] = useState<SearchRequest | null>(null);
+  const [step, setStep] = useState<"pot" | "place">("place");
+  const [pot, setPot] = useState<Pot | undefined>();
+
+  // A new request starts at its first step.
+  if (request !== shownFor) {
+    setShownFor(request);
+    setStep(request && !request.href ? "pot" : "place");
+    setPot(undefined);
+  }
 
   useEffect(() => {
     const dialog = ref.current;
-    if (query && dialog && !dialog.open) dialog.showModal();
-    if (!query && dialog?.open) dialog.close();
-  }, [query]);
+    if (request && dialog && !dialog.open) {
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
+    if (!request && dialog?.open) dialog.close();
+  }, [request]);
 
   const close = () => ref.current?.close();
-  const choose = () => {
+
+  const confirm = (place: Place) => {
+    if (!request) return;
+    setPlaceId(place.id);
     chosen.current = true;
     close();
+    onDone(request.href ?? searchHref(request.query, pot));
   };
+
+  const query = request?.query ?? "";
+  const placeLead = request?.title
+    ? `Für „${request.title}“ nennen wir Ihnen die zuständige Stelle.`
+    : query
+      ? `Damit wir zu „${query}“ die zuständige Stelle nennen können.`
+      : "Damit wir die zuständige Stelle nennen können.";
 
   return (
     <dialog
@@ -66,41 +240,70 @@ export function PotDialog({ query, onClose, onChat }: { query: string | null; on
         if (event.target === ref.current) close();
       }}
     >
-      {query && (
+      {request && (
         <div className="t-potdialog__box">
           <div className="t-potdialog__head">
-            <span className="t-potdialog__mark">
-              <PictogramSwitch size={28} />
-            </span>
+            <span className="t-potdialog__mark">{step === "pot" ? <PictogramSwitch size={28} /> : <IconPin size={26} />}</span>
             <div>
+              {twoSteps && <p className="t-potdialog__step">Schritt {step === "pot" ? 1 : 2} von 2</p>}
               <h2 id={titleId} className="t-potdialog__title">
-                Was suchen Sie?
+                {step === "pot" ? "Was suchen Sie?" : "Wo wohnen Sie?"}
               </h2>
               <p className="t-potdialog__lead">
-                Zu „{query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.
+                {step === "pot" ? `Zu „${query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.` : placeLead}
               </p>
             </div>
-            <button type="button" className="t-potdialog__close" onClick={close} aria-label="Frage schließen">
+            <button type="button" className="t-potdialog__close" onClick={close} aria-label="Suche abbrechen">
               <IconClose size={20} />
             </button>
           </div>
-          <PotChoices query={query} onChoose={choose} />
-          {onChat && (
+
+          {twoSteps && (
+            <ol className="t-dsteps" aria-label="Fortschritt">
+              <li data-state={step === "pot" ? "current" : "done"}>
+                <span aria-current={step === "pot" ? "step" : undefined}>Bereich wählen</span>
+              </li>
+              <li data-state={step === "place" ? "current" : "todo"}>
+                <span aria-current={step === "place" ? "step" : undefined}>Wohnort angeben</span>
+              </li>
+            </ol>
+          )}
+
+          {step === "pot" ? (
+            <PotChoices
+              query={query}
+              onPick={(next) => {
+                setPot(next);
+                setStep("place");
+              }}
+            />
+          ) : (
+            <PlaceStep key={shownFor ? `${shownFor.query}|${shownFor.href ?? ""}` : "none"} onConfirm={confirm} />
+          )}
+
+          {(step === "pot" ? onChat : twoSteps) && (
             <div className="t-potdialog__foot">
-              <p className="t-potdialog__chat">
-                Nicht sicher?{" "}
-                <button
-                  type="button"
-                  className="t-textbutton t-potdialog__chatbutton"
-                  onClick={() => {
-                    choose();
-                    onChat(query);
-                  }}
-                >
-                  <IconBubble size={16} />
-                  Im Chat fragen
+              {step === "pot" && onChat ? (
+                <p className="t-potdialog__chat">
+                  Nicht sicher?{" "}
+                  <button
+                    type="button"
+                    className="t-textbutton t-potdialog__chatbutton"
+                    onClick={() => {
+                      chosen.current = true;
+                      close();
+                      onChat(query);
+                    }}
+                  >
+                    <IconBubble size={16} />
+                    Im Chat fragen
+                  </button>
+                </p>
+              ) : (
+                <button type="button" className="t-textbutton" onClick={() => setStep("pot")}>
+                  Zurück zu Schritt 1
                 </button>
-              </p>
+              )}
             </div>
           )}
         </div>

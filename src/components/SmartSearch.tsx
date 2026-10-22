@@ -12,14 +12,16 @@ import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { openAssistant } from "@/lib/assistant-dock";
 import { routeQuery } from "@/lib/search-router";
-import { PotDialog } from "@/components/PotDialog";
+import { SearchSteps } from "@/components/PotDialog";
+import type { SearchRequest } from "@/components/PotDialog";
 
 // The highlighted first suggestion: the best service, or the information search when the switch points there.
 function isLead(item: { key: string }): boolean {
   return item.key.startsWith("answer") || item.key === "info-top";
 }
 
-type Item = { key: string; group: string; href?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
+// title: the service a suggestion opens, named again when the place is asked for.
+type Item = { key: string; group: string; href?: string; title?: string; fill?: string; chat?: boolean; label: string; node: ReactNode };
 
 function ServiceFacts({ service }: { service: Service }) {
   return (
@@ -45,8 +47,8 @@ export function SmartSearch({ label }: { label: string }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [announcement, setAnnouncement] = useState("");
-  // Query the search switch could not place: asked in an overlay.
-  const [asking, setAsking] = useState<string | null>(null);
+  // The steps before a search: "Was suchen Sie?" if unclear, then always the place.
+  const [request, setRequest] = useState<SearchRequest | null>(null);
   // From sending until the results page takes over: the button shows that the search runs.
   const [searching, setSearching] = useState(false);
 
@@ -83,6 +85,7 @@ export function SmartSearch({ label }: { label: string }) {
             key: s.slug,
             group: "Häufige Anliegen",
             href: `/leistungen/${s.slug}`,
+            title: s.title,
             label: s.title,
             node: s.title,
           });
@@ -122,6 +125,7 @@ export function SmartSearch({ label }: { label: string }) {
         key: `answer-${answer.slug}`,
         group: "Das passt am besten",
         href: `/leistungen/${answer.slug}`,
+            title: answer.title,
         label: `Das passt am besten: ${answer.title}. ${answer.online ? "Online möglich" : "Termin vor Ort"}`,
         node: (
           <span className="t-smart__answer">
@@ -134,13 +138,14 @@ export function SmartSearch({ label }: { label: string }) {
     }
     for (const hit of result.services.filter((h) => h.service.slug !== answer?.slug).slice(0, 4)) {
       const s = hit.service;
-      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, label: s.title, node: s.title });
+      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, title: s.title, label: s.title, node: s.title });
     }
     for (const s of result.related) {
       list.push({
         key: `rel-${s.slug}`,
         group: "Das brauchen Sie oft auch",
         href: `/leistungen/${s.slug}`,
+            title: s.title,
         label: s.title,
         node: s.title,
       });
@@ -216,9 +221,8 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
-    if (item.key === "all" && !routeQuery(trimmed).pot) return setAsking(trimmed);
-    if (["all", "info", "info-top"].includes(item.key)) setSearching(true);
-    if (item.href) router.push(item.href);
+    if (item.key === "all") return setRequest(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed });
+    if (item.href) setRequest({ query: trimmed, href: item.href, title: item.title });
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -282,14 +286,11 @@ export function SmartSearch({ label }: { label: string }) {
         role="search"
         className="t-smart__form"
         onSubmit={(event) => {
+          // Every search first asks for the place; an unclear one asks "Was suchen Sie?" before that.
+          event.preventDefault();
           setOpen(false);
-          // Unclear between services and information: ask over the page instead of guessing.
-          if (trimmed && !routeQuery(trimmed).pot) {
-            event.preventDefault();
-            setAsking(trimmed);
-            return;
-          }
-          setSearching(true);
+          if (!trimmed) return setRequest({ query: "", href: "/suche" });
+          setRequest(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed });
         }}
       >
         <div className="t-smart__head">
@@ -372,11 +373,15 @@ export function SmartSearch({ label }: { label: string }) {
       <p className="visually-hidden" role="status">
         {announcement}
       </p>
-      <PotDialog
-        query={asking}
+      <SearchSteps
+        request={request}
         onClose={(dismissed) => {
-          setAsking(null);
+          setRequest(null);
           if (dismissed) inputRef.current?.focus();
+        }}
+        onDone={(href) => {
+          if (href.startsWith("/suche")) setSearching(true);
+          router.push(href);
         }}
         onChat={askChat}
       />
