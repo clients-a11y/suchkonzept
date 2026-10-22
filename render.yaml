@@ -1,0 +1,16 @@
+# Render Blueprint: one web service for the prototype. Render asks for DEMO_PASSWORD when the
+# Blueprint is created; the password gate in src/proxy.ts then protects every page. Without it the
+# preview stays closed in production.
+services:
+  - type: web
+    name: suchkonzept
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DEMO_PASSWORD
+        sync: false
