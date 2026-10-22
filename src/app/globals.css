@@ -2151,21 +2151,22 @@ main:focus {
 .t-dsteps {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0.375rem;
   margin: 0;
   padding: 0;
   list-style: none;
   counter-reset: dstep;
 }
 
+/* Kept quiet: a hairline and small numbers, the step label above the title says the rest. */
 .t-dsteps li {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 4px solid var(--c-line-soft);
+  gap: 0.375rem;
+  padding-top: 0.375rem;
+  border-top: 2px solid var(--c-line-soft);
   color: var(--c-muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   counter-increment: dstep;
 }
 
@@ -2174,35 +2175,33 @@ main:focus {
   display: grid;
   flex: none;
   place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 2px solid var(--c-line);
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1px solid var(--c-line);
   border-radius: 50%;
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   font-weight: 600;
+  line-height: 1;
 }
 
 .t-dsteps li[data-state="done"] {
-  border-top-color: var(--c-blue);
-  color: var(--c-text);
+  border-top-color: var(--c-tint);
 }
 
 .t-dsteps li[data-state="done"]::before {
   content: "✓" / "";
   border-color: var(--c-blue);
-  background: var(--c-blue);
-  color: var(--c-white);
+  color: var(--c-blue);
 }
 
 .t-dsteps li[data-state="current"] {
-  border-top-color: var(--c-navy);
-  color: var(--c-navy);
-  font-weight: 600;
+  border-top-color: var(--c-blue);
+  color: var(--c-text);
 }
 
 .t-dsteps li[data-state="current"]::before {
-  border-color: var(--c-navy);
-  background: var(--c-navy);
+  border-color: var(--c-blue);
+  background: var(--c-blue);
   color: var(--c-white);
 }
 
