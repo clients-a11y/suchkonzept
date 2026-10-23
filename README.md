@@ -38,5 +38,6 @@ Mit der Umgebungsvariable `DEMO_PASSWORD` schützt ein Passwort-Gate alle Seiten
 - `src/app/(portal)/` Routen ohne Präfix, `src/app/zugang/` Passwort-Gate
 - `src/app/globals.css` ein Stylesheet, Klassen mit `t-`, Farben als CSS-Variablen
 
+Übergabe an die Entwicklung (Technik, Aufbau, was simuliert ist): [docs/UEBERGABE.md](docs/UEBERGABE.md).
 Umbauplan und Stand: [docs/BAUPLAN-SUCHE.md](docs/BAUPLAN-SUCHE.md). Vorgeschichte als mandantenfähiger Klick-Dummy:
 [docs/BAUPLAN.md](docs/BAUPLAN.md). Fotos: [docs/BILDER.md](docs/BILDER.md).
