@@ -75,8 +75,8 @@ export function UserTestPage() {
           <p className="t-case__step">Verwaltungsportal Musterland · Prototyp mit Beispieldaten</p>
           <h1 className="t-h1">Testszenarien</h1>
           <p className="t-lead">
-            Aufgaben für Tests mit echten Nutzerinnen und Nutzern. Sie prüfen Annahme 1 des Product Owners: Leistung und
-            Informationen können auf einer einzigen Ergebnisseite stehen.
+            Mit diesen Aufgaben prüfen wir an echten Menschen die Annahme 1 des Product Owners. Sie besagt, dass Leistung und
+            Informationen zusammen auf eine Ergebnisseite passen.
           </p>
           <p className="t-actions">
             <Link href="/" className="t-btn">
@@ -88,8 +88,8 @@ export function UserTestPage() {
 
       <div className="t-container t-page t-scens">
         <p className="t-scens__status">
-          <strong>Stand:</strong> Gebaut ist noch der bisherige Ablauf mit der Frage nach dem Wohnort vor den Treffern. Die
-          Ergebnisseite aus Annahme 1 fehlt. Die Szenarien mit „Szenario starten“ laufen deshalb im bisherigen Ablauf.
+          Die Ergebnisseite aus Annahme 1 fehlt noch. Wer heute auf „Szenario starten“ klickt, landet im bisherigen Ablauf, der
+          vor den Treffern nach dem Wohnort fragt.
         </p>
 
         <section aria-labelledby="ablauf">
@@ -97,12 +97,12 @@ export function UserTestPage() {
             So läuft der Test
           </h2>
           <ol className="t-scens__steps">
-            <li>Bitten Sie die Testperson, laut zu denken. Getestet wird die Seite, nicht die Person.</li>
-            <li>Starten Sie jedes Szenario über seinen Knopf. Er setzt den Prototyp zurück, als wäre es der erste Besuch.</li>
-            <li>Lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu. Die Orte sind erfunden, echte Postleitzahlen kennt der Prototyp nicht.</li>
-            <li>Helfen Sie nicht, und verwenden Sie keine Wörter von der Seite wie „Leistung“ oder „Bereich“.</li>
-            <li>Fragen Sie nach jeder Aufgabe: „Wie leicht oder schwer war das, von 1 sehr schwer bis 7 sehr leicht?“ Danach die Fragen aus dem Szenario.</li>
-            <li>Planen Sie 5 bis 8 Testpersonen und 30 bis 45 Minuten je Sitzung ein. Wechseln Sie die Reihenfolge der Szenarien.</li>
+            <li>Bitten Sie die Testperson, beim Klicken laut zu denken. Sagen Sie ihr, dass sie nichts falsch machen kann, weil wir die Seite testen.</li>
+            <li>Starten Sie jedes Szenario über seinen Knopf. Der löscht den Wohnort, das Demo-Konto und den Chatverlauf vom letzten Durchgang.</li>
+            <li>Lesen Sie die Aufgabe vor und geben Sie der Person die Wohnortkarte. Der Prototyp kennt nur erfundene Orte, mit der eigenen Postleitzahl käme sie nicht weiter.</li>
+            <li>Helfen Sie nicht, auch wenn es schwerfällt. Sagen Sie auch nie „Leistung“ oder „Bereich“. Die Wörter stehen auf der Seite und verraten, wonach die Person suchen soll.</li>
+            <li>Nach jeder Aufgabe fragen Sie „Wie leicht oder schwer war das, von 1 sehr schwer bis 7 sehr leicht?“ und dann die Fragen aus dem Szenario.</li>
+            <li>Planen Sie 5 bis 8 Personen und je Sitzung 30 bis 45 Minuten ein. Wechseln Sie die Reihenfolge der Szenarien, denn mit jeder Aufgabe kennt die Person die Seite besser.</li>
           </ol>
         </section>
 
@@ -133,8 +133,8 @@ export function UserTestPage() {
             Optional: Chat-Assistent
           </h2>
           <p className="t-case__intro">
-            Der Chat ist im Portal ausgeblendet, damit er die Tests der Suche nicht beeinflusst. Zeigen Sie ihn erst am Ende einer
-            Sitzung. Weitere Abläufe stehen im <Link href="/testfall/chat">Testfall Chat-Assistent</Link>.
+            Im Portal ist der Chat aus, damit die Testpersonen die Suche benutzen. Zeigen Sie ihn am Ende einer Sitzung, wenn noch
+            Zeit ist. Mehr Abläufe stehen im <Link href="/testfall/chat">Testfall Chat-Assistent</Link>.
           </p>
           <ol className="t-scens__list">
             <ScenarioCard scenario={CHAT_SCENARIO} href="/assistent" />
