@@ -3362,22 +3362,10 @@ button.t-route__choice {
 }
 
 /* Scenario overview: cards per case. */
-.t-scens__two {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
-  gap: 1rem 2rem;
-  margin-top: 1rem;
-}
-
 .t-scens__notes {
   max-width: 52rem;
   margin: 1.25rem 0 0;
   padding-left: 1.25rem;
-}
-
-.t-scens__lead {
-  max-width: 52rem;
-  margin-top: 0.25rem;
 }
 
 .t-scards {
@@ -3458,24 +3446,6 @@ button.t-route__choice {
   margin-top: auto;
   padding-top: 0.25rem;
   color: var(--c-blue);
-}
-
-.t-scard__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin: 0;
-  padding: 0;
-  color: var(--c-text);
-  font-size: 0.8125rem;
-  list-style: none;
-}
-
-.t-scard__tags li {
-  padding: 0.125rem 0.5rem;
-  border: 1px solid var(--c-line-soft);
-  border-radius: var(--radius);
-  background: var(--c-surface-2);
 }
 
 /* One scenario: path on the left, start on the right. */
@@ -4307,13 +4277,6 @@ button.t-route__choice {
 .t-footer__reset:hover {
   color: var(--c-white);
   text-decoration: underline;
-}
-
-.t-footer__status:not(:empty) {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--c-on-dark);
-  font-size: 0.875rem;
 }
 
 .t-footer__address {

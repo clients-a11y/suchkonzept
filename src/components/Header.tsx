@@ -6,8 +6,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { IconBubble, IconClose, IconMenu, IconSearch, IconUser } from "@/components/Icons";
 import { Wordmark } from "@/components/Wordmark";
-import { CHAT_IN_PORTAL, SITE } from "@/data/site";
-import { useVariant } from "@/lib/variant-store";
+import { CHAT_IN_PORTAL, SEARCH_PATH, SITE } from "@/data/site";
 import { useAccount } from "@/lib/account-store";
 
 // Escape closes, focus goes back to the button. A new page closes it too.
@@ -76,8 +75,6 @@ export function Header() {
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open, setOpen]);
 
-  const variant = useVariant();
-
   return (
     <header className="t-header" ref={headerRef}>
       <div className="t-container t-masthead">
@@ -85,7 +82,7 @@ export function Header() {
           <Wordmark />
         </Link>
         <div className="t-masthead__tools">
-          <Link href={variant === 2 ? "/ergebnisse" : "/suche"} className="t-tool">
+          <Link href={SEARCH_PATH} className="t-tool">
             <IconSearch />
             <span className="t-tool__text">Suche</span>
           </Link>

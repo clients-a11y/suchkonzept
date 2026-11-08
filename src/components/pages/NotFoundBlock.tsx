@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SEARCH_PATH } from "@/data/site";
 
 export function NotFoundBlock() {
   return (
@@ -9,7 +10,7 @@ export function NotFoundBlock() {
         <Link href="/" className="t-btn t-btn--primary">
           Zur Startseite
         </Link>
-        <Link href="/suche" className="t-btn">
+        <Link href={SEARCH_PATH} className="t-btn">
           Suche öffnen
         </Link>
       </p>

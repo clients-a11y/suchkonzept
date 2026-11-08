@@ -21,6 +21,11 @@ export const CHAT_IN_PORTAL: boolean = false;
 // The list of suggestions under the search field comes back with the AI search. Set to true to show it again.
 export const SUGGESTIONS_IN_SEARCH: boolean = false;
 
+// The user tests show one results page for services and information. Set to false for the earlier flow,
+// which asks "Was suchen Sie?" and for the place before the results (/suche).
+export const ONE_RESULTS_PAGE: boolean = true;
+export const SEARCH_PATH = ONE_RESULTS_PAGE ? "/ergebnisse" : "/suche";
+
 // The one portal of this prototype: services of the Land and its municipalities in one place.
 // Musterland, its places and everything on these pages are fictional.
 export const SITE: Site = {

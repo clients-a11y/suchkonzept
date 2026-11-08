@@ -157,6 +157,9 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Sprachwechsel. Im Footer steht jetzt eine Spalte „Prototyp“ mit Übersicht Testszenarien, Testfällen und „Demo zurücksetzen“.
 - Testszenarien neu gegliedert (auf Wunsch, 08.11.2026): `/testszenarien` zeigt Karten nach Fällen, `/testszenarien/[id]`
   je Szenario Ausgangslage, Klickpfade, Prüfpunkte und den Start. Die Seite `/testszenarien/testfaelle` entfällt.
+- Vereinfacht (auf Wunsch, 08.11.2026): Getestet wird nur noch die eine Ergebnisseite, in fünf Szenarien mit je einem
+  Klickpfad. Weiche und Frage nach dem Wohnort vor den Treffern sind über `ONE_RESULTS_PAGE` abgeschaltet und bleiben im Code.
+  Das Feld für den Ort fehlt, wenn alle gezeigten Leistungen überall dieselbe Stelle haben.
 - Startseite: „Häufig gesucht“ ist entfernt (auf Wunsch, 08.11.2026), „Aktuelle Themen“ stehen an dessen Stelle direkt unter der Suche.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)

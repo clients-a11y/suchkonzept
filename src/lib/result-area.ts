@@ -5,8 +5,7 @@ import { routeQuery } from "@/lib/search-router";
 import { normalize, searchServices } from "@/lib/smart-search";
 import type { Service } from "@/lib/types";
 
-// What the area for services shows on the one results page of variant 2 (Annahme 1). Later an AI makes this
-// decision; the prototype takes the rules of the search switch and the catalogue.
+// What the area for services shows on the one results page. Later an AI makes this decision; the prototype takes the rules of the search switch and the catalogue.
 export type ResultArea =
   | { kind: "services"; services: Service[] } // Fall 1
   | { kind: "needPlace" } // Fall 2: a service, but without a place there is nothing to show

@@ -14,8 +14,8 @@ import { latencyFor } from "@/lib/search-latency";
 import { searchInformation } from "@/lib/smart-search";
 import type { Service } from "@/lib/types";
 
-// Variant 2, Annahme 1 of the product owner: services and information on one results page. The area for
-// services on top changes with the case; the wording of its texts comes from the product owner.
+// Services and information on one results page. The area for services on top changes with the case; the
+// wording of its texts comes from the product owner.
 const ACTION = "/ergebnisse";
 
 function ServiceResult({ service, best }: { service: Service; best: boolean }) {
@@ -84,6 +84,8 @@ function ResultBody({ q }: { q: string }) {
   const area = resultArea(q, place, enteredHere);
   const information = searchInformation(q);
   const field = <RegionField key={placeId} label="PLZ/Ort für regionale Ergebnisse" initial={place?.name ?? ""} onPlace={choose} />;
+  // Services with one office for everyone: a place would change nothing.
+  const placeMatters = area.kind !== "services" || area.services.some((s) => s.level !== "land");
 
   return (
     <div className="t-results t-lbpage">
@@ -101,7 +103,7 @@ function ResultBody({ q }: { q: string }) {
             <h2 id={titles.services} className="t-h2">
               Leistungen
             </h2>
-            {area.kind !== "needPlace" && !refining && field}
+            {area.kind !== "needPlace" && placeMatters && !refining && field}
           </div>
           {refining && <SearchPending />}
           {!refining && area.kind === "services" && (

@@ -10,11 +10,10 @@ import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
-import { CHAT_IN_PORTAL, SUGGESTIONS_IN_SEARCH } from "@/data/site";
+import { CHAT_IN_PORTAL, ONE_RESULTS_PAGE, SEARCH_PATH, SUGGESTIONS_IN_SEARCH } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 import { placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
-import { getVariant } from "@/lib/variant-store";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
 
@@ -234,8 +233,8 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
-    // Variant 2 has no steps before the results: a service opens, everything else is a search.
-    if (getVariant() === 2) return go(item.title && item.href ? item.href : resultsHref(trimmed));
+    // The one results page has no steps before it: a service opens, everything else is a search.
+    if (ONE_RESULTS_PAGE) return go(item.title && item.href ? item.href : resultsHref(trimmed));
     if (item.key === "all") return start(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed }, undefined, true);
     if (!item.href) return;
     // A service decides by its own office, a search by the service it clearly leads to. A suggested service
@@ -311,14 +310,14 @@ export function SmartSearch({ label }: { label: string }) {
   return (
     <div className="t-smart">
       <Form
-        action="/suche"
+        action={SEARCH_PATH}
         role="search"
         className="t-smart__form"
         onSubmit={(event) => {
           // A search asks for the place first; an unclear one asks "Was suchen Sie?" before that.
           event.preventDefault();
           setOpen(false);
-          if (getVariant() === 2) return go(trimmed ? resultsHref(trimmed) : "/ergebnisse");
+          if (ONE_RESULTS_PAGE) return go(trimmed ? resultsHref(trimmed) : "/ergebnisse");
           if (!trimmed) return start({ query: "", href: "/suche" });
           start(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed }, undefined, true);
         }}
