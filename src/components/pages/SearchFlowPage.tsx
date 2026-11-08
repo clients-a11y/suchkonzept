@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import Link from "next/link";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
 // "So entscheidet die Suche": the search switch explained for stakeholders, with diagrams.
@@ -95,12 +96,6 @@ function FlowDiagram() {
       <text className="el l" x="247" y="499" textAnchor="middle">beantragen</text>
       <line className="edge i dash" x1="660" y1="508" x2="846" y2="508" markerEnd={a("i")} />
       <text className="el i" x="753" y="499" textAnchor="middle">informieren</text>
-
-      <line className="edge q dash" x1="500" y1="546" x2="500" y2="576" markerEnd={a("q")} />
-      <text className="el q" x="510" y="566">Im Chat fragen</text>
-      <g className="box"><rect x="380" y="580" width="240" height="56" rx="8" /></g>
-      <text className="t" x="500" y="603" textAnchor="middle">Chat-Assistent</text>
-      <text className="s" x="500" y="622" textAnchor="middle">fragt nach, nutzt dieselbe Weiche</text>
 
       <g className="box"><rect x="40" y="680" width="920" height="68" rx="8" /></g>
       <text className="t" x="500" y="706" textAnchor="middle">Wohnort angeben, damit jedes Ergebnis die zuständige Stelle nennt</text>
@@ -515,6 +510,10 @@ export function SearchFlowPage() {
           </div>
           <div className="t-flow__card">
             <h3 className="t-h3">Chat-Assistent</h3>
+            <p>
+              Für die Tests mit Nutzerinnen und Nutzern ist der Chat im Portal ausgeblendet. Zu sehen ist er im{" "}
+              <Link href="/testfall/chat">eigenen Testfall</Link>.
+            </p>
             <p>
               Der Chat nutzt dieselbe Weiche. Ist Informationen gemeint, zeigt er passende Seiten und Meldungen. Ist die Anfrage
               unklar, fragt er „Möchten Sie etwas erledigen oder sich informieren?“. Passen mehrere Leistungen, etwa bei „Wir haben

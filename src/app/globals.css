@@ -3508,6 +3508,105 @@ button.t-route__choice {
   font-weight: 600;
 }
 
+/* ---------- Test scenarios for user tests ---------- */
+
+.t-scens {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.t-scens__status {
+  max-width: 52rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--c-ask);
+  border-radius: var(--radius);
+  background: var(--c-ask-bg);
+}
+
+.t-scens__steps {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 52rem;
+  margin: 1rem 0 0;
+  padding-left: 1.5rem;
+}
+
+.t-scens__list {
+  display: grid;
+  gap: 1.25rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.t-scen {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--c-line-soft);
+  border-top: 4px solid var(--c-blue);
+  border-radius: var(--radius);
+}
+
+.t-scen__label {
+  color: var(--c-navy);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.t-scen__task {
+  display: grid;
+  gap: 0.375rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--c-tint);
+  font-size: 1.125rem;
+}
+
+.t-scen__home {
+  font-size: 1rem;
+}
+
+.t-scen__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+  gap: 1rem 2rem;
+}
+
+.t-scen__block {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+}
+
+.t-scen__block ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.t-scen__term {
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+}
+
+.t-scen__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.t-scen__foot p {
+  flex: 1 1 20rem;
+}
+
+.t-scen__foot[data-ready="false"] strong {
+  color: var(--c-ask);
+}
+
 /* ---------- Page "So entscheidet die Suche" ---------- */
 
 .t-flow {

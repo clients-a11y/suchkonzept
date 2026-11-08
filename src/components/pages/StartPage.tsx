@@ -8,7 +8,7 @@ import { TopicIcon } from "@/components/TopicIcons";
 import { LIFE_SITUATIONS, NEWS, TOP_TASKS } from "@/data/content";
 import { PROJECTS, PROJECTS_PAGE } from "@/data/projects";
 import { findService } from "@/data/services";
-import { SITE } from "@/data/site";
+import { CHAT_IN_PORTAL, SITE } from "@/data/site";
 import type { Service } from "@/lib/types";
 
 
@@ -113,7 +113,7 @@ export function StartPage() {
               {SITE.contact.office}, Telefon {SITE.contact.phone}, {SITE.contact.hours}.
             </p>
           </div>
-          <ChatButton className="t-btn t-btn--inverse">Chat-Assistent fragen</ChatButton>
+          {CHAT_IN_PORTAL && <ChatButton className="t-btn t-btn--inverse">Chat-Assistent fragen</ChatButton>}
         </div>
       </section>
     </>

@@ -5,7 +5,7 @@ import { resetAccount } from "@/lib/account-store";
 import { clearChat } from "@/lib/chat-store";
 import { setPlaceId } from "@/lib/place-store";
 
-function reset() {
+export function resetDemo() {
   setPlaceId("");
   resetAccount();
   clearChat();
@@ -19,7 +19,7 @@ export function DemoReset({ explained = false }: { explained?: boolean }) {
       type="button"
       className={explained ? "t-btn" : "t-topbar__link t-topbar__reset"}
       onClick={() => {
-        reset();
+        resetDemo();
         setStatus(explained ? "Zurückgesetzt. Die Vorführung startet wie beim ersten Besuch." : "Zurückgesetzt.");
       }}
     >

@@ -7,7 +7,7 @@ import type { RefObject } from "react";
 import { DemoReset } from "@/components/DemoReset";
 import { IconBook, IconBubble, IconClose, IconGlobe, IconHand, IconMenu, IconSearch, IconUser } from "@/components/Icons";
 import { Wordmark } from "@/components/Wordmark";
-import { SITE } from "@/data/site";
+import { CHAT_IN_PORTAL, SITE } from "@/data/site";
 import { languageSlug } from "@/data/content";
 import { useAccount } from "@/lib/account-store";
 
@@ -140,6 +140,9 @@ export function Header() {
           <div className="t-topbar__demo">
             <span className="t-tag">Prototyp</span>
             <span className="t-topbar__note">Nur Beispieldaten</span>
+            <Link href="/testszenarien" className="t-topbar__link">
+              Testszenarien
+            </Link>
             <Link href="/testfall" className="t-topbar__link">
               Testfall Kindergeld
             </Link>
@@ -194,12 +197,14 @@ export function Header() {
               </li>
             ))}
             {/* On phones the floating chat button would cover the page: the chat sits in the menu. */}
-            <li className="t-nav__chat">
-              <Link href="/assistent" className="t-nav__link" aria-current={current(pathname, "/assistent")} onClick={close}>
-                <IconBubble size={18} />
-                Chat-Assistent
-              </Link>
-            </li>
+            {CHAT_IN_PORTAL && (
+              <li className="t-nav__chat">
+                <Link href="/assistent" className="t-nav__link" aria-current={current(pathname, "/assistent")} onClick={close}>
+                  <IconBubble size={18} />
+                  Chat-Assistent
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </nav>

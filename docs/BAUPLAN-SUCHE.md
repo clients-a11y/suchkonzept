@@ -138,6 +138,10 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   zufällige Treffer. Jetzt erkennt der Assistent Lagen ohne Leistung (`src/data/situations.ts`: Zuwachs, Portemonnaie
   weg, Geld reicht nicht, Brief vom Amt) und fragt einmal gezielt nach, mit Antwortknöpfen oder freier Antwort. Nach
   zwei Rückfragen ohne Leistung nennt er den Bürgerservice. Eigener Teil im Testfall.
+- Vorbereitung der Nutzertests (auf Wunsch, 08.11.2026): `/testszenarien` liegt als eigene Seite vor dem Portal und
+  beschreibt Aufgaben, Beobachtungen und Erfolgskriterien zu Annahme 1 des Product Owners (Leistung und Informationen
+  auf einer Ergebnisseite). Die Ergebnisseite aus Annahme 1 ist noch nicht gebaut. Der Chat ist im Portal ausgeblendet
+  (`CHAT_IN_PORTAL`), seine Seite bleibt erreichbar, der optionale Testfall liegt unter `/testfall/chat`.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

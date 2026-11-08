@@ -61,7 +61,7 @@ const PARTS: Part[] = [
     steps: [
       {
         input: "Kinderg",
-        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“, „… im Chat fragen“ und „… in Informationen und Meldungen suchen“.",
+        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“ und „… in Informationen und Meldungen suchen“.",
         href: "/",
         action: "Startseite öffnen",
       },
@@ -140,6 +140,19 @@ const PARTS: Part[] = [
     ],
   },
   {
+    title: "Inhalte zum Nachsehen",
+    intro: "Diese Inhalte findet die Suche im Bereich Informationen.",
+    steps: [
+      { way: "Infoseite „Kindergeld: Das Wichtigste für Familien“", expect: "Wer es bekommt, wie hoch es ist und wie der Antrag geht.", href: "/seite/kindergeld", action: "Infoseite öffnen" },
+      { way: "Meldungen", expect: "Zwei Meldungen des Ministeriums zum Kindergeld und eine des Jugendamts Beispielstadt.", href: "/aktuelles", action: "Aktuelles öffnen" },
+      { way: "Ministerium", expect: "Aufgaben, Leitung, Kontakt und die Leistung Kindergeld.", href: "/organisation/gesundheit", action: "Ministerium öffnen" },
+    ],
+  },
+];
+
+// Shown only on request: the chat is not part of the portal during the user tests.
+const CHAT_PARTS: Part[] = [
+  {
     title: "Chat-Assistent",
     intro: "Der Assistent nutzt dieselbe Weiche wie die Suche. Ist sie unsicher, fragt er nach.",
     steps: [
@@ -173,12 +186,6 @@ const PARTS: Part[] = [
         href: `/assistent?frage=${q("Mein Ausweis läuft ab")}`,
         action: "Im Chat fragen",
       },
-      {
-        way: "Im Chatfenster der Startseite: „Hund anmelden“, dann „Beispielstadt“",
-        expect: "Das Fenster nennt das Steueramt Beispielstadt. Das Gespräch bleibt erhalten, wenn Sie danach im Portal weiterblättern.",
-        href: "/",
-        action: "Startseite öffnen",
-      },
     ],
   },
   {
@@ -205,7 +212,7 @@ const PARTS: Part[] = [
       },
       {
         input: "Ich habe einen Brief vom Amt bekommen und verstehe ihn nicht",
-        expect: "„Steht im Brief eine Vorgangsnummer?“ Ja: Nummer schreiben, zum Beispiel die aus dem Kindergeld-Antrag in Teil 4. Nach der Anmeldung mit dem Demo-Konto nennt der Assistent den Stand. Nein: Hinweis auf den Briefkopf und der Bürgerservice.",
+        expect: "„Steht im Brief eine Vorgangsnummer?“ Ja: Nummer schreiben, zum Beispiel die aus dem Kindergeld-Antrag im Testfall Kindergeld. Nach der Anmeldung mit dem Demo-Konto nennt der Assistent den Stand. Nein: Hinweis auf den Briefkopf und der Bürgerservice.",
         href: `/assistent?frage=${q("Ich habe einen Brief vom Amt bekommen und verstehe ihn nicht")}`,
         action: "Im Chat fragen",
       },
@@ -215,15 +222,6 @@ const PARTS: Part[] = [
         href: `/assistent?frage=${q("Ich komme mit dem Geld nicht mehr aus")}`,
         action: "Im Chat fragen",
       },
-    ],
-  },
-  {
-    title: "Inhalte zum Nachsehen",
-    intro: "Diese Inhalte findet die Suche im Bereich Informationen.",
-    steps: [
-      { way: "Infoseite „Kindergeld: Das Wichtigste für Familien“", expect: "Wer es bekommt, wie hoch es ist und wie der Antrag geht.", href: "/seite/kindergeld", action: "Infoseite öffnen" },
-      { way: "Meldungen", expect: "Zwei Meldungen des Ministeriums zum Kindergeld und eine des Jugendamts Beispielstadt.", href: "/aktuelles", action: "Aktuelles öffnen" },
-      { way: "Ministerium", expect: "Aufgaben, Leitung, Kontakt und die Leistung Kindergeld.", href: "/organisation/gesundheit", action: "Ministerium öffnen" },
     ],
   },
 ];
@@ -283,6 +281,28 @@ export function TestCasePage() {
         <DiagramLink />
         <DemoReset explained />
         {PARTS.map((part, index) => (
+          <PartSection key={part.title} part={part} index={index} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+export function ChatTestCasePage() {
+  return (
+    <>
+      <div className="t-pagehead">
+        <div className="t-container">
+          <Breadcrumb items={[{ label: "Testfall Chat-Assistent", href: "/testfall/chat" }]} />
+          <h1 className="t-h1">Testfall Chat-Assistent</h1>
+          <p className="t-lead">
+            Optional: Im Portal ist der Chat für die Tests ausgeblendet. Hier zeigen Sie ihn gezielt, wenn in der Sitzung Zeit bleibt.
+          </p>
+        </div>
+      </div>
+      <div className="t-container t-page t-testcase">
+        <DemoReset explained />
+        {CHAT_PARTS.map((part, index) => (
           <PartSection key={part.title} part={part} index={index} />
         ))}
       </div>

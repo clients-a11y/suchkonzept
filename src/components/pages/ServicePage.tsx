@@ -8,7 +8,7 @@ import { HomePlace } from "@/components/HomePlace";
 import { IconArrow, IconCheck, IconPin } from "@/components/Icons";
 import { landUnitFor, localUnitFor } from "@/data/organisation";
 import { findService } from "@/data/services";
-import { SITE } from "@/data/site";
+import { CHAT_IN_PORTAL, SITE } from "@/data/site";
 import { type Office, responsibleOffice } from "@/lib/offices";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
@@ -236,9 +236,11 @@ function ServiceView({ service }: { service: Service }) {
               <br />
               {SITE.contact.hours}
             </p>
-            <ChatButton question={service.title} className="t-btn t-btn--small">
-              Im Chat fragen
-            </ChatButton>
+            {CHAT_IN_PORTAL && (
+              <ChatButton question={service.title} className="t-btn t-btn--small">
+                Im Chat fragen
+              </ChatButton>
+            )}
           </section>
         </aside>
       </div>

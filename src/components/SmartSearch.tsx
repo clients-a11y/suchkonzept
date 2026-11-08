@@ -10,6 +10,7 @@ import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
+import { CHAT_IN_PORTAL } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 import { placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
@@ -166,20 +167,22 @@ export function SmartSearch({ label }: { label: string }) {
         </>
       ),
     });
-    list.push({
-      key: "chat",
-      group: "",
-      chat: true,
-      label: `„${trimmed}“ im Chat fragen`,
-      node: (
-        <>
-          <span className="t-smart__chatoption">
-            <IconBubble size={16} />„{trimmed}“ im Chat fragen
-          </span>
-          <IconArrow size={16} />
-        </>
-      ),
-    });
+    if (CHAT_IN_PORTAL) {
+      list.push({
+        key: "chat",
+        group: "",
+        chat: true,
+        label: `„${trimmed}“ im Chat fragen`,
+        node: (
+          <>
+            <span className="t-smart__chatoption">
+              <IconBubble size={16} />„{trimmed}“ im Chat fragen
+            </span>
+            <IconArrow size={16} />
+          </>
+        ),
+      });
+    }
     if (!infoFirst) {
       list.push({
         key: "info",
@@ -378,10 +381,12 @@ export function SmartSearch({ label }: { label: string }) {
             {searching && <span className="t-spinner" aria-hidden="true" />}
             {searching ? "Suche läuft …" : "Suchen"}
           </button>
-          <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
-            <IconBubble size={20} />
-            Im Chat fragen
-          </button>
+          {CHAT_IN_PORTAL && (
+            <button type="button" className="t-btn t-smart__submit t-smart__chat" onClick={() => askChat(trimmed)}>
+              <IconBubble size={20} />
+              Im Chat fragen
+            </button>
+          )}
         </div>
         <p id={ids.hint} className="t-smart__hint">
           In eigenen Worten, zum Beispiel „Garage bauen“.
@@ -398,7 +403,7 @@ export function SmartSearch({ label }: { label: string }) {
           if (dismissed) inputRef.current?.focus();
         }}
         onDone={go}
-        onChat={askChat}
+        onChat={CHAT_IN_PORTAL ? askChat : undefined}
       />
     </div>
   );

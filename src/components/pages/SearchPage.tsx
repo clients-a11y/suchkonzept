@@ -19,6 +19,7 @@ import { pluralize } from "@/lib/format";
 import { placeMatters, responsibleOffice } from "@/lib/offices";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
+import { CHAT_IN_PORTAL } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 
 const OTHER: Record<Pot, Pot> = { leistungen: "informationen", informationen: "leistungen" };
@@ -264,7 +265,7 @@ function SearchResults() {
             Für „{q}“ bitte einen Suchbereich wählen.
           </p>
           <PotQuestion q={q} route={route} />
-          <AssistantHint q={q} />
+          {CHAT_IN_PORTAL && <AssistantHint q={q} />}
         </div>
       </>
     );
@@ -347,7 +348,7 @@ function SearchResults() {
           <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
         </div>
       )}
-      {q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
+      {CHAT_IN_PORTAL && q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
     </div>
   );
 

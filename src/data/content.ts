@@ -1,3 +1,4 @@
+import { CHAT_IN_PORTAL } from "@/data/site";
 import type { ContentPage, NewsItem } from "@/lib/types";
 
 // News of the Land and of Beispielstadt in one list. Every picture is an AI-generated sample photo.
@@ -70,7 +71,7 @@ const PAGES: ContentPage[] = [
     sections: [
       { id: "leistungen", title: "Land und Gemeinden an einem Ort", body: ["Manche Leistungen bietet das Land selbst an, zum Beispiel das Kindergeld. Für andere ist Ihre Gemeinde zuständig, zum Beispiel für den Personalausweis.", "Für Leistungen der Gemeinden fragt das Portal erst auf der Seite der Leistung nach Ihrem Wohnort. Alle Informationen zur Leistung sehen Sie auch ohne Angabe."] },
       { id: "suche", title: "Suche in eigenen Worten", body: ["Sie können Ihr Anliegen so beschreiben, wie Sie es sagen würden, zum Beispiel „Ich ziehe um“.", "Die Suche schaut immer in einem Bereich nach: bei den Leistungen oder bei den Informationen. Ist das unklar, fragt sie nach."] },
-      { id: "prototyp", title: "Ein Prototyp mit Beispieldaten", body: ["Dieses Portal ist ein Prototyp. Musterland, Beispielstadt, alle Stellen, Personen, Beträge und Meldungen sind erfunden.", "Die Fotos sind KI-generierte Beispielbilder. Suche und Chat-Assistent arbeiten mit festen Regeln im Browser."] },
+      { id: "prototyp", title: "Ein Prototyp mit Beispieldaten", body: ["Dieses Portal ist ein Prototyp. Musterland, Beispielstadt, alle Stellen, Personen, Beträge und Meldungen sind erfunden.", "Die Fotos sind KI-generierte Beispielbilder. Die Suche arbeitet mit festen Regeln im Browser."] },
     ],
   },
   {
@@ -80,7 +81,7 @@ const PAGES: ContentPage[] = [
     sections: [
       { id: "buergerservice", title: "Bürgerservice Musterland", body: ["Schlossplatz 1, 10000 Musterstadt.", "Telefon 0100 123 45 67, Montag bis Freitag 8 bis 18 Uhr.", "E-Mail buergerservice@musterland.example."] },
       { id: "beispielstadt", title: "Bürgeramt Beispielstadt", body: ["Marktplatz 1, 20000 Beispielstadt.", "Telefon 0200 98 76 54. Öffnungszeiten stehen auf der Seite Rathaus Beispielstadt."] },
-      { id: "chat", title: "Chat-Assistent", body: ["Der Chat-Assistent hilft rund um die Uhr, die passende Leistung und die zuständige Stelle zu finden. Er ist eine automatische Hilfe, keine Person."] },
+      ...(CHAT_IN_PORTAL ? [{ id: "chat", title: "Chat-Assistent", body: ["Der Chat-Assistent hilft rund um die Uhr, die passende Leistung und die zuständige Stelle zu finden. Er ist eine automatische Hilfe, keine Person."] }] : []),
     ],
   },
   {

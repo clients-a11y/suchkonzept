@@ -16,6 +16,10 @@ type Site = {
   searchDiagram: string;
 };
 
+// The chat is left out of the portal for the user tests: no window, no links to it. Its page stays
+// reachable for the optional test case /testfall/chat. Set to true to bring it back everywhere.
+export const CHAT_IN_PORTAL: boolean = false;
+
 // The one portal of this prototype: services of the Land and its municipalities in one place.
 // Musterland, its places and everything on these pages are fictional.
 export const SITE: Site = {
@@ -54,7 +58,7 @@ export const SITE: Site = {
       links: [
         { label: "Kontakt", href: "/seite/kontakt" },
         { label: "Hilfe zum Portal", href: "/seite/hilfe" },
-        { label: "Chat-Assistent", href: "/assistent" },
+        ...(CHAT_IN_PORTAL ? [{ label: "Chat-Assistent", href: "/assistent" }] : []),
       ],
     },
   ],
