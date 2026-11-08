@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { IconArrow, IconBubble, IconCheck, IconClose, IconPin } from "@/components/Icons";
 import { LocateButton } from "@/components/LocateButton";
+import { SearchPending } from "@/components/SearchPending";
 import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/components/PotIcons";
 import type { Place } from "@/data/places";
 import { SITE } from "@/data/site";
 import { findPlaces, setPlaceId, usePlace } from "@/lib/place-store";
+import { latencyFor, markEvaluated } from "@/lib/search-latency";
 import type { Pot } from "@/lib/search-router";
 
 const CHOICES: { pot: Pot; title: string; text: string; icon: ReactNode }[] = [
@@ -182,8 +184,9 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
 
 // What the person asked for: a search the switch has placed (href), a search it could not place (no href:
 // the question comes first) or a page picked from the suggestions (href and title). place: whether the
-// place is asked; not for a service with one office for everyone, such as Kindergeld.
-export type SearchRequest = { query: string; href?: string; title?: string; place: boolean };
+// place is asked; not for a service with one office for everyone, such as Kindergeld. wait: the search still
+// has to judge the request, which later takes an AI 1 to 3 seconds.
+export type SearchRequest = { query: string; href?: string; title?: string; place: boolean; wait?: boolean };
 
 // Steps before a search: "Was suchen Sie?" when the switch is unsure, then the place, so the results can
 // name the office in charge. A native modal dialog keeps the focus inside and closes with Escape.
@@ -204,13 +207,13 @@ export function SearchSteps({
   const titleId = useId();
   const twoSteps = Boolean(request && !request.href && request.place);
   const [shownFor, setShownFor] = useState<SearchRequest | null>(null);
-  const [step, setStep] = useState<"pot" | "place">("place");
+  const [step, setStep] = useState<"wait" | "pot" | "place">("place");
   const [pot, setPot] = useState<Pot | undefined>();
 
   // A new request starts at its first step.
   if (request !== shownFor) {
     setShownFor(request);
-    setStep(request && !request.href ? "pot" : "place");
+    setStep(request?.wait ? "wait" : request && !request.href ? "pot" : "place");
     setPot(undefined);
   }
 
@@ -230,6 +233,26 @@ export function SearchSteps({
     close();
     onDone(href);
   };
+
+  // After the wait the search knows what comes next: a question, the place or straight to the results.
+  const proceed = useEffectEvent(() => {
+    if (!request) return;
+    markEvaluated(request.query);
+    if (!request.href) setStep("pot");
+    else if (request.place) setStep("place");
+    else finish(request.href);
+  });
+
+  useEffect(() => {
+    if (step !== "wait" || !request) return;
+    const timer = window.setTimeout(() => proceed(), latencyFor(request.query));
+    return () => window.clearTimeout(timer);
+  }, [step, request]);
+
+  // A step that follows the wait starts at its first control.
+  useEffect(() => {
+    ref.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, [step]);
 
   const confirm = (place: Place) => {
     if (!request) return;
@@ -258,7 +281,15 @@ export function SearchSteps({
         if (event.target === ref.current) close();
       }}
     >
-      {request && (
+      {request && step === "wait" && (
+        <div className="t-potdialog__box t-potdialog__box--wait">
+          <h2 id={titleId} className="visually-hidden">
+            Suche läuft
+          </h2>
+          <SearchPending />
+        </div>
+      )}
+      {request && step !== "wait" && (
         <div className="t-potdialog__box">
           <div className="t-potdialog__head">
             <span className="t-potdialog__mark">{step === "pot" ? <PictogramSwitch size={28} /> : <IconPin size={26} />}</span>

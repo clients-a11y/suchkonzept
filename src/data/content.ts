@@ -95,6 +95,23 @@ const PAGES: ContentPage[] = [
     ],
   },
   {
+    slug: "angeln",
+    title: "Angeln und Angelschein in Musterland",
+    lead: "Wo Sie in Musterland angeln dürfen und was Sie dafür brauchen.",
+    sections: [
+      { id: "gewaesser", title: "Gewässer", body: ["Angeln können Sie an den Seen und Flüssen in Seehausen, Neudorf und Beispielstadt. Waldheim hat keine eigenen Gewässer und stellt deshalb keinen Fischereischein aus.", "Der nächste See liegt von Waldheim aus in Seehausen."] },
+      { id: "schein", title: "Fischereischein", body: ["Zum Angeln brauchen Sie die bestandene Fischerprüfung und einen Fischereischein. Ausgestellt wird er von Gemeinden mit eigenen Gewässern."] },
+    ],
+  },
+  {
+    slug: "heizung",
+    title: "Neue Heizung: Zuschüsse in den Gemeinden",
+    lead: "Einige Gemeinden in Musterland zahlen einen Zuschuss für neue Heizungen.",
+    sections: [
+      { id: "gemeinden", title: "Welche Gemeinden mitmachen", body: ["Die Gemeinden entscheiden selbst, ob sie einen Zuschuss zahlen. Ein eigenes Antragsverfahren gibt es im Portal noch nicht.", "Fragen Sie bei Ihrer Gemeinde nach, ob sie einen Zuschuss anbietet."] },
+    ],
+  },
+  {
     slug: "impressum",
     title: "Impressum",
     lead: "Angaben zum Anbieter dieses Portals. Alle Angaben sind Beispieldaten.",

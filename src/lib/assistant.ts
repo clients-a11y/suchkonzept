@@ -6,7 +6,7 @@ import { SITUATIONS, findSituation, type Situation } from "@/data/situations";
 import { SITE } from "@/data/site";
 import { STATUS_LABEL, type Account, type Application } from "@/lib/account-store";
 import { formatDate, pluralize } from "@/lib/format";
-import { type Office, landOffice, officeForPlace, responsibleOffice } from "@/lib/offices";
+import { type Office, landOffice, offeredIn, officeForPlace, responsibleOffice } from "@/lib/offices";
 import { findPlaces } from "@/lib/place-store";
 import { normalize, searchInformation, searchServices } from "@/lib/smart-search";
 import { routeQuery } from "@/lib/search-router";
@@ -229,6 +229,12 @@ class Turn {
     this.c.place = place.id;
     this.c.pending = { kind: "none" };
     if (place.id !== this.env.placeId) this.effects.placeId = place.id;
+    if (!offeredIn(service, place)) {
+      return this.say({
+        text: [`„${service.title}“ gibt es in ${place.name} nicht.`],
+        choices: [{ label: "Anderen Ort angeben", value: "#ort-aendern" }, TALK_TO_HUMAN],
+      });
+    }
     this.say({
       text: [`Für „${service.title}“ in ${place.name} ist zuständig:`],
       office: officeForPlace(place, service),

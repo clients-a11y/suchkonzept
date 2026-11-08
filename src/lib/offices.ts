@@ -25,6 +25,11 @@ export function officeForPlace(place: Place, service: Service): Office {
   return unit ? ofUnit(unit) : place;
 }
 
+// Some places do not offer every municipal service.
+export function offeredIn(service: Service, place: Place): boolean {
+  return !service.notOfferedIn?.includes(place.id);
+}
+
 // The place is asked before every search, so the results can name the office in charge. Not when the
 // search clearly leads to a service with one office for everyone (a service of the Land, like Kindergeld).
 export function placeMatters(query: string): boolean {
@@ -34,5 +39,5 @@ export function placeMatters(query: string): boolean {
 // The office in charge. Municipal services need the place; without it there is no answer yet.
 export function responsibleOffice(service: Service, place?: Place): Office | undefined {
   if (service.level === "land") return landOffice(service);
-  return place ? officeForPlace(place, service) : undefined;
+  return place && offeredIn(service, place) ? officeForPlace(place, service) : undefined;
 }

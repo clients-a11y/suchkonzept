@@ -9,7 +9,7 @@ import { IconArrow, IconCheck, IconPin } from "@/components/Icons";
 import { landUnitFor, localUnitFor } from "@/data/organisation";
 import { findService } from "@/data/services";
 import { CHAT_IN_PORTAL, SITE } from "@/data/site";
-import { type Office, responsibleOffice } from "@/lib/offices";
+import { type Office, offeredIn, responsibleOffice } from "@/lib/offices";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
 
@@ -56,6 +56,8 @@ function Responsible({ service }: { service: Service }) {
           <OfficeLines office={office} />
           <p className="t-box__note">{land ? "Diese Leistung bietet das Land selbst an." : `Zuständig für ${place?.name}.`}</p>
         </>
+      ) : place && !offeredIn(service, place) ? (
+        <p className="t-box__note">In {place.name} gibt es diese Leistung nicht.</p>
       ) : (
         <p className="t-box__note">
           Hängt von Ihrem Wohnort ab. Geben Sie Postleitzahl oder Ort ein. Alle Informationen zur Leistung gelten auch ohne Angabe.

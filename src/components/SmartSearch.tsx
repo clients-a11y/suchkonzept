@@ -14,12 +14,17 @@ import { CHAT_IN_PORTAL } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 import { placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
+import { getVariant } from "@/lib/variant-store";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
 
 // The highlighted first suggestion: the best service, or the information search when the switch points there.
 function isLead(item: { key: string }): boolean {
   return item.key.startsWith("answer") || item.key === "info-top";
+}
+
+function resultsHref(query: string): string {
+  return `/ergebnisse?q=${encodeURIComponent(query)}`;
 }
 
 // title: the service a suggestion opens, named again when the place is asked for. central: one office for
@@ -229,21 +234,24 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
-    if (item.key === "all") return start(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed });
+    // Variant 2 has no steps before the results: a service opens, everything else is a search.
+    if (getVariant() === 2) return go(item.title && item.href ? item.href : resultsHref(trimmed));
+    if (item.key === "all") return start(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed }, undefined, true);
     if (!item.href) return;
-    // A service decides by its own office, a search by the service it clearly leads to.
-    start({ query: trimmed, href: item.href, title: item.title }, item.title ? !item.central : placeMatters(trimmed));
+    // A service decides by its own office, a search by the service it clearly leads to. A suggested service
+    // comes from the catalogue, so nothing has to be judged first.
+    start({ query: trimmed, href: item.href, title: item.title }, item.title ? !item.central : placeMatters(trimmed), !item.title);
   };
 
   const go = (href: string) => {
-    if (href.startsWith("/suche")) setSearching(true);
+    if (href.startsWith("/suche") || href.startsWith("/ergebnisse")) setSearching(true);
     router.push(href);
   };
 
   // Every search asks for the place first, unless it clearly leads to a service with one office for everyone.
-  const start = (next: Omit<SearchRequest, "place">, place = placeMatters(next.query)) => {
-    if (next.href && !place) return go(next.href);
-    setRequest({ ...next, place });
+  const start = (next: Omit<SearchRequest, "place" | "wait">, place = placeMatters(next.query), wait = false) => {
+    if (next.href && !place && !wait) return go(next.href);
+    setRequest({ ...next, place, wait });
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -310,8 +318,9 @@ export function SmartSearch({ label }: { label: string }) {
           // A search asks for the place first; an unclear one asks "Was suchen Sie?" before that.
           event.preventDefault();
           setOpen(false);
+          if (getVariant() === 2) return go(trimmed ? resultsHref(trimmed) : "/ergebnisse");
           if (!trimmed) return start({ query: "", href: "/suche" });
-          start(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed });
+          start(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed }, undefined, true);
         }}
       >
         <div className="t-smart__head">

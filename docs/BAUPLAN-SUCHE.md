@@ -142,6 +142,13 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   beschreibt Aufgaben, Beobachtungen und Erfolgskriterien zu Annahme 1 des Product Owners (Leistung und Informationen
   auf einer Ergebnisseite). Die Ergebnisseite aus Annahme 1 ist noch nicht gebaut. Der Chat ist im Portal ausgeblendet
   (`CHAT_IN_PORTAL`), seine Seite bleibt erreichbar, der optionale Testfall liegt unter `/testfall/chat`.
+- Variante 2 (auf Wunsch, 08.11.2026): `/ergebnisse` ist die eine Ergebnisseite aus Annahme 1, gesteuert über
+  `src/lib/result-area.ts`. `src/lib/variant-store.ts` merkt die Variante, die Testfälle setzen sie. Später bewertet eine
+  KI die Suche und braucht 1 bis 3 Sekunden. Der Prototyp entscheidet weiter mit festen Regeln und spielt die Zeit mit
+  `SearchPending` und `src/lib/search-latency.ts` nach. Beispieldaten: Waldheim hat keine Gewässer und bietet keinen
+  Fischereischein an (`notOfferedIn`), Hund, Fischereischein und Baugenehmigung gibt es nur mit Ort (`regional`).
+  Die Übersicht `/testszenarien` zeigt Kurzbeschreibung und Prozessflows, `/testszenarien/testfaelle` die Moderation.
+  Alle Tests enden vor dem Antrag. Links zu Testfall und Testszenarien sind aus dem Portal entfernt.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

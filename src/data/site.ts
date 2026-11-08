@@ -41,7 +41,6 @@ export const SITE: Site = {
         { label: "Über dieses Portal", href: "/seite/ueber-das-portal" },
         { label: "Leistungen A bis Z", href: "/leistungen" },
         { label: "Aktuelles", href: "/aktuelles" },
-        { label: "Testfall Kindergeld", href: "/testfall" },
         { label: "So entscheidet die Suche", href: "/so-entscheidet-die-suche" },
       ],
     },

@@ -8,6 +8,7 @@ import { DemoReset } from "@/components/DemoReset";
 import { IconBook, IconBubble, IconClose, IconGlobe, IconHand, IconMenu, IconSearch, IconUser } from "@/components/Icons";
 import { Wordmark } from "@/components/Wordmark";
 import { CHAT_IN_PORTAL, SITE } from "@/data/site";
+import { useVariant } from "@/lib/variant-store";
 import { languageSlug } from "@/data/content";
 import { useAccount } from "@/lib/account-store";
 
@@ -133,6 +134,8 @@ export function Header() {
     return () => document.removeEventListener("pointerdown", onPointer);
   }, [open, setOpen]);
 
+  const variant = useVariant();
+
   return (
     <header className="t-header" ref={headerRef}>
       <div className="t-topbar">
@@ -140,12 +143,6 @@ export function Header() {
           <div className="t-topbar__demo">
             <span className="t-tag">Prototyp</span>
             <span className="t-topbar__note">Nur Beispieldaten</span>
-            <Link href="/testszenarien" className="t-topbar__link">
-              Testszenarien
-            </Link>
-            <Link href="/testfall" className="t-topbar__link">
-              Testfall Kindergeld
-            </Link>
             <DemoReset />
           </div>
           <ul className="t-topbar__list">
@@ -168,7 +165,7 @@ export function Header() {
           <Wordmark />
         </Link>
         <div className="t-masthead__tools">
-          <Link href="/suche" className="t-tool">
+          <Link href={variant === 2 ? "/ergebnisse" : "/suche"} className="t-tool">
             <IconSearch />
             <span className="t-tool__text">Suche</span>
           </Link>

@@ -1,20 +1,31 @@
 import Link from "next/link";
-import { ScenarioStart } from "@/components/ScenarioStart";
 import { CHAT_SCENARIO, CORE_SCENARIOS, EXTRA_SCENARIOS } from "@/data/test-scenarios";
-import type { Scenario } from "@/data/test-scenarios";
+import type { FlowStep, Scenario } from "@/data/test-scenarios";
 
-// In front of the prototype, without the portal around it: what the moderator of a user test needs.
+// In front of the prototype, without the portal around it: the overview for the product owners.
+// What a moderator needs in a session is on the page of test cases.
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
+const KIND_LABEL: Record<FlowStep["kind"], string> = { person: "Person", wait: "Warten", page: "Seite", end: "Ende" };
+
+function Flow({ label, steps }: { label: string; steps: FlowStep[] }) {
   return (
-    <div className="t-scen__block">
-      <h4 className="t-scen__label">{title}</h4>
-      {children}
+    <div className="t-flowrow">
+      <h4 className="t-scen__label">{label}</h4>
+      <ol className="t-flowline">
+        {steps.map((step, i) => (
+          <li key={i}>
+            <span className="t-flowstep" data-kind={step.kind}>
+              <span className="visually-hidden">{KIND_LABEL[step.kind]}: </span>
+              {step.text}
+            </span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
 
-function ScenarioCard({ scenario, href = "/" }: { scenario: Scenario; href?: string }) {
+function ScenarioSummary({ scenario }: { scenario: Scenario }) {
   return (
     <li className="t-scen">
       <div>
@@ -22,47 +33,11 @@ function ScenarioCard({ scenario, href = "/" }: { scenario: Scenario; href?: str
           Szenario {scenario.id} · {scenario.case}
         </p>
         <h3 className="t-h3">{scenario.title}</h3>
+        <p className="t-scen__summary">{scenario.summary}</p>
       </div>
-      <div className="t-scen__task">
-        <h4 className="t-scen__label">Aufgabe vorlesen</h4>
-        <p>„{scenario.task}“</p>
-        {scenario.home && (
-          <p className="t-scen__home">
-            <strong>Wohnortkarte:</strong> {scenario.home}
-          </p>
-        )}
-      </div>
-      <div className="t-scen__grid">
-        <Block title="Das soll passieren">
-          <p>{scenario.expected}</p>
-        </Block>
-        <Block title="Beobachten">
-          <ul>
-            {scenario.observe.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Block>
-        <Block title="Geschafft, wenn">
-          <p>{scenario.success}</p>
-        </Block>
-        <Block title="Danach fragen">
-          <ul>
-            {scenario.ask.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Block>
-      </div>
-      <p className="t-scen__term">
-        <strong>Suchbegriff, nur wenn die Person nicht weiterkommt:</strong> {scenario.term}
-      </p>
-      <div className="t-scen__foot" data-ready={Boolean(scenario.today)}>
-        <p>
-          <strong>{scenario.today ? "Heute im Prototyp:" : "Noch nicht testbar:"}</strong> {scenario.today ?? scenario.missing}
-        </p>
-        {scenario.today && <ScenarioStart href={href} title={scenario.title} />}
-      </div>
+      {scenario.v1 && <Flow label="Variante 1, Frage vor den Treffern" steps={scenario.v1} />}
+      {scenario.v2 && <Flow label="Variante 2, eine Ergebnisseite" steps={scenario.v2} />}
+      {scenario.chat && <Flow label="Chat-Assistent" steps={scenario.chat} />}
     </li>
   );
 }
@@ -75,10 +50,13 @@ export function UserTestPage() {
           <p className="t-case__step">Verwaltungsportal Musterland · Prototyp mit Beispieldaten</p>
           <h1 className="t-h1">Testszenarien</h1>
           <p className="t-lead">
-            Mit diesen Aufgaben prüfen wir an echten Menschen die Annahme 1 des Product Owners. Sie besagt, dass Leistung und
+            Mit diesen Szenarien prüfen wir an echten Menschen die Annahme 1 des Product Owners. Sie besagt, dass Leistung und
             Informationen zusammen auf eine Ergebnisseite passen.
           </p>
           <p className="t-actions">
+            <Link href="/testszenarien/testfaelle" className="t-btn t-btn--primary">
+              Testfälle öffnen
+            </Link>
             <Link href="/" className="t-btn">
               Prototyp öffnen
             </Link>
@@ -87,32 +65,48 @@ export function UserTestPage() {
       </div>
 
       <div className="t-container t-page t-scens">
-        <p className="t-scens__status">
-          Die Ergebnisseite aus Annahme 1 fehlt noch. Wer heute auf „Szenario starten“ klickt, landet im bisherigen Ablauf, der
-          vor den Treffern nach dem Wohnort fragt.
-        </p>
-
-        <section aria-labelledby="ablauf">
-          <h2 id="ablauf" className="t-h2">
-            So läuft der Test
+        <section aria-labelledby="varianten">
+          <h2 id="varianten" className="t-h2">
+            Zwei Varianten im Vergleich
           </h2>
-          <ol className="t-scens__steps">
-            <li>Bitten Sie die Testperson, beim Klicken laut zu denken. Sagen Sie ihr, dass sie nichts falsch machen kann, weil wir die Seite testen.</li>
-            <li>Starten Sie jedes Szenario über seinen Knopf. Der löscht den Wohnort, das Demo-Konto und den Chatverlauf vom letzten Durchgang.</li>
-            <li>Lesen Sie die Aufgabe vor und geben Sie der Person die Wohnortkarte. Der Prototyp kennt nur erfundene Orte, mit der eigenen Postleitzahl käme sie nicht weiter.</li>
-            <li>Helfen Sie nicht, auch wenn es schwerfällt. Sagen Sie auch nie „Leistung“ oder „Bereich“. Die Wörter stehen auf der Seite und verraten, wonach die Person suchen soll.</li>
-            <li>Nach jeder Aufgabe fragen Sie „Wie leicht oder schwer war das, von 1 sehr schwer bis 7 sehr leicht?“ und dann die Fragen aus dem Szenario.</li>
-            <li>Planen Sie 5 bis 8 Personen und je Sitzung 30 bis 45 Minuten ein. Wechseln Sie die Reihenfolge der Szenarien, denn mit jeder Aufgabe kennt die Person die Seite besser.</li>
-          </ol>
+          <div className="t-scens__two">
+            <div>
+              <h3 className="t-h3">Variante 1, Frage vor den Treffern</h3>
+              <p>Ist die Suche unklar, fragt die Seite „Was suchen Sie?“. Danach will sie den Wohnort wissen, erst dann kommen die Treffer.</p>
+            </div>
+            <div>
+              <h3 className="t-h3">Variante 2, eine Ergebnisseite</h3>
+              <p>Die Treffer kommen ohne Zwischenfrage. Oben steht der Leistungsbereich mit dem Feld für den Ort, darunter die Informationen.</p>
+            </div>
+          </div>
+          <ul className="t-scens__notes">
+            <li>Später bewertet eine KI jede Suche. Im Prototyp machen das feste Regeln.</li>
+            <li>Die KI braucht dafür 1 bis 3 Sekunden. Der Prototyp spielt diese Zeit mit einer Ladeanimation nach.</li>
+            <li>Getestet wird nur die Suche. Jeder Test endet, bevor jemand einen Antrag startet.</li>
+          </ul>
         </section>
 
         <section aria-labelledby="kern">
           <h2 id="kern" className="t-h2">
             Kernszenarien
           </h2>
+          <div className="t-flowlegend" aria-hidden="true">
+            <span className="t-flowstep" data-kind="person">
+              Das macht die Person
+            </span>
+            <span className="t-flowstep" data-kind="wait">
+              Ladeanimation
+            </span>
+            <span className="t-flowstep" data-kind="page">
+              Das zeigt die Seite
+            </span>
+            <span className="t-flowstep" data-kind="end">
+              Ende des Tests
+            </span>
+          </div>
           <ol className="t-scens__list">
             {CORE_SCENARIOS.map((scenario) => (
-              <ScenarioCard key={scenario.id} scenario={scenario} />
+              <ScenarioSummary key={scenario.id} scenario={scenario} />
             ))}
           </ol>
         </section>
@@ -123,7 +117,7 @@ export function UserTestPage() {
           </h2>
           <ol className="t-scens__list">
             {EXTRA_SCENARIOS.map((scenario) => (
-              <ScenarioCard key={scenario.id} scenario={scenario} />
+              <ScenarioSummary key={scenario.id} scenario={scenario} />
             ))}
           </ol>
         </section>
@@ -133,11 +127,10 @@ export function UserTestPage() {
             Optional: Chat-Assistent
           </h2>
           <p className="t-case__intro">
-            Im Portal ist der Chat aus, damit die Testpersonen die Suche benutzen. Zeigen Sie ihn am Ende einer Sitzung, wenn noch
-            Zeit ist. Mehr Abläufe stehen im <Link href="/testfall/chat">Testfall Chat-Assistent</Link>.
+            Im Portal ist der Chat aus, damit die Testpersonen die Suche benutzen. Mehr Abläufe stehen im <Link href="/testfall/chat">Testfall Chat-Assistent</Link>.
           </p>
           <ol className="t-scens__list">
-            <ScenarioCard scenario={CHAT_SCENARIO} href="/assistent" />
+            <ScenarioSummary scenario={CHAT_SCENARIO} />
           </ol>
         </section>
       </div>

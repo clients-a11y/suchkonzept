@@ -9,6 +9,7 @@ import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DiagramLink } from "@/components/DiagramLink";
 import { HomePlace } from "@/components/HomePlace";
+import { SearchPending } from "@/components/SearchPending";
 import { IconArrow, IconCheck, IconPin, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { searchInformation, searchServices } from "@/lib/smart-search";
@@ -16,7 +17,8 @@ import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
 import type { Pot, Route } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
-import { placeMatters, responsibleOffice } from "@/lib/offices";
+import { offeredIn, placeMatters, responsibleOffice } from "@/lib/offices";
+import { latencyFor, wasEvaluated } from "@/lib/search-latency";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
 import { CHAT_IN_PORTAL } from "@/data/site";
@@ -33,10 +35,10 @@ function searchHref(q: string, pot?: Pot): string {
 }
 
 // On the search page no overlay opens: an unclear term shows the choice in the page, under the tabs.
-function SearchForm({ q }: { q: string }) {
+function SearchForm({ q, action }: { q: string; action: string }) {
   const inputId = useId();
   return (
-    <Form action="/suche" role="search" className="t-searchform">
+    <Form action={action} role="search" className="t-searchform">
       <label htmlFor={inputId} className="t-searchform__label">
         Suchbegriff
       </label>
@@ -52,13 +54,13 @@ function SearchForm({ q }: { q: string }) {
 }
 
 // Page head with breadcrumb, the one H1 and the search field.
-function SearchHead({ q }: { q: string }) {
+export function SearchHead({ q, action = "/suche" }: { q: string; action?: string }) {
   return (
     <div className="t-pagehead">
       <div className="t-container">
-        <Breadcrumb items={[{ label: "Suche", href: "/suche" }]} />
+        <Breadcrumb items={[{ label: "Suche", href: action }]} />
         <h1 className="t-h1">Suche</h1>
-        <SearchForm q={q} />
+        <SearchForm q={q} action={action} />
       </div>
     </div>
   );
@@ -84,23 +86,28 @@ function PotTabs({ q, pot }: { q: string; pot?: Pot }) {
 // A new search shows a short loading state: the one request runs, then the hits rise in one by one.
 const LOADING_MS = 550;
 
-function useArrival(key: string): boolean {
+export function useArrival(key: string, ms: number = LOADING_MS): boolean {
   const [arrived, setArrived] = useState<string | null>(null);
   useEffect(() => {
     if (arrived === key) return;
-    const timer = window.setTimeout(() => setArrived(key), LOADING_MS);
+    const timer = window.setTimeout(() => setArrived(key), ms);
     return () => window.clearTimeout(timer);
-  }, [key, arrived]);
+  }, [key, arrived, ms]);
   return arrived === key;
 }
 
-function Loading() {
+// thinking: the search still judges the request, which later takes an AI 1 to 3 seconds.
+export function Loading({ thinking = false }: { thinking?: boolean }) {
   return (
-    <div className="t-loadingbox" aria-hidden="true">
-      <div className="t-loadingbar">
-        <span />
-      </div>
-      <ol className="t-hits">
+    <div className="t-loadingbox">
+      {thinking ? (
+        <SearchPending />
+      ) : (
+        <div className="t-loadingbar" aria-hidden="true">
+          <span />
+        </div>
+      )}
+      <ol className="t-hits" aria-hidden="true">
         {[0, 1, 2].map((i) => (
           <li key={i} className="t-hit t-hit--skeleton">
             <span />
@@ -113,7 +120,7 @@ function Loading() {
   );
 }
 
-function HitList({ hits }: { hits: Hit[] }) {
+export function HitList({ hits }: { hits: Hit[] }) {
   return (
     <ol className="t-hits">
       {hits.map((hit, i) => (
@@ -216,9 +223,12 @@ function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }
 }
 
 // A remembered place shows right away who is in charge. Land services have one office anyway.
-function AnswerPlace({ service }: { service: Service }) {
+export function AnswerPlace({ service }: { service: Service }) {
   const place = usePlace();
   const office = responsibleOffice(service, place);
+  if (place && service.level !== "land" && !offeredIn(service, place)) {
+    return <p className="t-answer__place">In {place.name} gibt es diese Leistung nicht.</p>;
+  }
   if (!office) return null;
   return (
     <p className="t-answer__place">
@@ -252,8 +262,10 @@ function SearchResults() {
   const route = q && !chosen ? routeQuery(q) : undefined;
   // Without a search term the page lists all services, A to Z.
   const pot: Pot | undefined = chosen ?? (q ? route?.pot : "leistungen");
-  // An unclear term sends no request, so it has nothing to wait for.
-  const ready = useArrival(`${pot ?? "frage"}|${q}`);
+  // Without a chosen area the search has to judge the term first. The steps on the start page may have done that.
+  const thinking = Boolean(q && !chosen);
+  const arrived = useArrival(`${pot ?? "frage"}|${q}`, thinking ? latencyFor(q) : undefined);
+  const ready = arrived || (thinking && wasEvaluated(q));
 
   if (!pot) {
     return (
@@ -261,11 +273,17 @@ function SearchResults() {
         <SearchHead q={q} />
         <div className="t-container t-page">
           <PotTabs q={q} />
-          <p className="t-search__summary" role="status">
-            Für „{q}“ bitte einen Suchbereich wählen.
-          </p>
-          <PotQuestion q={q} route={route} />
-          {CHAT_IN_PORTAL && <AssistantHint q={q} />}
+          {ready ? (
+            <>
+              <p className="t-search__summary" role="status">
+                Für „{q}“ bitte einen Suchbereich wählen.
+              </p>
+              <PotQuestion q={q} route={route} />
+              {CHAT_IN_PORTAL && <AssistantHint q={q} />}
+            </>
+          ) : (
+            <Loading thinking />
+          )}
         </div>
       </>
     );
@@ -356,8 +374,8 @@ function SearchResults() {
     <>
       <SearchHead q={q} />
       <div className="t-container t-page">
-        <PotTabs q={q} pot={pot} />
-        <div className="t-route__bar">
+        <PotTabs q={q} pot={ready || !thinking ? pot : undefined} />
+        {(ready || !thinking) && <div className="t-route__bar">
           <p className="t-search__summary" role="status">
             {!ready
               ? `Suche läuft in ${POT_LABEL[pot]} …`
@@ -370,8 +388,8 @@ function SearchResults() {
               {q ? `Stattdessen in ${POT_LABEL[other]} suchen` : `${POT_LABEL[other]} anzeigen`}
             </Link>
           )}
-        </div>
-        {ready ? results : <Loading />}
+        </div>}
+        {ready ? results : <Loading thinking={thinking} />}
       </div>
     </>
   );

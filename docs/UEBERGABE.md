@@ -95,6 +95,8 @@ Beim Tippen entsteht keine Anfrage: Vorschläge und Weiche rechnen im Browser mi
 - **Backend**: Die Erklärseite zeigt „genau eine Anfrage an `/api/leistungen` oder `/api/informationen`“. Im
   Prototyp gibt es diese Endpunkte nicht, die Suche läuft vollständig im Browser.
 - **Nutzerkonto, Anträge, Postfach**: Demo-Konto ohne Passwort, alles in `localStorage`.
+- **Bewertung der Suche**: Später übernimmt eine KI, was heute die Punkteregeln entscheiden. Ihre Wartezeit von 1 bis 3
+  Sekunden spielt `src/lib/search-latency.ts` nach.
 - **Standort**: „Meinen Standort verwenden“ fragt den Browser nicht, sondern trägt nach kurzer Wartezeit immer
   20100 (Beispielstadt) ein.
 - **Inhalte**: Leistungen, Stellen, Orte, Meldungen und Personen sind erfunden. Die Fotos sind KI-generiert

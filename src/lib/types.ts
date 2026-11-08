@@ -22,6 +22,10 @@ export type Service = {
   duration: string;
   documents: string[];
   sections: ServiceSection[];
+  // Exists only per place: without a place the one results page has nothing to show.
+  regional?: boolean;
+  // Places that do not offer it, as place ids.
+  notOfferedIn?: string[];
 };
 
 // Every picture is an AI-generated sample photo and is labelled as such.
