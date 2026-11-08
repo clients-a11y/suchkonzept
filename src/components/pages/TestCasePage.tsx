@@ -15,7 +15,7 @@ const q = (text: string) => encodeURIComponent(text);
 const PARTS: Part[] = [
   {
     title: "Suche: Leistung oder Information",
-    intro: "Die Suche schaut immer nur in einem Bereich nach. Auf jeder Ergebnisseite zeigt „So hat die Suche entschieden“ die Punkte.",
+    intro: "Die Suche schaut immer nur in einem Bereich nach.",
     steps: [
       {
         input: "Kindergeld beantragen",

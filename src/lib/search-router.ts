@@ -40,8 +40,6 @@ const SIGNALS: { pot: Pot; label: string; points: number; stems: string[] }[] = 
 ];
 
 // Thresholds: a pot needs enough points and a lead over the other one.
-export const RULE = "Leistungen ab 3 Punkten, Informationen ab 2 Punkten, jeweils mit mindestens 1 Punkt Vorsprung. Sonst fragt die Suche nach. Von der Redaktion zugeordnete Suchbegriffe zählen 10 Punkte.";
-
 export type Signal = { pot: Pot; word: string; label: string; points: number };
 export type Route = { pot?: Pot; signals: Signal[]; points: Record<Pot, number>; catalogue?: string };
 

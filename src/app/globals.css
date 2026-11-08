@@ -1756,60 +1756,6 @@ main:focus {
   margin-bottom: 0.75rem;
 }
 
-.t-route__why {
-  max-width: 52rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--c-line-soft);
-  border-radius: var(--radius);
-  background: var(--c-white);
-  font-size: 0.9375rem;
-}
-
-.t-route__why summary {
-  padding: 0.625rem 1rem;
-  color: var(--c-blue);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.t-route__why summary:hover {
-  color: var(--c-blue-dark);
-  text-decoration: underline;
-}
-
-.t-route__body {
-  padding: 0 1rem 1rem;
-}
-
-.t-route__points {
-  display: grid;
-  gap: 0.75rem 2rem;
-}
-
-.t-route__points ul {
-  margin: 0.25rem 0 0;
-  padding-left: 1.25rem;
-}
-
-.t-route__pot {
-  font-weight: 600;
-}
-
-.t-route__none,
-.t-route__rule {
-  color: var(--c-muted);
-}
-
-.t-route__rule {
-  margin-top: 0.75rem;
-  font-size: 0.875rem;
-}
-
-.t-route__request {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-}
-
 .t-diagramlink {
   margin-top: 0.5rem;
   font-size: 0.875rem;
@@ -1819,14 +1765,6 @@ main:focus {
   margin: 0 0 1rem;
 }
 
-.t-route__code {
-  padding: 0.0625rem 0.375rem;
-  border-radius: var(--radius);
-  background: var(--c-surface);
-  font-size: 0.8125rem;
-  overflow-wrap: anywhere;
-}
-
 .t-route {
   max-width: 52rem;
   margin-block: 1.25rem 1.5rem;
@@ -1834,10 +1772,6 @@ main:focus {
 
 .t-route .t-h2 {
   margin-bottom: 0.5rem;
-}
-
-.t-route .t-route__why {
-  margin-top: 1.25rem;
 }
 
 .t-route__choices {
@@ -4553,7 +4487,6 @@ button.t-route__choice {
     padding-block: 3.25rem;
   }
 
-  .t-route__points,
   .t-route__choices {
     grid-template-columns: 1fr 1fr;
   }

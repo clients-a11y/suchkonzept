@@ -149,6 +149,8 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Fischereischein an (`notOfferedIn`), Hund, Fischereischein und Baugenehmigung gibt es nur mit Ort (`regional`).
   Die Übersicht `/testszenarien` zeigt Kurzbeschreibung und Prozessflows, `/testszenarien/testfaelle` die Moderation.
   Alle Tests enden vor dem Antrag. Links zu Testfall und Testszenarien sind aus dem Portal entfernt.
+- Die aufklappbare Erklärung „So hat die Suche entschieden“ ist von der Suchseite entfernt (auf Wunsch, 08.11.2026).
+  Die Punkteregeln stehen weiter auf `/so-entscheidet-die-suche`.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

@@ -7,14 +7,13 @@ import { Suspense, useEffect, useId, useState } from "react";
 import type { CSSProperties } from "react";
 import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { DiagramLink } from "@/components/DiagramLink";
 import { HomePlace } from "@/components/HomePlace";
 import { SearchPending } from "@/components/SearchPending";
 import { IconArrow, IconCheck, IconPin, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
 import { searchInformation, searchServices } from "@/lib/smart-search";
-import { POT_LABEL, RULE, routeQuery } from "@/lib/search-router";
-import type { Pot, Route } from "@/lib/search-router";
+import { POT_LABEL, routeQuery } from "@/lib/search-router";
+import type { Pot } from "@/lib/search-router";
 import type { Hit } from "@/lib/search";
 import { pluralize } from "@/lib/format";
 import { offeredIn, placeMatters, responsibleOffice } from "@/lib/offices";
@@ -156,72 +155,6 @@ function AssistantHint({ q }: { q: string }) {
   );
 }
 
-// What the backend would receive: exactly one request to one pot, or none while the person chooses.
-function RequestLine({ q, pot }: { q: string; pot?: Pot }) {
-  if (!pot) {
-    return (
-      <p className="t-route__request">
-        Anfrage an das Backend: <strong>noch keine.</strong> Erst Ihre Wahl löst sie aus.
-      </p>
-    );
-  }
-  const query = new URLSearchParams(q ? { q } : {}).toString();
-  return (
-    <p className="t-route__request">
-      Anfrage an das Backend: <code className="t-route__code">GET /api/{pot}{query ? `?${query}` : ""}</code>. Genau eine
-      Anfrage, nur an den Bereich {POT_LABEL[pot]}.
-    </p>
-  );
-}
-
-// Makes the decision of the search switch visible, for demos and for curious visitors.
-function RouteExplain({ route, q, pot }: { route?: Route; q: string; pot?: Pot }) {
-  if (!route) {
-    return (
-      <details className="t-route__why">
-        <summary>So läuft die Suche</summary>
-        <div className="t-route__body">
-          <p className="t-route__rule">Sie haben den Bereich selbst gewählt, die Weiche hat nicht entschieden.</p>
-          <RequestLine q={q} pot={pot} />
-        </div>
-      </details>
-    );
-  }
-  return (
-    <details className="t-route__why">
-      <summary>So hat die Suche entschieden</summary>
-      <div className="t-route__body">
-        <div className="t-route__points">
-          {POTS.map((p) => {
-            const signals = route.signals.filter((s) => s.pot === p);
-            return (
-              <div key={p}>
-                <p className="t-route__pot">
-                  {POT_LABEL[p]}: {pluralize(route.points[p], "Punkt", "Punkte")}
-                </p>
-                {signals.length > 0 ? (
-                  <ul>
-                    {signals.map((s) => (
-                      <li key={s.label + s.word}>
-                        „{s.word}“: {s.label}, +{s.points}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="t-route__none">Keine Hinweise</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <p className="t-route__rule">{RULE} Grundlage sind nur der Leistungskatalog und feste Signalwörter, keine Datenbank.</p>
-        <RequestLine q={q} pot={pot} />
-        <DiagramLink />
-      </div>
-    </details>
-  );
-}
-
 // A remembered place shows right away who is in charge. Land services have one office anyway.
 export function AnswerPlace({ service }: { service: Service }) {
   const place = usePlace();
@@ -238,7 +171,7 @@ export function AnswerPlace({ service }: { service: Service }) {
 }
 
 // The search switch could not decide: one question, two answers.
-function PotQuestion({ q, route }: { q: string; route?: Route }) {
+function PotQuestion({ q }: { q: string }) {
   const titleId = useId();
   return (
     <section className="t-route" aria-labelledby={titleId}>
@@ -247,7 +180,6 @@ function PotQuestion({ q, route }: { q: string; route?: Route }) {
       </h2>
       <p>Zu „{q}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.</p>
       <PotChoices query={q} />
-      {route && <RouteExplain route={route} q={q} />}
     </section>
   );
 }
@@ -278,7 +210,7 @@ function SearchResults() {
               <p className="t-search__summary" role="status">
                 Für „{q}“ bitte einen Suchbereich wählen.
               </p>
-              <PotQuestion q={q} route={route} />
+              <PotQuestion q={q} />
               {CHAT_IN_PORTAL && <AssistantHint q={q} />}
             </>
           ) : (
@@ -305,7 +237,6 @@ function SearchResults() {
   // The results, shown once the request has "arrived".
   const results = (
     <div className="t-results">
-      {q && <RouteExplain route={route?.pot ? route : undefined} q={q} pot={pot} />}
       {/* The place belongs to every search, so the hits can name the office in charge. Not for a service
           with one office for everyone, such as Kindergeld. */}
       {q && placeMatters(q) && (

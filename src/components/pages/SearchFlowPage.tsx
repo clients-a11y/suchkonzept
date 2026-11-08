@@ -3,8 +3,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
 // "So entscheidet die Suche": the search switch explained for stakeholders, with diagrams.
-// The numbers are those of src/lib/search-router.ts and src/lib/smart-search.ts; the examples were read
-// from the search page ("So hat die Suche entschieden").
+// The numbers are those of src/lib/search-router.ts and src/lib/smart-search.ts.
 
 type Lane = "l" | "i" | "q";
 
@@ -442,7 +441,6 @@ export function SearchFlowPage() {
           <ul className="t-flow__notes">
             <li>Für Informationen reicht eine niedrigere Schwelle, weil ihre Signalwörter seltener zufällig vorkommen.</li>
             <li>Ein einzelnes Thema wie „Kindergeld“, „Kinder“ oder „Hund“ erreicht keine Schwelle. Es kann ein Antrag oder eine Nachricht gemeint sein, deshalb fragt das Portal.</li>
-            <li>Die Ergebnisseite zeigt die Rechnung unter „So hat die Suche entschieden“, samt der einen Anfrage an das Backend.</li>
           </ul>
         </section>
 
