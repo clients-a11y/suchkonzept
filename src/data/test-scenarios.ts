@@ -90,7 +90,7 @@ export const CORE_SCENARIOS: Scenario[] = [
     case: "Fall 2",
     title: "Für diesen Ort gibt es nichts",
     summary: "Waldheim hat keine Gewässer und bietet deshalb keinen Fischereischein an. Wir prüfen, ob die Menschen das als Antwort verstehen und unten weiterlesen.",
-    v1: [search("Angelschein"), WAIT, ASK_PLACE, enter("10300"), page("Treffer mit dem Satz, dass es das in Waldheim nicht gibt"), ANSWERED],
+    v1: [search("Angelschein"), WAIT, ASK_PLACE, enter("10300"), page("Hinweis, dass es dazu in Waldheim keine Leistung gibt"), ANSWERED],
     v2: [search("Angelschein"), WAIT, OVERLAY, enter("10300"), WAIT, NOTHING, person("Liest in den Informationen weiter"), ANSWERED],
     task: "Sie möchten am Wochenende angeln gehen. Was brauchen Sie dafür?",
     home: WALDHEIM,

@@ -159,9 +159,6 @@ function AssistantHint({ q }: { q: string }) {
 export function AnswerPlace({ service }: { service: Service }) {
   const place = usePlace();
   const office = responsibleOffice(service, place);
-  if (place && service.level !== "land" && !offeredIn(service, place)) {
-    return <p className="t-answer__place">In {place.name} gibt es diese Leistung nicht.</p>;
-  }
   if (!office) return null;
   return (
     <p className="t-answer__place">
@@ -186,6 +183,7 @@ function PotQuestion({ q }: { q: string }) {
 
 function SearchResults() {
   const params = useSearchParams();
+  const place = usePlace();
 
   const q = (params.get("q") ?? "").trim();
   // "tab" is the older name of the parameter.
@@ -223,15 +221,20 @@ function SearchResults() {
 
   // Exactly one request, to exactly one pot.
   const services = pot === "leistungen" && q ? searchServices(q) : undefined;
+  // A service the place does not offer is no result: nothing to open there.
+  const offered = (service: Service) => !place || offeredIn(service, place);
+  const here = services?.services.filter((h) => offered(h.service));
+  const notInPlace = Boolean(services?.services.length && !here?.length);
   const hits: Hit[] =
     pot === "leistungen"
-      ? services
-        ? services.services.map((h) => serviceHit(h.service))
+      ? here
+        ? here.map((h) => serviceHit(h.service))
         : allServices()
       : q
         ? searchInformation(q)
         : allInformation();
-  const answer = services?.answer;
+  const answer = services?.answer && offered(services.answer) ? services.answer : undefined;
+  const related = services?.related.filter(offered) ?? [];
   const other = OTHER[pot];
 
   // The results, shown once the request has "arrived".
@@ -270,10 +273,10 @@ function SearchResults() {
             <li>Kosten: {answer.costs}</li>
             <li>Dauer: {answer.duration}</li>
           </ul>
-          {services.related.length > 0 && (
+          {related.length > 0 && (
             <p className="t-answer__related">
               Das brauchen Sie oft auch:{" "}
-              {services.related.map((s, i) => (
+              {related.map((s, i) => (
                 <span key={s.slug}>
                   {i > 0 && ", "}
                   <Link href={`/leistungen/${s.slug}`}>{s.title}</Link>
@@ -290,11 +293,11 @@ function SearchResults() {
         <HitList hits={hits} />
       ) : (
         <div className="t-empty">
-          <p>Keine {POT_LABEL[pot]} zu „{q}“.</p>
+          <p>{notInPlace ? `In ${place?.name} gibt es dazu keine Leistung.` : `Keine ${POT_LABEL[pot]} zu „${q}“.`}</p>
           <Link href={searchHref(q, other)} className="t-btn">
             In {POT_LABEL[other]} suchen
           </Link>
-          <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>
+          {!notInPlace && <p>Oder prüfen Sie die Schreibweise und versuchen Sie ein allgemeineres Wort, zum Beispiel „Ausweis“.</p>}
         </div>
       )}
       {CHAT_IN_PORTAL && q && (hits.length === 0 || (pot === "leistungen" && !answer)) && <AssistantHint q={q} />}
