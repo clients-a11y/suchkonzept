@@ -44,8 +44,8 @@ export function UserTestPage() {
           <p className="t-case__step">Verwaltungsportal Musterland · Prototyp mit Beispieldaten</p>
           <h1 className="t-h1">Testszenarien</h1>
           <p className="t-lead">
-            Mit diesen Szenarien prüfen wir an echten Menschen die Annahme 1 des Product Owners. Sie besagt, dass Leistung und
-            Informationen zusammen auf eine Ergebnisseite passen.
+            Mit diesen Szenarien prüfen wir an echten Menschen, ob Leistung und Informationen zusammen auf eine Ergebnisseite
+            passen.
           </p>
           <p className="t-actions">
             <Link href="/" className="t-btn">

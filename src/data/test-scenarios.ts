@@ -144,9 +144,9 @@ export const EXTRA_SCENARIOS: Scenario[] = [
   },
   {
     id: 8,
-    case: "Ergänzung, nicht in Annahme 1",
+    case: "Ergänzung",
     title: "Leistung, bei der der Wohnort keine Rolle spielt",
-    summary: "Kindergeld hat überall dieselbe Stelle, Annahme 1 regelt das nicht. Wir prüfen, ob das Feld für den Ort hier stört.",
+    summary: "Kindergeld hat überall dieselbe Stelle. Wir prüfen, ob das Feld für den Ort hier stört.",
     v1: [search("Kindergeld"), WAIT, ASK_POT, PICK_APPLY, page("Treffer ohne Frage nach dem Ort"), STOP],
     v2: [search("Kindergeld"), WAIT, page("Leistung oben, Feld für den Ort bleibt leer"), STOP],
     task: "Sie möchten Kindergeld beantragen. Geht das online?",
@@ -196,5 +196,5 @@ export const SCENARIO_GROUPS: { title: string; lead: string; scenarios: Scenario
   { title: "Fall 1: Die Suche erkennt eine Leistung", lead: "Die Leistung steht oben, das Feld für den Ort ist freiwillig.", scenarios: pick(1, 2) },
   { title: "Fall 2: Ohne Ort gibt es kein Ergebnis", lead: "Ein Overlay fragt nach dem Ort. Manche Orte bieten die Leistung gar nicht an.", scenarios: pick(3, 4) },
   { title: "Fall 3: Die Suche findet eher Informationen", lead: "Der Leistungsbereich schrumpft auf zwei Zeilen und wächst erst mit dem Ort.", scenarios: pick(5, 6, 7) },
-  { title: "Ergänzungen", lead: "Außerhalb von Annahme 1. Der Chat ist im Portal ausgeblendet und nur hier zu sehen.", scenarios: pick(8, 9) },
+  { title: "Ergänzungen", lead: "Kindergeld als Sonderfall und der Chat, der im Portal ausgeblendet ist.", scenarios: pick(8, 9) },
 ];
