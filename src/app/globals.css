@@ -427,19 +427,6 @@ main:focus {
   font-size: 0.9375rem;
 }
 
-.t-tag {
-  display: inline-block;
-  padding: 0 0.375rem;
-  border-radius: 2px;
-  background: var(--c-navy);
-  color: var(--c-white);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1.6;
-  text-transform: uppercase;
-}
-
 .t-badge {
   display: inline-flex;
   align-items: center;
@@ -558,104 +545,6 @@ main:focus {
   z-index: 20;
   border-bottom: 1px solid var(--c-line-soft);
   background: var(--c-white);
-}
-
-.t-topbar {
-  border-bottom: 1px solid var(--c-line-soft);
-  background: var(--c-surface-2);
-  font-size: 0.875rem;
-}
-
-.t-topbar__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 1.5rem;
-}
-
-.t-topbar__demo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 0.875rem;
-}
-
-.t-topbar__note {
-  color: var(--c-muted);
-}
-
-.t-topbar__list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.t-topbar__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 2.5rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--c-navy);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.t-topbar__link:hover {
-  color: var(--c-blue);
-  text-decoration: underline;
-}
-
-.t-topbar__link .icon {
-  color: var(--c-blue);
-}
-
-.t-topbar__status {
-  color: var(--c-green);
-  font-weight: 600;
-}
-
-.t-lang {
-  position: relative;
-}
-
-.t-lang__list {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 30;
-  min-width: 11rem;
-  margin: 0;
-  padding: 0.375rem;
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius);
-  background: var(--c-white);
-  box-shadow: var(--shadow);
-  list-style: none;
-}
-
-.t-lang__list a {
-  display: block;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius);
-  color: var(--c-navy);
-  text-decoration: none;
-}
-
-.t-lang__list a:hover {
-  background: var(--c-surface);
-  text-decoration: underline;
-}
-
-.t-lang__list a[aria-current] {
-  font-weight: 600;
 }
 
 .t-masthead {
@@ -4313,6 +4202,28 @@ button.t-route__choice {
   text-decoration: underline;
 }
 
+.t-footer__reset {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-on-dark);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.t-footer__reset:hover {
+  color: var(--c-white);
+  text-decoration: underline;
+}
+
+.t-footer__status:not(:empty) {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--c-on-dark);
+  font-size: 0.875rem;
+}
+
 .t-footer__address {
   color: var(--c-on-dark);
   font-style: normal;
@@ -4413,29 +4324,6 @@ button.t-route__choice {
   .t-wordmark__region {
     font-size: 0.9375rem;
   }
-
-  .t-topbar__note {
-    display: none;
-  }
-
-  .t-lang__text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .t-topbar__link {
-    min-height: 2.25rem;
-  }
-
-  .t-topbar__inner,
-  .t-topbar__list {
-    column-gap: 0.875rem;
-  }
-
 
   .t-steps__item > span:last-child {
     font-size: 0.8125rem;

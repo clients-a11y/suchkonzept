@@ -97,6 +97,7 @@ Beim Tippen entsteht keine Anfrage: Vorschläge und Weiche rechnen im Browser mi
 - **Nutzerkonto, Anträge, Postfach**: Demo-Konto ohne Passwort, alles in `localStorage`.
 - **Bewertung der Suche**: Später übernimmt eine KI, was heute die Punkteregeln entscheiden. Ihre Wartezeit von 1 bis 3
   Sekunden spielt `src/lib/search-latency.ts` nach.
+- **Vorschlagsliste**: im Code vorhanden, aber ausgeblendet (`SUGGESTIONS_IN_SEARCH`), bis die KI-Suche kommt.
 - **Standort**: „Meinen Standort verwenden“ fragt den Browser nicht, sondern trägt nach kurzer Wartezeit immer
   20100 (Beispielstadt) ein.
 - **Inhalte**: Leistungen, Stellen, Orte, Meldungen und Personen sind erfunden. Die Fotos sind KI-generiert

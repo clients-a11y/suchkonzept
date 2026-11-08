@@ -151,6 +151,11 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   Alle Tests enden vor dem Antrag. Links zu Testfall und Testszenarien sind aus dem Portal entfernt.
 - Die aufklappbare Erklärung „So hat die Suche entschieden“ ist von der Suchseite entfernt (auf Wunsch, 08.11.2026).
   Die Punkteregeln stehen weiter auf `/so-entscheidet-die-suche`.
+- Die Vorschlagsliste unter dem Suchfeld ist in beiden Varianten aus (auf Wunsch, 08.11.2026), weil die KI-Suche erst
+  später kommt. Schalter: `SUGGESTIONS_IN_SEARCH` in `src/data/site.ts`.
+- Die Leiste über dem Kopf ist entfernt (auf Wunsch, 08.11.2026), mit ihr Gebärdensprache, Leichte Sprache und der
+  Sprachwechsel. Im Footer steht jetzt eine Spalte „Prototyp“ mit Übersicht Testszenarien, Testfällen und „Demo zurücksetzen“.
+- Startseite: „Häufig gesucht“ ist entfernt (auf Wunsch, 08.11.2026), „Aktuelle Themen“ stehen an dessen Stelle direkt unter der Suche.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

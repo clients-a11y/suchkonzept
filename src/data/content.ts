@@ -1,4 +1,4 @@
-import { CHAT_IN_PORTAL } from "@/data/site";
+import { CHAT_IN_PORTAL, SUGGESTIONS_IN_SEARCH } from "@/data/site";
 import type { ContentPage, NewsItem } from "@/lib/types";
 
 // News of the Land and of Beispielstadt in one list. Every picture is an AI-generated sample photo.
@@ -89,7 +89,7 @@ const PAGES: ContentPage[] = [
     title: "Hilfe zum Portal",
     lead: "So finden Sie Leistungen, die zuständige Stelle und den Stand Ihrer Anträge.",
     sections: [
-      { id: "suchen", title: "Suchen", body: ["Schreiben Sie in das Suchfeld, was Sie vorhaben. Beim Tippen schlägt das Portal passende Leistungen vor.", "Mit den Pfeiltasten wählen Sie einen Vorschlag, mit der Eingabetaste öffnen Sie ihn, mit Escape schließen Sie die Liste."] },
+      { id: "suchen", title: "Suchen", body: SUGGESTIONS_IN_SEARCH ? ["Schreiben Sie in das Suchfeld, was Sie vorhaben. Beim Tippen schlägt das Portal passende Leistungen vor.", "Mit den Pfeiltasten wählen Sie einen Vorschlag, mit der Eingabetaste öffnen Sie ihn, mit Escape schließen Sie die Liste."] : ["Schreiben Sie in das Suchfeld, was Sie vorhaben, und wählen Sie „Suchen“."] },
       { id: "wohnort", title: "Wohnort angeben", body: ["Für Leistungen der Gemeinden geben Sie auf der Seite der Leistung Ihre Postleitzahl oder Ihren Ort ein. Das Portal zeigt dann die zuständige Stelle.", "Ihr Wohnort bleibt nur in diesem Browser gespeichert."] },
       { id: "konto", title: "Nutzerkonto und Postfach", body: ["Mit dem Nutzerkonto sind Ihre Daten im Antrag schon eingetragen. Eingangsbestätigungen und Bescheide kommen ins Postfach.", "Im Prototyp gibt es ein Demo-Konto ohne Passwort."] },
     ],
@@ -145,11 +145,6 @@ const PAGES: ContentPage[] = [
 export const LANGUAGES = [
   { name: "English", code: "en", title: "English", lead: "This page is a placeholder for the English version of the portal." },
 ];
-
-export function languageSlug(name: string): string | undefined {
-  const lang = LANGUAGES.find((l) => l.name === name);
-  return lang ? `sprache-${lang.code}` : undefined;
-}
 
 // Placeholder pages behind the quick links for sign language and easy language.
 const META_PAGES: { slug: string; title: string; lead: string; body: string }[] = [

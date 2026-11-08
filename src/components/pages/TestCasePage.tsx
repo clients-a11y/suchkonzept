@@ -3,6 +3,7 @@ import { useId } from "react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { DemoReset } from "@/components/DemoReset";
 import { DiagramLink } from "@/components/DiagramLink";
+import { SUGGESTIONS_IN_SEARCH } from "@/data/site";
 
 // Script for demos: shows how the portal tells services from information, with Kindergeld as the
 // example. Every step links to the place where it can be tried.
@@ -11,6 +12,25 @@ type Step = { input?: string; way?: string; expect: string; href: string; action
 type Part = { title: string; intro: string; steps: Step[] };
 
 const q = (text: string) => encodeURIComponent(text);
+
+const SUGGESTION_PART: Part = {
+    title: "Vorschläge beim Tippen",
+    intro: "Die Vorschläge kommen nur aus dem Leistungskatalog, einer festen Datei. Beim Tippen entsteht keine Anfrage an die Informationen.",
+    steps: [
+      {
+        input: "Kinderg",
+        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“ und „… in Informationen und Meldungen suchen“.",
+        href: "/",
+        action: "Startseite öffnen",
+      },
+      {
+        input: "Neuigkeiten Kindergeld",
+        expect: "Die Weiche rechnet schon beim Tippen mit, ohne Anfrage. Oben steht „Informationen zu ‚Neuigkeiten Kindergeld‘“, die Leistung Kindergeld beantragen erst darunter.",
+        href: "/",
+        action: "Startseite öffnen",
+      },
+    ],
+  };
 
 const PARTS: Part[] = [
   {
@@ -55,31 +75,14 @@ const PARTS: Part[] = [
       },
     ],
   },
-  {
-    title: "Vorschläge beim Tippen",
-    intro: "Die Vorschläge kommen nur aus dem Leistungskatalog, einer festen Datei. Beim Tippen entsteht keine Anfrage an die Informationen.",
-    steps: [
-      {
-        input: "Kinderg",
-        expect: "Auf der Startseite getippt: Vorschlag „Kindergeld beantragen“, dazu „Suchen nach …“ und „… in Informationen und Meldungen suchen“.",
-        href: "/",
-        action: "Startseite öffnen",
-      },
-      {
-        input: "Neuigkeiten Kindergeld",
-        expect: "Die Weiche rechnet schon beim Tippen mit, ohne Anfrage. Oben steht „Informationen zu ‚Neuigkeiten Kindergeld‘“, die Leistung Kindergeld beantragen erst darunter.",
-        href: "/",
-        action: "Startseite öffnen",
-      },
-    ],
-  },
+  ...(SUGGESTIONS_IN_SEARCH ? [SUGGESTION_PART] : []),
   {
     title: "Wohnort: Kindergeld und Gartenlaube im Vergleich",
-    intro: "Wer auf „Suchen“ klickt oder einen Vorschlag wählt, gibt vorher Postleitzahl oder Ort an, damit das Portal die zuständige Stelle nennt. Ausnahme: Die Suche führt klar zu einer Leistung, für die überall dieselbe Stelle zuständig ist. Vorher „Demo zurücksetzen“, sonst ist der Ort schon bekannt.",
+    intro: "Wer auf „Suchen“ klickt, gibt vorher Postleitzahl oder Ort an, damit das Portal die zuständige Stelle nennt. Ausnahme: Die Suche führt klar zu einer Leistung, für die überall dieselbe Stelle zuständig ist. Vorher „Demo zurücksetzen“, sonst ist der Ort schon bekannt.",
     steps: [
       {
         input: "Kindergeld, dann „Suchen“",
-        expect: "Nur eine Frage: „Was suchen Sie?“. Nach „Etwas beantragen“ geht es ohne Postleitzahl zu den Treffern, denn für Kindergeld ist überall das Ministerium für Gesundheit und Familie zuständig. Auch der Vorschlag „Kindergeld beantragen“ öffnet die Leistungsseite direkt.",
+        expect: "Nur eine Frage: „Was suchen Sie?“. Nach „Etwas beantragen“ geht es ohne Postleitzahl zu den Treffern, denn für Kindergeld ist überall das Ministerium für Gesundheit und Familie zuständig.",
         href: "/",
         action: "Startseite öffnen",
       },
@@ -96,8 +99,8 @@ const PARTS: Part[] = [
         action: "Startseite öffnen",
       },
       {
-        input: "Personalausweis, dann den Vorschlag wählen",
-        expect: "Nur ein Schritt: „Wo wohnen Sie?“, denn der Vorschlag ist eindeutig. Mit 20100 öffnet sich die Leistungsseite, rechts steht das Bürgeramt Beispielstadt mit Adresse und Öffnungszeiten.",
+        input: "Personalausweis, dann „Suchen“",
+        expect: "Nur ein Schritt: „Wo wohnen Sie?“, denn die Suche ist eindeutig. Mit 20100 nennt die Kurzantwort das Bürgeramt Beispielstadt.",
         href: "/",
         action: "Startseite öffnen",
       },

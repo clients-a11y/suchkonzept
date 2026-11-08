@@ -334,7 +334,7 @@ export function SearchFlowPage() {
               <span><svg width="34" height="8" viewBox="0 0 34 8"><line x1="0" y1="4" x2="34" y2="4" stroke="currentColor" strokeWidth="1.6" strokeDasharray="6 5" /></svg>Die Person entscheidet</span>
             </div>
             <figcaption>
-              Beim Tippen entsteht keine Anfrage: Die Vorschläge kommen aus dem Leistungskatalog, der als feste Datei im Browser
+              Die Vorschläge beim Tippen sind im Prototyp vorerst ausgeblendet und kommen erst mit der KI-Suche. Beim Tippen entsteht keine Anfrage: Die Vorschläge kommen aus dem Leistungskatalog, der als feste Datei im Browser
               liegt. Die Weiche rechnet dabei schon mit. Zeigt sie klar auf Informationen, etwa bei „Neuigkeiten Kindergeld“,
               steht die Suche in Informationen oben in der Liste und keine Leistung wird als beste Antwort genannt. Nach dem
               Absenden fragt das Portal nach dem Wohnort, bei einer unsicheren Weiche als zweiten Schritt nach „Was suchen
@@ -479,7 +479,7 @@ export function SearchFlowPage() {
             <figcaption>
               Auch diese Prüfung braucht keine Datenbank: Die Orte mit ihren Postleitzahl-Bereichen liegen ebenfalls als feste
               Datei vor. Der Ort wird nur im Browser gemerkt. Suche, Leistungsseite, Antrag und Chat nutzen denselben Ort, damit
-              niemand ihn zweimal eingeben muss. Wer eine Leistungsseite direkt öffnet, etwa über „Häufig gesucht“, gibt den Ort
+              niemand ihn zweimal eingeben muss. Wer eine Leistungsseite direkt öffnet, etwa über „Leistungen A bis Z“, gibt den Ort
               dort an. Die Inhalte der Seite sind auch ohne Angabe sichtbar. „Meinen Standort verwenden“ ist im Prototyp eine
               Demo und findet immer Beispielstadt. Im Betrieb fragt der Browser einmal um Erlaubnis, ein Geodienst macht aus den
               Koordinaten eine Postleitzahl, und gemerkt wird nur der Ort.

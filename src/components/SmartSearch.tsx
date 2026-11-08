@@ -10,7 +10,7 @@ import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
 import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
-import { CHAT_IN_PORTAL } from "@/data/site";
+import { CHAT_IN_PORTAL, SUGGESTIONS_IN_SEARCH } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 import { placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
@@ -204,7 +204,7 @@ export function SmartSearch({ label }: { label: string }) {
     return list;
   }, [result, trimmed, infoFirst, answer]);
 
-  const visible = open && items.length > 0;
+  const visible = SUGGESTIONS_IN_SEARCH && open && items.length > 0;
   const optionId = (i: number) => `${ids.list}-opt-${i}`;
 
   // Announce the number of suggestions after typing pauses.
@@ -255,11 +255,11 @@ export function SmartSearch({ label }: { label: string }) {
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown") {
+    if (SUGGESTIONS_IN_SEARCH && event.key === "ArrowDown") {
       event.preventDefault();
       if (!open) setOpen(true);
       setActive((a) => (a + 1 >= items.length ? 0 : a + 1));
-    } else if (event.key === "ArrowUp") {
+    } else if (SUGGESTIONS_IN_SEARCH && event.key === "ArrowUp") {
       event.preventDefault();
       if (!open) setOpen(true);
       setActive((a) => (a <= 0 ? items.length - 1 : a - 1));
@@ -339,11 +339,13 @@ export function SmartSearch({ label }: { label: string }) {
               name="q"
               type="text"
               className="t-smart__input"
-              role="combobox"
-              aria-expanded={visible}
-              aria-controls={ids.list}
-              aria-autocomplete="list"
-              aria-activedescendant={visible && active >= 0 ? optionId(active) : undefined}
+              {...(SUGGESTIONS_IN_SEARCH && {
+                role: "combobox",
+                "aria-expanded": visible,
+                "aria-controls": ids.list,
+                "aria-autocomplete": "list" as const,
+                "aria-activedescendant": visible && active >= 0 ? optionId(active) : undefined,
+              })}
               aria-describedby={ids.hint}
               autoComplete="off"
               spellCheck={false}
@@ -358,33 +360,35 @@ export function SmartSearch({ label }: { label: string }) {
               onBlur={() => setOpen(false)}
               onClick={() => setOpen(true)}
             />
-            <div
-              id={ids.list}
-              role="listbox"
-              aria-label="Vorschläge"
-              className="t-smart__list"
-              hidden={!visible}
-              onMouseDown={(event) => event.preventDefault()}
-            >
-              {blocks.map((block, b) =>
-                block.group ? (
-                  <div
-                    key={block.group + b}
-                    role="group"
-                    aria-labelledby={`${ids.list}-g${b}`}
-                    className="t-smart__block"
-                  >
-                    <div id={`${ids.list}-g${b}`} role="presentation" className="t-smart__group">
-                      {block.group === "Das passt am besten" && <IconSparkle size={14} />}
-                      {block.group}
+            {SUGGESTIONS_IN_SEARCH && (
+              <div
+                id={ids.list}
+                role="listbox"
+                aria-label="Vorschläge"
+                className="t-smart__list"
+                hidden={!visible}
+                onMouseDown={(event) => event.preventDefault()}
+              >
+                {blocks.map((block, b) =>
+                  block.group ? (
+                    <div
+                      key={block.group + b}
+                      role="group"
+                      aria-labelledby={`${ids.list}-g${b}`}
+                      className="t-smart__block"
+                    >
+                      <div id={`${ids.list}-g${b}`} role="presentation" className="t-smart__group">
+                        {block.group === "Das passt am besten" && <IconSparkle size={14} />}
+                        {block.group}
+                      </div>
+                      {block.entries.map(renderOption)}
                     </div>
-                    {block.entries.map(renderOption)}
-                  </div>
-                ) : (
-                  block.entries.map(renderOption)
-                ),
-              )}
-            </div>
+                  ) : (
+                    block.entries.map(renderOption)
+                  ),
+                )}
+              </div>
+            )}
           </div>
           <button type="submit" className="t-btn t-btn--primary t-smart__submit" aria-disabled={searching || undefined}>
             {searching && <span className="t-spinner" aria-hidden="true" />}

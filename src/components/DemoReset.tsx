@@ -11,13 +11,13 @@ export function resetDemo() {
   clearChat();
 }
 
-// Before a demo: every run starts the same. Small in the header, with an explanation on the test case page.
+// Before a demo: every run starts the same. Small in the footer, with an explanation on the test case page.
 export function DemoReset({ explained = false }: { explained?: boolean }) {
   const [status, setStatus] = useState("");
   const button = (
     <button
       type="button"
-      className={explained ? "t-btn" : "t-topbar__link t-topbar__reset"}
+      className={explained ? "t-btn" : "t-footer__reset"}
       onClick={() => {
         resetDemo();
         setStatus(explained ? "Zurückgesetzt. Die Vorführung startet wie beim ersten Besuch." : "Zurückgesetzt.");
@@ -30,7 +30,7 @@ export function DemoReset({ explained = false }: { explained?: boolean }) {
     return (
       <>
         {button}
-        <span role="status" className="t-topbar__status">
+        <span role="status" className="t-footer__status">
           {status}
         </span>
       </>

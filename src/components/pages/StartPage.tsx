@@ -5,7 +5,7 @@ import { ChatButton } from "@/components/ChatButton";
 import { IconArrow } from "@/components/Icons";
 import { SmartSearch } from "@/components/SmartSearch";
 import { TopicIcon } from "@/components/TopicIcons";
-import { LIFE_SITUATIONS, NEWS, TOP_TASKS } from "@/data/content";
+import { LIFE_SITUATIONS, NEWS } from "@/data/content";
 import { PROJECTS, PROJECTS_PAGE } from "@/data/projects";
 import { findService } from "@/data/services";
 import { CHAT_IN_PORTAL, SITE } from "@/data/site";
@@ -48,16 +48,11 @@ export function StartPage() {
         </div>
       </div>
 
-      <section className="t-container t-section" aria-labelledby="haeufig">
-        <SectionHead id="haeufig" title="Häufig gesucht" href="/leistungen" more="Alle Leistungen A bis Z" />
-        <ul className="t-tasks">
-          {services(TOP_TASKS).map((service) => (
-            <li key={service.slug}>
-              <Link href={`/leistungen/${service.slug}`} className="t-task">
-                <span>{service.title}</span>
-                <IconArrow size={18} />
-              </Link>
-            </li>
+      <section className="t-container t-section" aria-labelledby="aktuelles">
+        <SectionHead id="aktuelles" title="Aktuelle Themen" href="/aktuelles" more="Alle Meldungen" />
+        <ul className="t-cards t-cards--4">
+          {news.map((item) => (
+            <NewsCard key={item.id} item={item} />
           ))}
         </ul>
       </section>
@@ -83,15 +78,6 @@ export function StartPage() {
             ))}
           </ul>
         </div>
-      </section>
-
-      <section className="t-container t-section" aria-labelledby="aktuelles">
-        <SectionHead id="aktuelles" title="Aktuelle Themen" href="/aktuelles" more="Alle Meldungen" />
-        <ul className="t-cards t-cards--4">
-          {news.map((item) => (
-            <NewsCard key={item.id} item={item} />
-          ))}
-        </ul>
       </section>
 
       <section className="t-container t-section" aria-labelledby="projekte">

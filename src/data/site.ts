@@ -8,8 +8,6 @@ type Site = {
   region: string;
   nav: NavItem[];
   footer: FooterColumn[];
-  meta: (NavItem & { icon: "hand" | "book" })[];
-  languages: string[];
   contact: Contact & { email: string; hours: string };
   assistant: { greeting: string; starters: string[] };
   // Page with the diagrams of the search switch, for stakeholders.
@@ -19,6 +17,9 @@ type Site = {
 // The chat is left out of the portal for the user tests: no window, no links to it. Its page stays
 // reachable for the optional test case /testfall/chat. Set to true to bring it back everywhere.
 export const CHAT_IN_PORTAL: boolean = false;
+
+// The list of suggestions under the search field comes back with the AI search. Set to true to show it again.
+export const SUGGESTIONS_IN_SEARCH: boolean = false;
 
 // The one portal of this prototype: services of the Land and its municipalities in one place.
 // Musterland, its places and everything on these pages are fictional.
@@ -61,12 +62,6 @@ export const SITE: Site = {
       ],
     },
   ],
-  // Quick links above the header: sign language and easy language.
-  meta: [
-    { label: "Gebärdensprache", href: "/seite/gebaerdensprache", icon: "hand" },
-    { label: "Leichte Sprache", href: "/seite/leichte-sprache", icon: "book" },
-  ],
-  languages: ["Deutsch", "English"],
   contact: {
     office: "Bürgerservice Musterland",
     address: "Schlossplatz 1, 10000 Musterstadt",

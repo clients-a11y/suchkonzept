@@ -7,7 +7,8 @@ Beispieldaten, die Fotos sind KI-generiert.
 
 Was der Prototyp zeigt:
 
-- **Zentrale Suche** in eigenen Worten mit Vorschlägen, Tippfehlerkorrektur und Kurzantwort
+- **Zentrale Suche** in eigenen Worten mit Tippfehlerkorrektur und Kurzantwort. Die Vorschlagsliste ist vorerst aus
+  (`SUGGESTIONS_IN_SEARCH` in `src/data/site.ts`) und kommt mit der KI-Suche
 - **Suchweiche** mit zwei Bereichen (Leistungen, Informationen) und Overlay „Was suchen Sie?“ bei unklaren Anfragen
 - **Wohnort vor der Suche**: vor den Treffern oder der Leistungsseite Postleitzahl oder Ort, damit das Portal die
   zuständige Stelle nennt; bei unklarer Weiche zwei Schritte („Was suchen Sie?“, „Wo wohnen Sie?“). Entfällt bei
@@ -16,7 +17,7 @@ Was der Prototyp zeigt:
   Alltag gezielt nach („Mein Portemonnaie ist weg“) und verweist nach zwei Rückfragen an den Bürgerservice
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
 - **Testszenarien** unter `/testszenarien`: Übersicht mit Prozessflows für die Product Owner, die Details für die
-  Moderation unter `/testszenarien/testfaelle`. Im Portal gibt es keinen Link darauf
+  Moderation unter `/testszenarien/testfaelle`. Beide sind im Footer verlinkt, dort steht auch „Demo zurücksetzen“
 - **Zwei Suchabläufe**: Variante 1 fragt vor den Treffern, Variante 2 ist die eine Ergebnisseite aus Annahme 1
   (`/ergebnisse`). Die Testfälle wählen die Variante. Beide spielen die spätere Wartezeit der KI mit einer Ladeanimation nach
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“
