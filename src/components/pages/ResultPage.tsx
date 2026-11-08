@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useState } from "react";
 import { IconCheck, IconSparkle } from "@/components/Icons";
-import { AnswerPlace, HitList, Loading, SearchHead, useArrival } from "@/components/pages/SearchPage";
+import { AnswerPlace, HitList, Loading, PotQuestion, SearchHead, useArrival } from "@/components/pages/SearchPage";
 import { RegionField } from "@/components/RegionField";
 import { SearchPending } from "@/components/SearchPending";
 import type { Place } from "@/data/places";
 import { setPlaceId, usePlace } from "@/lib/place-store";
-import { resultArea } from "@/lib/result-area";
-import { latencyFor } from "@/lib/search-latency";
+import { isUnclear, resultArea } from "@/lib/result-area";
+import { latencyFor, wasEvaluated } from "@/lib/search-latency";
+import type { Pot } from "@/lib/search-router";
 import { searchInformation } from "@/lib/smart-search";
 import type { Service } from "@/lib/types";
 
@@ -58,11 +59,13 @@ function Ghost() {
   );
 }
 
-function ResultBody({ q }: { q: string }) {
+function ResultBody({ q, chosen }: { q: string; chosen?: Pot }) {
   const place = usePlace();
   const placeId = place?.id;
   const titles = { services: useId(), info: useId() };
-  const ready = useArrival(q, latencyFor(q));
+  // The steps on the start page may have waited already, and a chosen area needs no judging.
+  const arrived = useArrival(q, latencyFor(q));
+  const ready = arrived || Boolean(chosen) || wasEvaluated(q);
   // Only a place entered here turns a search for information into a search for services.
   const [enteredHere, setEnteredHere] = useState(false);
   const [refining, setRefining] = useState(false);
@@ -74,6 +77,8 @@ function ResultBody({ q }: { q: string }) {
   }, [refining, q, placeId]);
 
   if (!ready) return <Loading thinking />;
+  // Searched from this page: the question stands in the page, no overlay.
+  if (!chosen && isUnclear(q)) return <PotQuestion q={q} />;
 
   const choose = (next: Place) => {
     setPlaceId(next.id);
@@ -81,7 +86,7 @@ function ResultBody({ q }: { q: string }) {
     setRefining(true);
   };
 
-  const area = resultArea(q, place, enteredHere);
+  const area = resultArea(q, place, enteredHere, chosen);
   const information = searchInformation(q);
   const field = <RegionField key={placeId} label="PLZ/Ort für regionale Ergebnisse" initial={place?.name ?? ""} onPlace={choose} />;
   // Services with one office for everyone: a place would change nothing.
@@ -142,13 +147,16 @@ function ResultBody({ q }: { q: string }) {
 }
 
 function Results() {
-  const q = (useSearchParams().get("q") ?? "").trim();
+  const params = useSearchParams();
+  const q = (params.get("q") ?? "").trim();
+  const requested = params.get("in");
+  const chosen: Pot | undefined = requested === "leistungen" || requested === "informationen" ? requested : undefined;
   return (
     <>
       <SearchHead q={q} action={ACTION} />
       <div className="t-container t-page">
         {/* A new search starts over: new wait, no place entered yet. */}
-        {q ? <ResultBody key={q} q={q} /> : <p className="t-search__summary">Geben Sie oben ein, was Sie suchen.</p>}
+        {q ? <ResultBody key={`${q}|${chosen}`} q={q} chosen={chosen} /> : <p className="t-search__summary">Geben Sie oben ein, was Sie suchen.</p>}
       </div>
     </>
   );

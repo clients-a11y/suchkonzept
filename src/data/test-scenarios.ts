@@ -32,6 +32,7 @@ const enter = (plz: string) => person(`Gibt ${plz} ein`);
 const WAIT: FlowStep = { kind: "wait", text: "Ladeanimation, 1 bis 3 Sekunden" };
 const OVERLAY = page("Overlay fragt nach dem Ort, dahinter ein Skeleton");
 const TWO_LINES = page("Zwei Zeilen zum Ort, darunter die Informationen");
+const PICK_APPLY = person("Wählt „Etwas beantragen“");
 const STOP: FlowStep = { kind: "end", text: "Test endet vor dem Antrag" };
 const ANSWERED: FlowStep = { kind: "end", text: "Test endet, die Frage ist beantwortet" };
 
@@ -100,6 +101,19 @@ export const SCENARIOS: Scenario[] = [
     observe: ["Trägt die Person ihren Ort von selbst ein?", "Findet sie sich zurecht, wenn die Seite sich umbaut?"],
     success: "Die Person trägt ihren Ort ein und nennt mindestens eine passende Leistung.",
     ask: "Was hat sich auf der Seite verändert, nachdem Sie den Ort eingegeben haben?",
+  },
+  {
+    id: 6,
+    case: "Unklar: Leistung oder Information",
+    title: "Die Suche fragt zuerst nach",
+    summary: "Aus dem Begriff allein geht nicht hervor, was gemeint ist. Ein Overlay fragt vor den Treffern nach. Wir prüfen, ob die Menschen die Frage verstehen oder sie als Hürde empfinden.",
+    path: [search("Kindergeld"), WAIT, page("Overlay „Was suchen Sie?“"), PICK_APPLY, page("Ergebnisseite mit Kindergeld oben, ohne Feld für den Ort"), STOP],
+    task: "Ihr Kind ist gerade geboren, und Sie möchten jetzt Geld für Ihr Kind bekommen. Suchen Sie nach dem Wort Kindergeld.",
+    home: SEEHAUSEN,
+    term: "Kindergeld",
+    observe: ["Versteht die Person die Frage, oder stört sie sie?", "Wählt sie ohne Zögern?"],
+    success: "Die Person wählt „Etwas beantragen“ und findet Kindergeld oben auf der Ergebnisseite.",
+    ask: "Hätten Sie diese Frage gebraucht?",
   },
 ];
 

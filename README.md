@@ -16,9 +16,9 @@ Was der Prototyp zeigt:
 - **Chat-Assistent** (im Portal vorerst ausgeblendet, siehe `CHAT_IN_PORTAL` in `src/data/site.ts`; optional unter `/testfall/chat`) als Seite und als kleines Fenster, auf Basis derselben Suche; fragt bei unklaren Anliegen aus dem
   Alltag gezielt nach („Mein Portemonnaie ist weg“) und verweist nach zwei Rückfragen an den Bürgerservice
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
-- **Testszenarien** unter `/testszenarien`: fünf Karten, je Szenario eine Detailseite mit Aufgabe, Klickpfad und Start. Im Footer verlinkt, dort steht auch „Demo zurücksetzen“
+- **Testszenarien** unter `/testszenarien`: sechs Karten, je Szenario eine Detailseite mit Aufgabe, Klickpfad und Start. Im Footer verlinkt, dort steht auch „Demo zurücksetzen“
 - **Eine Ergebnisseite** (`/ergebnisse`) für Leistungen und Informationen, mit Ladeanimation für die spätere Wartezeit der
-  KI. Der frühere Ablauf mit Fragen vor den Treffern (`/suche`) ist über `ONE_RESULTS_PAGE` in `src/data/site.ts` abgeschaltet
+  KI. Nur bei einem unklaren Begriff fragt vorher das Overlay „Was suchen Sie?“. Der frühere Ablauf mit der Frage nach dem Wohnort vor den Treffern (`/suche`) ist über `ONE_RESULTS_PAGE` in `src/data/site.ts` abgeschaltet
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“
 - **So entscheidet die Suche** unter `/so-entscheidet-die-suche`: Diagramme und Punkteregeln für Stakeholder
 

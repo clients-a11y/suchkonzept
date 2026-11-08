@@ -168,7 +168,7 @@ export function AnswerPlace({ service }: { service: Service }) {
 }
 
 // The search switch could not decide: one question, two answers.
-function PotQuestion({ q }: { q: string }) {
+export function PotQuestion({ q }: { q: string }) {
   const titleId = useId();
   return (
     <section className="t-route" aria-labelledby={titleId}>

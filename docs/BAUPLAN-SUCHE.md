@@ -160,6 +160,8 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Vereinfacht (auf Wunsch, 08.11.2026): Getestet wird nur noch die eine Ergebnisseite, in fünf Szenarien mit je einem
   Klickpfad. Weiche und Frage nach dem Wohnort vor den Treffern sind über `ONE_RESULTS_PAGE` abgeschaltet und bleiben im Code.
   Das Feld für den Ort fehlt, wenn alle gezeigten Leistungen überall dieselbe Stelle haben.
+- Die Rückfrage „Was suchen Sie?“ ist zurück (auf Wunsch, 08.11.2026): Bei einem unklaren Begriff wie „Kindergeld“ kommt sie
+  nach der Ladeanimation als Overlay, danach die Ergebnisseite. Sechstes Szenario. Regel: `isUnclear` in `src/lib/result-area.ts`.
 - Startseite: „Häufig gesucht“ ist entfernt (auf Wunsch, 08.11.2026), „Aktuelle Themen“ stehen an dessen Stelle direkt unter der Suche.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)

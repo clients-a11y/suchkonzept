@@ -2,6 +2,7 @@ import { STOPWORDS } from "@/data/intents";
 import type { Place } from "@/data/places";
 import { offeredIn } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
+import type { Pot } from "@/lib/search-router";
 import { normalize, searchServices } from "@/lib/smart-search";
 import type { Service } from "@/lib/types";
 
@@ -25,10 +26,17 @@ function matchesEveryWord(service: Service, query: string): boolean {
     .every((word) => searchServices(word).services.some((h) => h.service.slug === service.slug));
 }
 
-export function resultArea(query: string, place: Place | undefined, enteredHere: boolean): ResultArea {
+// The catalogue knows the term, but it can mean a service or information: "Kindergeld". Then the page asks first.
+export function isUnclear(query: string): boolean {
+  if (routeQuery(query).pot) return false;
+  const found = searchServices(query);
+  return Boolean(found.answer) || found.services.some((h) => h.score >= STRONG);
+}
+
+export function resultArea(query: string, place: Place | undefined, enteredHere: boolean, chosen?: Pot): ResultArea {
   const found = searchServices(query);
   const strong = found.answer ? [found.answer] : found.services.filter((h) => h.score >= STRONG).map((h) => h.service);
-  const clear = routeQuery(query).pot === "informationen" ? [] : strong.slice(0, MAX_SERVICES);
+  const clear = (chosen ?? routeQuery(query).pot) === "informationen" ? [] : strong.slice(0, MAX_SERVICES);
 
   if (clear.length) {
     if (place) {

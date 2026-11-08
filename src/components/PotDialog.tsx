@@ -8,7 +8,7 @@ import { LocateButton } from "@/components/LocateButton";
 import { SearchPending } from "@/components/SearchPending";
 import { PictogramApplication, PictogramNews, PictogramSwitch } from "@/components/PotIcons";
 import type { Place } from "@/data/places";
-import { SITE } from "@/data/site";
+import { SEARCH_PATH, SITE } from "@/data/site";
 import { findPlaces, setPlaceId, usePlace } from "@/lib/place-store";
 import { latencyFor, markEvaluated } from "@/lib/search-latency";
 import type { Pot } from "@/lib/search-router";
@@ -22,7 +22,7 @@ function searchHref(query: string, pot?: Pot): string {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (pot) params.set("in", pot);
-  return `/suche?${params.toString()}`;
+  return `${SEARCH_PATH}?${params.toString()}`;
 }
 
 // The two answers to "Was suchen Sie?": links on the search page, buttons in the steps of the overlay.

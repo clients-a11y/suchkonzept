@@ -305,7 +305,7 @@ export function SearchFlowPage() {
             entscheidet eine Weiche, welcher Bereich gemeint ist. Sie braucht dafür keine Datenbank, nur den Leistungskatalog
             und feste Signalwörter. Ist sie unsicher, fragt sie nach, statt zu raten. Vor der Anfrage fragt das Portal nach dem
             Wohnort, damit es die zuständige Stelle nennen kann, außer es ist überall dieselbe Stelle zuständig. Im Prototyp läuft
-            derzeit die eine Ergebnisseite ohne diese Rückfragen.
+            derzeit die eine Ergebnisseite, nur bei einem unklaren Begriff kommt die Rückfrage davor.
           </p>
           <nav aria-label="Auf dieser Seite" className="t-jumps">
             <ul>

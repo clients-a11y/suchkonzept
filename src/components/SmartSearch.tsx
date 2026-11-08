@@ -13,6 +13,7 @@ import type { Service } from "@/lib/types";
 import { CHAT_IN_PORTAL, ONE_RESULTS_PAGE, SEARCH_PATH, SUGGESTIONS_IN_SEARCH } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
 import { placeMatters } from "@/lib/offices";
+import { isUnclear } from "@/lib/result-area";
 import { routeQuery } from "@/lib/search-router";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
@@ -233,8 +234,8 @@ export function SmartSearch({ label }: { label: string }) {
     }
     if (item.chat) return askChat(trimmed);
     setOpen(false);
-    // The one results page has no steps before it: a service opens, everything else is a search.
-    if (ONE_RESULTS_PAGE) return go(item.title && item.href ? item.href : resultsHref(trimmed));
+    // With the one results page a service opens at once, everything else is a search.
+    if (ONE_RESULTS_PAGE) return item.title && item.href ? go(item.href) : searchNow();
     if (item.key === "all") return start(routeQuery(trimmed).pot ? { query: trimmed, href: item.href } : { query: trimmed }, undefined, true);
     if (!item.href) return;
     // A service decides by its own office, a search by the service it clearly leads to. A suggested service
@@ -251,6 +252,12 @@ export function SmartSearch({ label }: { label: string }) {
   const start = (next: Omit<SearchRequest, "place" | "wait">, place = placeMatters(next.query), wait = false) => {
     if (next.href && !place && !wait) return go(next.href);
     setRequest({ ...next, place, wait });
+  };
+
+  // After the wait come the results, or first the question if the term can mean both.
+  const searchNow = () => {
+    if (!trimmed) return go(SEARCH_PATH);
+    start(isUnclear(trimmed) ? { query: trimmed } : { query: trimmed, href: resultsHref(trimmed) }, false, true);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -317,7 +324,7 @@ export function SmartSearch({ label }: { label: string }) {
           // A search asks for the place first; an unclear one asks "Was suchen Sie?" before that.
           event.preventDefault();
           setOpen(false);
-          if (ONE_RESULTS_PAGE) return go(trimmed ? resultsHref(trimmed) : "/ergebnisse");
+          if (ONE_RESULTS_PAGE) return searchNow();
           if (!trimmed) return start({ query: "", href: "/suche" });
           start(routeQuery(trimmed).pot ? { query: trimmed, href: `/suche?q=${encodeURIComponent(trimmed)}` } : { query: trimmed }, undefined, true);
         }}
