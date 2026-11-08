@@ -20,10 +20,9 @@ export type Scenario = {
   home?: string;
   // Nur nennen, wenn die Person keinen Begriff findet oder woanders landet.
   term: string;
-  expected: string;
   observe: string[];
   success: string;
-  ask: string[];
+  ask: string;
 };
 
 const SEEHAUSEN = "Sie wohnen in Seehausen, Postleitzahl 10200.";
@@ -54,10 +53,9 @@ export const CORE_SCENARIOS: Scenario[] = [
     task: "Ihr Personalausweis läuft in zwei Monaten ab. Was müssen Sie jetzt tun, und wo müssen Sie hin?",
     home: SEEHAUSEN,
     term: "Personalausweis",
-    expected: "Die Leistung steht oben, die Informationen darunter. Das Feld mit dem Hinweis „PLZ/Ort für regionale Ergebnisse“ sitzt im oberen Teil des Leistungsbereichs.",
-    observe: ["Wohin schaut die Person zuerst?", "Trägt sie ihre Postleitzahl ein, ohne dass jemand danach fragt?", "Merkt sie, dass danach die zuständige Stelle dasteht?"],
+    observe: ["Trägt die Person ihre Postleitzahl ein, ohne dass jemand danach fragt?", "Wohin schaut sie zuerst?"],
     success: "Die Person nennt das Bürgerbüro Seehausen und sagt, was sie mitbringen muss.",
-    ask: ["Wofür ist das Feld mit der Postleitzahl da?", "Was machen Sie als Nächstes?"],
+    ask: "Wofür ist das Feld mit der Postleitzahl da?",
   },
   {
     id: 2,
@@ -69,10 +67,9 @@ export const CORE_SCENARIOS: Scenario[] = [
     task: "Sie haben gerade ein Kind bekommen. Was können Sie jetzt beantragen?",
     home: SEEHAUSEN,
     term: "Baby",
-    expected: "Im Leistungsbereich stehen bis zu drei Leistungen, hier Kindergeld und Kitaplatz. Die Informationen kommen darunter.",
     observe: ["Liest die Person beide Leistungen, oder klickt sie die erste an?", "Kann sie sagen, worin sich die beiden unterscheiden?"],
     success: "Die Person nennt Kindergeld und Kitaplatz.",
-    ask: ["Womit würden Sie anfangen, und warum?", "Hat Ihnen etwas gefehlt?"],
+    ask: "Womit würden Sie anfangen, und warum?",
   },
   {
     id: 3,
@@ -84,10 +81,9 @@ export const CORE_SCENARIOS: Scenario[] = [
     task: "Sie haben sich einen Hund angeschafft. Müssen Sie ihn irgendwo anmelden, und wenn ja, wo?",
     home: SEEHAUSEN,
     term: "Hund anmelden",
-    expected: "Ohne Ort gibt es noch keine Treffer. Über dem Leistungsbereich liegt ein Overlay mit dem Text „Bitte geben Sie Ihre PLZ oder Ihren Ort für regionale Ergebnisse ein“ und einem Eingabefeld. Dahinter schimmert ein Skeleton.",
-    observe: ["Denkt die Person, die Seite lädt noch oder ist kaputt?", "Gibt sie den Ort ein, oder scrollt sie am Overlay vorbei zu den Informationen?", "Versucht sie, das Overlay wegzuklicken?"],
+    observe: ["Denkt die Person, die Seite lädt noch oder ist kaputt?", "Gibt sie den Ort ein, oder scrollt sie am Overlay vorbei?"],
     success: "Die Person gibt ihren Ort ein und nennt das Bürgerbüro Seehausen und die Frist von einem Monat.",
-    ask: ["Was haben Sie gedacht, als Sie den abgedeckten Bereich gesehen haben?", "Warum will die Seite Ihren Ort wissen?"],
+    ask: "Was haben Sie gedacht, als Sie den abgedeckten Bereich gesehen haben?",
   },
   {
     id: 4,
@@ -99,10 +95,9 @@ export const CORE_SCENARIOS: Scenario[] = [
     task: "Sie möchten am Wochenende angeln gehen. Was brauchen Sie dafür?",
     home: WALDHEIM,
     term: "Angelschein",
-    expected: "Gibt die Person ihren Ort ein, erscheint der Hinweis „Für diesen Ort gibt es keine regionalen Leistungen, vielleicht helfen Ihnen die Informationen unten weiter“.",
-    observe: ["Hält die Person das für einen Fehler der Suche, oder versteht sie, dass es an ihrem Ort nichts gibt?", "Liest sie unten weiter, oder probiert sie einen anderen Ort oder Begriff?"],
+    observe: ["Hält die Person das für einen Fehler der Suche?", "Liest sie unten weiter?"],
     success: "Die Person sagt, dass es dazu in Waldheim nichts gibt, und liest in den Informationen weiter.",
-    ask: ["Was machen Sie jetzt?", "Was hat Ihnen der Hinweis gesagt?"],
+    ask: "Was hat Ihnen der Hinweis gesagt?",
   },
   {
     id: 5,
@@ -114,10 +109,9 @@ export const CORE_SCENARIOS: Scenario[] = [
     task: "Am Marktplatz in Beispielstadt ist Baustelle, und Ihr Bus fährt anders als sonst. Bis wann bleibt das so?",
     home: "Sie wohnen in Beispielstadt, Postleitzahl 20100.",
     term: "Baustelle Marktplatz",
-    expected: "Der Leistungsbereich schrumpft auf zwei Zeilen mit dem Text „Gibt es dazu eine Leistung in Ihrer Region? PLZ/Ort eingeben“ und einem Eingabefeld. Darunter stehen die Informationen.",
-    observe: ["Bemerkt die Person die zwei Zeilen überhaupt?", "Trägt sie dort etwas ein, obwohl sie nur etwas lesen will?", "Findet sie die Meldung, ohne zurückzugehen?"],
+    observe: ["Bemerkt die Person die zwei Zeilen?", "Trägt sie dort etwas ein, obwohl sie nur lesen will?"],
     success: "Die Person sagt „bis Dezember“.",
-    ask: ["Was passiert Ihrer Meinung nach, wenn Sie in das kleine Feld etwas eintragen?"],
+    ask: "Was passiert Ihrer Meinung nach, wenn Sie in das kleine Feld etwas eintragen?",
   },
 ];
 
@@ -131,10 +125,9 @@ export const EXTRA_SCENARIOS: Scenario[] = [
     task: "Jemand hat Ihnen erzählt, dass Familien in Ihrer Gegend Unterstützung bekommen können. Ist für Sie etwas dabei?",
     home: SEEHAUSEN,
     term: "Unterstützung für Familien",
-    expected: "Erst erscheinen die Informationen mit den zwei Zeilen darüber. Gibt die Person ihren Ort ein, wächst daraus der Leistungsbereich aus Fall 1.",
-    observe: ["Trägt die Person ihren Ort ein, ohne dass jemand es ihr sagt?", "Findet sie sich zurecht, wenn die Seite sich danach umbaut?"],
+    observe: ["Trägt die Person ihren Ort von selbst ein?", "Findet sie sich zurecht, wenn die Seite sich umbaut?"],
     success: "Die Person trägt ihren Ort ein und nennt mindestens eine passende Leistung.",
-    ask: ["Was hat sich auf der Seite verändert, nachdem Sie den Ort eingegeben haben?"],
+    ask: "Was hat sich auf der Seite verändert, nachdem Sie den Ort eingegeben haben?",
   },
   {
     id: 7,
@@ -145,10 +138,9 @@ export const EXTRA_SCENARIOS: Scenario[] = [
     task: "Sie haben gehört, dass manche Orte Zuschüsse für neue Heizungen zahlen. Gilt das auch bei Ihnen?",
     home: WALDHEIM,
     term: "Zuschuss Heizung",
-    expected: "Erst erscheinen die Informationen mit den zwei Zeilen darüber. Nach der Eingabe des Orts steht dort der Hinweis, dass es für diesen Ort nichts gibt.",
     observe: ["Versteht die Person, dass die Antwort „bei Ihnen nicht“ lautet?", "Sucht sie weiter, oder gibt sie auf?"],
     success: "Die Person sagt, dass es an ihrem Ort nichts gibt.",
-    ask: ["Wie sicher sind Sie, dass es dazu bei Ihnen nichts gibt?"],
+    ask: "Wie sicher sind Sie, dass es dazu bei Ihnen nichts gibt?",
   },
   {
     id: 8,
@@ -159,10 +151,9 @@ export const EXTRA_SCENARIOS: Scenario[] = [
     v2: [search("Kindergeld"), WAIT, page("Leistung oben, Feld für den Ort bleibt leer"), STOP],
     task: "Sie möchten Kindergeld beantragen. Geht das online?",
     term: "Kindergeld",
-    expected: "Annahme 1 nennt keine Ausnahme, deshalb steht das Feld für den Ort auch hier. Ein Ort ändert bei Kindergeld nichts.",
     observe: ["Trägt die Person trotzdem ihren Ort ein?", "Sucht sie nach einer Stelle in ihrer Nähe?"],
     success: "Die Person sagt, dass der Antrag online geht.",
-    ask: ["Hätten Sie erwartet, dass die Seite nach Ihrem Wohnort fragt?"],
+    ask: "Hätten Sie erwartet, dass die Seite nach Ihrem Wohnort fragt?",
   },
 ];
 
@@ -175,8 +166,7 @@ export const CHAT_SCENARIO: Scenario = {
   task: "Ihr Portemonnaie ist weg, und Ihr Personalausweis war darin. Fragen Sie den Chat, was Sie jetzt tun müssen.",
   home: SEEHAUSEN,
   term: "Mein Portemonnaie ist weg",
-  expected: "Der Chat fragt zurück, was darin war. Danach sagt er, dass die Person den Verlust melden soll, und nennt die Stelle am Wohnort.",
-  observe: ["Klickt die Person die Knöpfe an, oder tippt sie?", "Beantwortet sie die Rückfrage, oder schreibt sie etwas anderes?"],
+  observe: ["Klickt die Person die Knöpfe an, oder tippt sie?", "Beantwortet sie die Rückfrage?"],
   success: "Die Person sagt, dass sie den Verlust melden muss, und nennt das Bürgerbüro Seehausen.",
-  ask: ["Würden Sie so etwas lieber im Chat oder über die Suche erledigen?"],
+  ask: "Würden Sie so etwas lieber im Chat oder über die Suche erledigen?",
 };
