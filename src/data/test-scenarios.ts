@@ -170,3 +170,31 @@ export const CHAT_SCENARIO: Scenario = {
   success: "Die Person sagt, dass sie den Verlust melden muss, und nennt das Bürgerbüro Seehausen.",
   ask: "Würden Sie so etwas lieber im Chat oder über die Suche erledigen?",
 };
+
+export const SCENARIOS: Scenario[] = [...CORE_SCENARIOS, ...EXTRA_SCENARIOS, CHAT_SCENARIO];
+
+export function findScenario(id: string): Scenario | undefined {
+  return SCENARIOS.find((s) => String(s.id) === id);
+}
+
+export function priorityOf(scenario: Scenario): string {
+  if (CORE_SCENARIOS.includes(scenario)) return "Kernszenario";
+  return scenario.chat ? "Optional" : "Wenn Zeit bleibt";
+}
+
+// "Seehausen, 10200" from the sentence on the card with the place.
+export function placeOf(scenario: Scenario): string | undefined {
+  const match = scenario.home?.match(/in (.+), Postleitzahl (\d+)/);
+  return match ? `${match[1]}, ${match[2]}` : undefined;
+}
+
+function pick(...ids: number[]): Scenario[] {
+  return SCENARIOS.filter((s) => ids.includes(s.id));
+}
+
+export const SCENARIO_GROUPS: { title: string; lead: string; scenarios: Scenario[] }[] = [
+  { title: "Fall 1: Die Suche erkennt eine Leistung", lead: "Die Leistung steht oben, das Feld für den Ort ist freiwillig.", scenarios: pick(1, 2) },
+  { title: "Fall 2: Ohne Ort gibt es kein Ergebnis", lead: "Ein Overlay fragt nach dem Ort. Manche Orte bieten die Leistung gar nicht an.", scenarios: pick(3, 4) },
+  { title: "Fall 3: Die Suche findet eher Informationen", lead: "Der Leistungsbereich schrumpft auf zwei Zeilen und wächst erst mit dem Ort.", scenarios: pick(5, 6, 7) },
+  { title: "Ergänzungen", lead: "Außerhalb von Annahme 1. Der Chat ist im Portal ausgeblendet und nur hier zu sehen.", scenarios: pick(8, 9) },
+];

@@ -16,8 +16,8 @@ Was der Prototyp zeigt:
 - **Chat-Assistent** (im Portal vorerst ausgeblendet, siehe `CHAT_IN_PORTAL` in `src/data/site.ts`; optional unter `/testfall/chat`) als Seite und als kleines Fenster, auf Basis derselben Suche; fragt bei unklaren Anliegen aus dem
   Alltag gezielt nach („Mein Portemonnaie ist weg“) und verweist nach zwei Rückfragen an den Bürgerservice
 - **Online-Antrag** mit Formularprüfung und **Nutzerkonto mit Postfach** (Demo-Konto ohne Passwort)
-- **Testszenarien** unter `/testszenarien`: Übersicht mit Prozessflows für die Product Owner, die Details für die
-  Moderation unter `/testszenarien/testfaelle`. Beide sind im Footer verlinkt, dort steht auch „Demo zurücksetzen“
+- **Testszenarien** unter `/testszenarien`: Karten nach Fällen, je Szenario eine Detailseite mit Aufgabe, Klickpfaden und
+  Start. Im Footer verlinkt, dort steht auch „Demo zurücksetzen“
 - **Zwei Suchabläufe**: Variante 1 fragt vor den Treffern, Variante 2 ist die eine Ergebnisseite aus Annahme 1
   (`/ergebnisse`). Die Testfälle wählen die Variante. Beide spielen die spätere Wartezeit der KI mit einer Ladeanimation nach
 - **Testfall Kindergeld** unter `/testfall` als Vorführablauf, mit „Demo zurücksetzen“

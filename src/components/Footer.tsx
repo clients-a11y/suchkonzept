@@ -24,10 +24,7 @@ export function Footer() {
           <h2 className="t-footer__title">Prototyp</h2>
           <ul className="t-footer__links">
             <li>
-              <Link href="/testszenarien">Übersicht Testszenarien</Link>
-            </li>
-            <li>
-              <Link href="/testszenarien/testfaelle">Testfälle</Link>
+              <Link href="/testszenarien">Testszenarien</Link>
             </li>
             <li>
               <DemoReset />

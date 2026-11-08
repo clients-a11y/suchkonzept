@@ -1,43 +1,37 @@
 import Link from "next/link";
-import { CHAT_SCENARIO, CORE_SCENARIOS, EXTRA_SCENARIOS } from "@/data/test-scenarios";
-import type { FlowStep, Scenario } from "@/data/test-scenarios";
+import { IconArrow } from "@/components/Icons";
+import { SCENARIO_GROUPS, placeOf, priorityOf } from "@/data/test-scenarios";
+import type { Scenario } from "@/data/test-scenarios";
 
-// In front of the prototype, without the portal around it: the overview for the product owners.
-// What a moderator needs in a session is on the page of test cases.
+// In front of the prototype, without the portal around it: all scenarios at a glance, one page per scenario.
 
-const KIND_LABEL: Record<FlowStep["kind"], string> = { person: "Person", wait: "Warten", page: "Seite", end: "Ende" };
-
-function Flow({ label, steps }: { label: string; steps: FlowStep[] }) {
+function ScenarioCard({ scenario }: { scenario: Scenario }) {
+  const place = placeOf(scenario);
   return (
-    <div className="t-flowrow">
-      <h4 className="t-scen__label">{label}</h4>
-      <ol className="t-flowline">
-        {steps.map((step, i) => (
-          <li key={i}>
-            <span className="t-flowstep" data-kind={step.kind}>
-              <span className="visually-hidden">{KIND_LABEL[step.kind]}: </span>
-              {step.text}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-function ScenarioSummary({ scenario }: { scenario: Scenario }) {
-  return (
-    <li className="t-scen">
-      <div>
-        <p className="t-case__step">
-          Szenario {scenario.id} · {scenario.case}
-        </p>
-        <h3 className="t-h3">{scenario.title}</h3>
-        <p className="t-scen__summary">{scenario.summary}</p>
+    <li className="t-scard">
+      <div className="t-scard__top">
+        <span className="t-scard__badge">{scenario.id}</span>
+        <span className="t-scard__meta">{scenario.case}</span>
       </div>
-      {scenario.v1 && <Flow label="Variante 1, Frage vor den Treffern" steps={scenario.v1} />}
-      {scenario.v2 && <Flow label="Variante 2, eine Ergebnisseite" steps={scenario.v2} />}
-      {scenario.chat && <Flow label="Chat-Assistent" steps={scenario.chat} />}
+      <h3 className="t-scard__title">
+        <Link href={`/testszenarien/${scenario.id}`} className="t-cardlink">
+          {scenario.title}
+        </Link>
+      </h3>
+      <p>{scenario.summary}</p>
+      <p className="t-scard__entry">
+        Suchbegriff: {scenario.term}
+        {place && ` · Wohnort: ${place}`}
+      </p>
+      <div className="t-scard__foot">
+        <ul className="t-scard__tags">
+          <li>{priorityOf(scenario)}</li>
+          {scenario.v1 && <li>Variante 1</li>}
+          {scenario.v2 && <li>Variante 2</li>}
+          {scenario.chat && <li>Chat</li>}
+        </ul>
+        <IconArrow size={20} />
+      </div>
     </li>
   );
 }
@@ -54,9 +48,6 @@ export function UserTestPage() {
             Informationen zusammen auf eine Ergebnisseite passen.
           </p>
           <p className="t-actions">
-            <Link href="/testszenarien/testfaelle" className="t-btn t-btn--primary">
-              Testfälle öffnen
-            </Link>
             <Link href="/" className="t-btn">
               Prototyp öffnen
             </Link>
@@ -86,51 +77,30 @@ export function UserTestPage() {
           </ul>
         </section>
 
-        <section aria-labelledby="kern">
-          <h2 id="kern" className="t-h2">
-            Kernszenarien
-          </h2>
-          <div className="t-flowlegend" aria-hidden="true">
-            <span className="t-flowstep" data-kind="person">
-              Das macht die Person
-            </span>
-            <span className="t-flowstep" data-kind="wait">
-              Ladeanimation
-            </span>
-            <span className="t-flowstep" data-kind="page">
-              Das zeigt die Seite
-            </span>
-            <span className="t-flowstep" data-kind="end">
-              Ende des Tests
-            </span>
-          </div>
-          <ol className="t-scens__list">
-            {CORE_SCENARIOS.map((scenario) => (
-              <ScenarioSummary key={scenario.id} scenario={scenario} />
-            ))}
-          </ol>
-        </section>
+        {SCENARIO_GROUPS.map((group, index) => (
+          <section key={group.title} aria-labelledby={`gruppe-${index}`}>
+            <h2 id={`gruppe-${index}`} className="t-h2">
+              {group.title}
+            </h2>
+            <p className="t-scens__lead">{group.lead}</p>
+            <ul className="t-scards">
+              {group.scenarios.map((scenario) => (
+                <ScenarioCard key={scenario.id} scenario={scenario} />
+              ))}
+            </ul>
+          </section>
+        ))}
 
-        <section aria-labelledby="extra">
-          <h2 id="extra" className="t-h2">
-            Wenn Zeit bleibt
+        <section aria-labelledby="ablauf">
+          <h2 id="ablauf" className="t-h2">
+            So läuft der Test
           </h2>
-          <ol className="t-scens__list">
-            {EXTRA_SCENARIOS.map((scenario) => (
-              <ScenarioSummary key={scenario.id} scenario={scenario} />
-            ))}
-          </ol>
-        </section>
-
-        <section aria-labelledby="chat">
-          <h2 id="chat" className="t-h2">
-            Optional: Chat-Assistent
-          </h2>
-          <p className="t-case__intro">
-            Im Portal ist der Chat aus, damit die Testpersonen die Suche benutzen. Mehr Abläufe stehen im <Link href="/testfall/chat">Testfall Chat-Assistent</Link>.
-          </p>
-          <ol className="t-scens__list">
-            <ScenarioSummary scenario={CHAT_SCENARIO} />
+          <ol className="t-scens__steps">
+            <li>Bitten Sie die Person, laut zu denken. Sie kann nichts falsch machen, wir testen die Seite.</li>
+            <li>Starten Sie das Szenario, lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu.</li>
+            <li>Helfen Sie nicht, und sagen Sie nie „Leistung“ oder „Bereich“.</li>
+            <li>Stoppen Sie, bevor die Person einen Antrag oder Termin startet. Fragen Sie dann „Wie leicht war das, von 1 sehr schwer bis 7 sehr leicht?“.</li>
+            <li>Planen Sie 5 bis 8 Personen und je 30 bis 45 Minuten ein. Wechseln Sie Reihenfolge und Startvariante.</li>
           </ol>
         </section>
       </div>

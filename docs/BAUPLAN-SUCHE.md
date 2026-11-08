@@ -155,6 +155,8 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   später kommt. Schalter: `SUGGESTIONS_IN_SEARCH` in `src/data/site.ts`.
 - Die Leiste über dem Kopf ist entfernt (auf Wunsch, 08.11.2026), mit ihr Gebärdensprache, Leichte Sprache und der
   Sprachwechsel. Im Footer steht jetzt eine Spalte „Prototyp“ mit Übersicht Testszenarien, Testfällen und „Demo zurücksetzen“.
+- Testszenarien neu gegliedert (auf Wunsch, 08.11.2026): `/testszenarien` zeigt Karten nach Fällen, `/testszenarien/[id]`
+  je Szenario Ausgangslage, Klickpfade, Prüfpunkte und den Start. Die Seite `/testszenarien/testfaelle` entfällt.
 - Startseite: „Häufig gesucht“ ist entfernt (auf Wunsch, 08.11.2026), „Aktuelle Themen“ stehen an dessen Stelle direkt unter der Suche.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)

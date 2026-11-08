@@ -10,7 +10,7 @@ export function ScenarioStart({ href = "/", title, variant, children }: { href?:
   return (
     <Link
       href={href}
-      className="t-btn t-btn--primary t-btn--small"
+      className="t-btn"
       onClick={() => {
         resetDemo();
         if (variant) setVariant(variant);
