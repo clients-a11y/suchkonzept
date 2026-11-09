@@ -7,15 +7,15 @@ export const SERVICES: Service[] = [
     title: "Personalausweis beantragen",
     summary: "Einen neuen Personalausweis beantragen, wenn der alte abläuft oder Sie zum ersten Mal einen brauchen.",
     keywords: ["ausweis", "perso", "personalausweis", "identität", "pass"],
-    level: "kommune",
+    level: "bund",
     audience: ["privat"],
     online: false,
     costs: "Beispielwert: 40 Euro, unter 24 Jahren 25 Euro",
     duration: "etwa 3 bis 4 Wochen",
     documents: ["bisheriger Ausweis oder Geburtsurkunde", "ein aktuelles biometrisches Foto"],
     sections: [
-      { title: "Voraussetzungen", body: ["Sie sind mindestens 16 Jahre alt und in der Kommune gemeldet."] },
-      { title: "Ablauf", body: ["Termin im Bürgeramt buchen.", "Mit Unterlagen persönlich vorsprechen, Fingerabdrücke werden erfasst.", "Benachrichtigung abwarten und Ausweis abholen."] },
+      { title: "Voraussetzungen", body: ["Sie sind mindestens 16 Jahre alt."] },
+      { title: "Ablauf", body: ["Termin buchen.", "Mit Unterlagen persönlich vorsprechen, Fingerabdrücke werden erfasst.", "Benachrichtigung abwarten und Ausweis abholen."] },
     ],
   },
   {

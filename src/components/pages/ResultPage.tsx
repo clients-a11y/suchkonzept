@@ -1,23 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useId, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useId, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { IconCheck, IconSparkle } from "@/components/Icons";
-import { AnswerPlace, HitList, Loading, PotQuestion, SearchHead, useArrival } from "@/components/pages/SearchPage";
+import { AnswerPlace, HitList, SearchHead, useArrival } from "@/components/pages/SearchPage";
+import { SearchSteps } from "@/components/PotDialog";
+import type { SearchRequest } from "@/components/PotDialog";
 import { RegionField } from "@/components/RegionField";
 import { SearchPending } from "@/components/SearchPending";
 import type { Place } from "@/data/places";
+import { hintAfter } from "@/data/test-scenarios";
+import type { TestConfig } from "@/data/test-scenarios";
+import { isCentral } from "@/lib/offices";
 import { setPlaceId, usePlace } from "@/lib/place-store";
 import { isUnclear, resultArea } from "@/lib/result-area";
-import { latencyFor, wasEvaluated } from "@/lib/search-latency";
+import { POT_LABEL, routeQuery } from "@/lib/search-router";
 import type { Pot } from "@/lib/search-router";
 import { searchInformation } from "@/lib/smart-search";
+import { useTestConfig } from "@/lib/test-config";
 import type { Service } from "@/lib/types";
 
-// Services and information on one results page. The area for services on top changes with the case; the
-// wording of its texts comes from the product owner.
+// Services and information on one results page, or in two tabs. Which questions come first and how long the
+// search takes is set per test scenario. The wording of the texts in the area for services comes from the
+// product owner.
 const ACTION = "/ergebnisse";
+const POTS: Pot[] = ["leistungen", "informationen"];
+const SEARCHING = "Wir suchen die passende Antwort …";
+const STILL_SEARCHING = "Das dauert noch einen Moment. Wir suchen weiter nach der passenden Antwort …";
 
 function ServiceResult({ service, best }: { service: Service; best: boolean }) {
   return (
@@ -45,10 +56,11 @@ function ServiceResult({ service, best }: { service: Service; best: boolean }) {
   );
 }
 
-function Ghost() {
+// still: nothing is loading, the page waits for an answer from the person.
+function Ghost({ still = false, count = 3 }: { still?: boolean; count?: number }) {
   return (
-    <ol className="t-hits t-lb__ghost" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
+    <ol className={still ? "t-hits t-lb__ghost" : "t-hits"} aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => (
         <li key={i} className="t-hit t-hit--skeleton">
           <span />
           <span />
@@ -59,38 +71,203 @@ function Ghost() {
   );
 }
 
-function ResultBody({ q, chosen }: { q: string; chosen?: Pot }) {
+function PageSkeleton({ q, tabs, still = false }: { q: string; tabs: boolean; still?: boolean }) {
+  return (
+    <div className="t-lbpage" aria-hidden="true">
+      {/* While the search runs, the note of Waiting stands here. */}
+      {still && <p className="t-search__summary">Ergebnisse für „{q}“</p>}
+      {tabs ? (
+        <div className="t-pottabs">
+          <ul>
+            {POTS.map((pot) => (
+              <li key={pot}>
+                <span className="t-pottab">{POT_LABEL[pot]}</span>
+              </li>
+            ))}
+          </ul>
+          <Ghost still={still} />
+        </div>
+      ) : (
+        <>
+          <div className="t-lb">
+            <p className="t-h2">Leistungen</p>
+            <Ghost still={still} count={1} />
+          </div>
+          <div className="t-lb__info">
+            <p className="t-h2">Informationen</p>
+            <Ghost still={still} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// First the skeleton with a small note. In a long wait a second note with a loading animation follows on top of it.
+function Waiting({ wait, children }: { wait: TestConfig["wait"]; children: ReactNode }) {
+  const [late, setLate] = useState(false);
+  const after = hintAfter(wait);
+
+  useEffect(() => {
+    if (!after) return;
+    const timer = window.setTimeout(() => setLate(true), after * 1000);
+    return () => window.clearTimeout(timer);
+  }, [after]);
+
+  return (
+    <div className="t-lb__cover">
+      <p role="status" className="visually-hidden">
+        {late ? STILL_SEARCHING : SEARCHING}
+      </p>
+      <p className="t-search__summary t-waiting__note" aria-hidden="true">
+        <span className="t-spinner" />
+        {SEARCHING}
+      </p>
+      {children}
+      {late && (
+        <div className="t-lb__overlay" aria-hidden="true">
+          <div className="t-lb__prompt">
+            <SearchPending text={STILL_SEARCHING} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function tabHref(q: string, chosen: Pot | undefined, tab: Pot): string {
+  const params = new URLSearchParams({ q });
+  if (chosen) params.set("in", chosen);
+  params.set("tab", tab);
+  return `${ACTION}?${params.toString()}`;
+}
+
+function ResultBody({ q, chosen, tab }: { q: string; chosen?: Pot; tab?: Pot }) {
+  const router = useRouter();
+  const config = useTestConfig();
   const place = usePlace();
   const placeId = place?.id;
   const titles = { services: useId(), info: useId() };
-  // The steps on the start page may have waited already, and a chosen area needs no judging.
-  const arrived = useArrival(q, latencyFor(q));
-  const ready = arrived || Boolean(chosen) || wasEvaluated(q);
-  // Only a place entered here turns a search for information into a search for services.
-  const [enteredHere, setEnteredHere] = useState(false);
+  const tabs = config.results === "tabs";
+  const ms = config.wait * 1000;
+  // Closed without an answer: the results come anyway, the area for services can still ask for the place.
+  const [skipped, setSkipped] = useState(false);
+  const [placeEntered, setPlaceEntered] = useState(false);
   const [refining, setRefining] = useState(false);
+
+  const askPot = !skipped && config.potOverlay && !chosen && isUnclear(q);
+  const askPlace = !skipped && !askPot && config.place === "overlay" && !place && resultArea(q, undefined, false, chosen).kind === "needPlace";
+  const question = useMemo<SearchRequest | null>(() => {
+    if (askPot) return { query: q, place: false };
+    if (askPlace) return { query: q, href: ACTION, place: true };
+    return null;
+  }, [askPot, askPlace, q]);
+
+  // The questions come right after the search, the wait only once they are answered.
+  const ready = useArrival(question ? "frage" : q, ms);
 
   useEffect(() => {
     if (!refining) return;
-    const timer = window.setTimeout(() => setRefining(false), latencyFor(`${q}|${placeId}`));
+    const timer = window.setTimeout(() => setRefining(false), ms);
     return () => window.clearTimeout(timer);
-  }, [refining, q, placeId]);
+  }, [refining, ms, placeId]);
 
-  if (!ready) return <Loading thinking />;
-  // Searched from this page: the question stands in the page, no overlay.
-  if (!chosen && isUnclear(q)) return <PotQuestion q={q} />;
+  if (question) {
+    return (
+      <>
+        <PageSkeleton q={q} tabs={tabs} still />
+        <SearchSteps
+          request={question}
+          dismissLabel="Frage schließen"
+          onClose={(dismissed) => {
+            if (dismissed) setSkipped(true);
+          }}
+          onDone={(href) => {
+            // The place is remembered and the page goes on by itself; the area is part of the address.
+            if (askPot) router.replace(href);
+          }}
+        />
+      </>
+    );
+  }
+
+  if (!ready) {
+    return (
+      <Waiting wait={config.wait}>
+        <PageSkeleton q={q} tabs={tabs} />
+      </Waiting>
+    );
+  }
 
   const choose = (next: Place) => {
     setPlaceId(next.id);
-    setEnteredHere(true);
+    setPlaceEntered(true);
     setRefining(true);
   };
 
-  const area = resultArea(q, place, enteredHere, chosen);
+  // Only a place entered for this search turns a search for information into a search for services.
+  const area = resultArea(q, place, placeEntered || config.place === "start", chosen);
   const information = searchInformation(q);
   const field = <RegionField key={placeId} label="PLZ/Ort für regionale Ergebnisse" initial={place?.name ?? ""} onPlace={choose} />;
-  // Services with one office for everyone: a place would change nothing.
-  const placeMatters = area.kind !== "services" || area.services.some((s) => s.level !== "land");
+  // Services that are the same for everyone: a place would change nothing.
+  const placeMatters = area.kind !== "services" || area.services.some((s) => !isCentral(s));
+  // Tabs name the area already.
+  const heading = tabs ? "visually-hidden" : "t-h2";
+
+  const services =
+    area.kind === "info" && !refining ? (
+      <section className="t-lb t-lb--small" aria-label="Leistungen in Ihrer Region">
+        <RegionField label="Gibt es dazu eine Leistung in Ihrer Region? PLZ/Ort eingeben" onPlace={choose} />
+      </section>
+    ) : (
+      <section className="t-lb" aria-labelledby={titles.services}>
+        <div className="t-lb__head">
+          <h2 id={titles.services} className={heading}>
+            Leistungen
+          </h2>
+          {area.kind !== "needPlace" && placeMatters && !refining && field}
+        </div>
+        {refining && (
+          <Waiting wait={config.wait}>
+            <Ghost />
+          </Waiting>
+        )}
+        {!refining && area.kind === "services" && (
+          <ul className="t-lb__services">
+            {area.services.map((service) => (
+              <ServiceResult key={service.slug} service={service} best={area.services.length === 1} />
+            ))}
+          </ul>
+        )}
+        {!refining && area.kind === "needPlace" && (
+          <div className="t-lb__cover">
+            <Ghost still />
+            <div className="t-lb__overlay">
+              <div className="t-lb__prompt">
+                <RegionField label="Bitte geben Sie Ihre PLZ oder Ihren Ort für regionale Ergebnisse ein" onPlace={choose} />
+              </div>
+            </div>
+          </div>
+        )}
+        {!refining && area.kind === "nothing" && (
+          <p className="t-lb__none" role="status">
+            Für diesen Ort gibt es keine regionalen Leistungen, vielleicht helfen Ihnen die Informationen {tabs ? "im anderen Tab" : "unten"} weiter.
+          </p>
+        )}
+      </section>
+    );
+
+  const infos = (
+    <section className="t-lb__info" aria-labelledby={titles.info}>
+      <h2 id={titles.info} className={heading}>
+        Informationen
+      </h2>
+      {information.length > 0 ? <HitList hits={information} /> : <p>Zu „{q}“ haben wir keine Informationen gefunden.</p>}
+    </section>
+  );
+
+  const infoFirst = area.kind === "info" || (area.kind === "nothing" && (chosen ?? routeQuery(q).pot) === "informationen");
+  const activeTab: Pot = tab ?? (infoFirst ? "informationen" : "leistungen");
 
   return (
     <div className="t-results t-lbpage">
@@ -98,65 +275,47 @@ function ResultBody({ q, chosen }: { q: string; chosen?: Pot }) {
         Ergebnisse für „{q}“
       </p>
 
-      {area.kind === "info" && !refining ? (
-        <section className="t-lb t-lb--small" aria-label="Leistungen in Ihrer Region">
-          <RegionField label="Gibt es dazu eine Leistung in Ihrer Region? PLZ/Ort eingeben" onPlace={choose} />
-        </section>
-      ) : (
-        <section className="t-lb" aria-labelledby={titles.services}>
-          <div className="t-lb__head">
-            <h2 id={titles.services} className="t-h2">
-              Leistungen
-            </h2>
-            {area.kind !== "needPlace" && placeMatters && !refining && field}
-          </div>
-          {refining && <SearchPending />}
-          {!refining && area.kind === "services" && (
-            <ul className="t-lb__services">
-              {area.services.map((service) => (
-                <ServiceResult key={service.slug} service={service} best={area.services.length === 1} />
+      {tabs ? (
+        <div>
+          <nav aria-label="Suchbereich" className="t-pottabs">
+            <ul>
+              {POTS.map((pot) => (
+                <li key={pot}>
+                  <Link href={tabHref(q, chosen, pot)} scroll={false} className="t-pottab" aria-current={pot === activeTab ? "page" : undefined}>
+                    {POT_LABEL[pot]}
+                  </Link>
+                </li>
               ))}
             </ul>
-          )}
-          {!refining && area.kind === "needPlace" && (
-            <div className="t-lb__cover">
-              <Ghost />
-              <div className="t-lb__overlay">
-                <div className="t-lb__prompt">
-                  <RegionField label="Bitte geben Sie Ihre PLZ oder Ihren Ort für regionale Ergebnisse ein" onPlace={choose} />
-                </div>
-              </div>
-            </div>
-          )}
-          {!refining && area.kind === "nothing" && (
-            <p className="t-lb__none" role="status">
-              Für diesen Ort gibt es keine regionalen Leistungen, vielleicht helfen Ihnen die Informationen unten weiter.
-            </p>
-          )}
-        </section>
+          </nav>
+          {activeTab === "leistungen" ? services : infos}
+        </div>
+      ) : (
+        <>
+          {services}
+          {infos}
+        </>
       )}
-
-      <section className="t-lb__info" aria-labelledby={titles.info}>
-        <h2 id={titles.info} className="t-h2">
-          Informationen
-        </h2>
-        {information.length > 0 ? <HitList hits={information} /> : <p>Zu „{q}“ haben wir keine Informationen gefunden.</p>}
-      </section>
     </div>
   );
+}
+
+function asPot(value: string | null): Pot | undefined {
+  return value === "leistungen" || value === "informationen" ? value : undefined;
 }
 
 function Results() {
   const params = useSearchParams();
   const q = (params.get("q") ?? "").trim();
-  const requested = params.get("in");
-  const chosen: Pot | undefined = requested === "leistungen" || requested === "informationen" ? requested : undefined;
+  const chosen = asPot(params.get("in"));
+  const tab = asPot(params.get("tab"));
+  const placeInForm = useTestConfig().place === "start";
   return (
     <>
-      <SearchHead q={q} action={ACTION} />
+      <SearchHead q={q} action={ACTION} placeInForm={placeInForm} />
       <div className="t-container t-page">
         {/* A new search starts over: new wait, no place entered yet. */}
-        {q ? <ResultBody key={`${q}|${chosen}`} q={q} chosen={chosen} /> : <p className="t-search__summary">Geben Sie oben ein, was Sie suchen.</p>}
+        {q ? <ResultBody key={`${q}|${chosen}`} q={q} chosen={chosen} tab={tab} /> : <p className="t-search__summary">Geben Sie oben ein, was Sie suchen.</p>}
       </div>
     </>
   );

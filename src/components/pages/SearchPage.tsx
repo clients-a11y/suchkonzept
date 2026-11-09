@@ -8,6 +8,7 @@ import type { CSSProperties } from "react";
 import { PotChoices } from "@/components/PotDialog";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { HomePlace } from "@/components/HomePlace";
+import { PlaceAlert, useRequiredPlace } from "@/components/RequiredPlace";
 import { SearchPending } from "@/components/SearchPending";
 import { IconArrow, IconCheck, IconPin, IconSearch, IconSparkle } from "@/components/Icons";
 import { allInformation, allServices, serviceHit } from "@/lib/search";
@@ -34,32 +35,66 @@ function searchHref(q: string, pot?: Pot): string {
 }
 
 // On the search page no overlay opens: an unclear term shows the choice in the page, under the tabs.
-function SearchForm({ q, action }: { q: string; action: string }) {
+function SearchForm({ q, action, placeInForm }: { q: string; action: string; placeInForm: boolean }) {
   const inputId = useId();
+  const placeId = useId();
+  const statusId = useId();
+  const requiredPlace = useRequiredPlace(placeId);
   return (
-    <Form action={action} role="search" className="t-searchform">
-      <label htmlFor={inputId} className="t-searchform__label">
-        Suchbegriff
-      </label>
+    <Form
+      action={action}
+      role="search"
+      className="t-searchform"
+      noValidate
+      onSubmit={(event) => {
+        if (placeInForm && !requiredPlace.confirm()) event.preventDefault();
+      }}
+    >
       <div className="t-searchform__row">
-        <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
+        <div className="t-searchform__field">
+          <label htmlFor={inputId} className="t-searchform__label">
+            Suchbegriff
+          </label>
+          <input key={q} id={inputId} className="t-input" name="q" type="search" defaultValue={q} autoComplete="off" />
+        </div>
+        {placeInForm && (
+          <div className={requiredPlace.problem ? "t-searchform__field t-searchform__field--place t-searchform__field--problem" : "t-searchform__field t-searchform__field--place"}>
+            <label htmlFor={placeId} className="t-searchform__label">
+              PLZ oder Ort (Pflichtfeld)
+            </label>
+            {/* No name: the place is remembered, it does not go into the address. */}
+            <input
+              id={placeId}
+              className="t-input"
+              type="text"
+              value={requiredPlace.value}
+              required
+              autoComplete="postal-code"
+              spellCheck={false}
+              aria-describedby={statusId}
+              aria-invalid={requiredPlace.problem ? true : undefined}
+              onChange={(event) => requiredPlace.change(event.target.value)}
+            />
+          </div>
+        )}
         <button type="submit" className="t-btn t-btn--primary">
           <IconSearch />
           Suchen
         </button>
       </div>
+      {placeInForm && <PlaceAlert id={statusId} problem={requiredPlace.problem} tries={requiredPlace.tries} />}
     </Form>
   );
 }
 
 // Page head with breadcrumb, the one H1 and the search field.
-export function SearchHead({ q, action = "/suche" }: { q: string; action?: string }) {
+export function SearchHead({ q, action = "/suche", placeInForm = false }: { q: string; action?: string; placeInForm?: boolean }) {
   return (
     <div className="t-pagehead">
       <div className="t-container">
         <Breadcrumb items={[{ label: "Suche", href: action }]} />
         <h1 className="t-h1">Suche</h1>
-        <SearchForm q={q} action={action} />
+        <SearchForm q={q} action={action} placeInForm={placeInForm} />
       </div>
     </div>
   );
@@ -96,7 +131,7 @@ export function useArrival(key: string, ms: number = LOADING_MS): boolean {
 }
 
 // thinking: the search still judges the request, which later takes an AI 1 to 3 seconds.
-export function Loading({ thinking = false }: { thinking?: boolean }) {
+function Loading({ thinking = false }: { thinking?: boolean }) {
   return (
     <div className="t-loadingbox">
       {thinking ? (
@@ -155,9 +190,11 @@ function AssistantHint({ q }: { q: string }) {
   );
 }
 
-// A remembered place shows right away who is in charge. Land services have one office anyway.
+// A remembered place shows right away who is in charge. Land services have one office anyway, and services
+// of the federation say that no place is needed.
 export function AnswerPlace({ service }: { service: Service }) {
   const place = usePlace();
+  if (service.level === "bund") return <p className="t-answer__place">Bundesweit einheitlich, eine Postleitzahl ist nicht nötig.</p>;
   const office = responsibleOffice(service, place);
   if (!office) return null;
   return (
@@ -168,7 +205,7 @@ export function AnswerPlace({ service }: { service: Service }) {
 }
 
 // The search switch could not decide: one question, two answers.
-export function PotQuestion({ q }: { q: string }) {
+function PotQuestion({ q }: { q: string }) {
   const titleId = useId();
   return (
     <section className="t-route" aria-labelledby={titleId}>

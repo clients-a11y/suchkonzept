@@ -1,7 +1,7 @@
 import { IconSearch } from "@/components/Icons";
 
-// Bridges the 1 to 3 seconds in which the search judges a request.
-export function SearchPending() {
+// Bridges the seconds in which the search judges a request.
+export function SearchPending({ text = "Wir suchen die passende Antwort …" }: { text?: string }) {
   return (
     <div className="t-pending" role="status">
       <span className="t-pending__mark" aria-hidden="true">
@@ -11,7 +11,7 @@ export function SearchPending() {
         </svg>
         <IconSearch size={20} />
       </span>
-      <p className="t-pending__text">Wir suchen die passende Antwort …</p>
+      <p className="t-pending__text">{text}</p>
     </div>
   );
 }

@@ -100,7 +100,7 @@ const PARTS: Part[] = [
       },
       {
         input: "Personalausweis, dann „Suchen“",
-        expect: "Nur ein Schritt: „Wo wohnen Sie?“, denn die Suche ist eindeutig. Mit 20100 nennt die Kurzantwort das Bürgeramt Beispielstadt.",
+        expect: "Keine Frage nach dem Ort, denn die Leistung ist bundesweit einheitlich. Das steht auch an der Leistung.",
         href: "/",
         action: "Startseite öffnen",
       },

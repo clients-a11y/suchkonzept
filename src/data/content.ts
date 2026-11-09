@@ -69,7 +69,7 @@ const PAGES: ContentPage[] = [
     title: "Über dieses Portal",
     lead: "Das Verwaltungsportal Musterland bündelt die Leistungen des Landes und seiner Gemeinden. Sie suchen an einer Stelle, das Portal nennt die zuständige Stelle.",
     sections: [
-      { id: "leistungen", title: "Land und Gemeinden an einem Ort", body: ["Manche Leistungen bietet das Land selbst an, zum Beispiel das Kindergeld. Für andere ist Ihre Gemeinde zuständig, zum Beispiel für den Personalausweis.", "Für Leistungen der Gemeinden fragt das Portal erst auf der Seite der Leistung nach Ihrem Wohnort. Alle Informationen zur Leistung sehen Sie auch ohne Angabe."] },
+      { id: "leistungen", title: "Land und Gemeinden an einem Ort", body: ["Manche Leistungen bietet das Land selbst an, zum Beispiel das Kindergeld. Für andere ist Ihre Gemeinde zuständig, zum Beispiel für die Hundesteuer.", "Für Leistungen der Gemeinden fragt das Portal erst auf der Seite der Leistung nach Ihrem Wohnort. Alle Informationen zur Leistung sehen Sie auch ohne Angabe."] },
       { id: "suche", title: "Suche in eigenen Worten", body: ["Sie können Ihr Anliegen so beschreiben, wie Sie es sagen würden, zum Beispiel „Ich ziehe um“.", "Die Suche schaut immer in einem Bereich nach: bei den Leistungen oder bei den Informationen. Ist das unklar, fragt sie nach."] },
       { id: "prototyp", title: "Ein Prototyp mit Beispieldaten", body: ["Dieses Portal ist ein Prototyp. Musterland, Beispielstadt, alle Stellen, Personen, Beträge und Meldungen sind erfunden.", "Die Fotos sind KI-generierte Beispielbilder. Die Suche arbeitet mit festen Regeln im Browser."] },
     ],

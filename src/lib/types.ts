@@ -15,7 +15,8 @@ export type Service = {
   title: string;
   summary: string;
   keywords: string[];
-  level: Level;
+  // "bund": the same everywhere, neither Land nor municipality makes a difference.
+  level: Level | "bund";
   audience: Audience[];
   online: boolean;
   costs: string;

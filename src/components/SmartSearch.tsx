@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { IconArrow, IconBubble, IconCheck, IconSearch, IconSparkle } from "@/components/Icons";
+import { PlaceAlert, useRequiredPlace } from "@/components/RequiredPlace";
 import { TOP_TASKS } from "@/data/content";
 import { findService } from "@/data/services";
 import { searchServices } from "@/lib/smart-search";
@@ -12,9 +13,9 @@ import { pluralize } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { CHAT_IN_PORTAL, ONE_RESULTS_PAGE, SEARCH_PATH, SUGGESTIONS_IN_SEARCH } from "@/data/site";
 import { openAssistant } from "@/lib/assistant-dock";
-import { placeMatters } from "@/lib/offices";
-import { isUnclear } from "@/lib/result-area";
+import { isCentral, placeMatters } from "@/lib/offices";
 import { routeQuery } from "@/lib/search-router";
+import { useTestConfig } from "@/lib/test-config";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
 
@@ -49,8 +50,10 @@ function ServiceFacts({ service }: { service: Service }) {
 // request to its own pot. The search switch runs while typing too, so the list never contradicts it.
 export function SmartSearch({ label }: { label: string }) {
   const router = useRouter();
-  const ids = { input: useId(), list: useId(), hint: useId() };
+  const ids = { input: useId(), list: useId(), hint: useId(), place: useId(), placeStatus: useId() };
   const inputRef = useRef<HTMLInputElement>(null);
+  const placeInForm = useTestConfig().place === "start";
+  const requiredPlace = useRequiredPlace(ids.place);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -94,7 +97,7 @@ export function SmartSearch({ label }: { label: string }) {
             group: "Häufige Anliegen",
             href: `/leistungen/${s.slug}`,
             title: s.title,
-            central: s.level === "land",
+            central: isCentral(s),
             label: s.title,
             node: s.title,
           });
@@ -135,7 +138,7 @@ export function SmartSearch({ label }: { label: string }) {
         group: "Das passt am besten",
         href: `/leistungen/${answer.slug}`,
         title: answer.title,
-        central: answer.level === "land",
+        central: isCentral(answer),
         label: `Das passt am besten: ${answer.title}. ${answer.online ? "Online möglich" : "Termin vor Ort"}`,
         node: (
           <span className="t-smart__answer">
@@ -148,7 +151,7 @@ export function SmartSearch({ label }: { label: string }) {
     }
     for (const hit of result.services.filter((h) => h.service.slug !== answer?.slug).slice(0, 4)) {
       const s = hit.service;
-      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, title: s.title, central: s.level === "land", label: s.title, node: s.title });
+      list.push({ key: s.slug, group: "Leistungen", href: `/leistungen/${s.slug}`, title: s.title, central: isCentral(s), label: s.title, node: s.title });
     }
     for (const s of result.related) {
       list.push({
@@ -156,7 +159,7 @@ export function SmartSearch({ label }: { label: string }) {
         group: "Das brauchen Sie oft auch",
         href: `/leistungen/${s.slug}`,
         title: s.title,
-        central: s.level === "land",
+        central: isCentral(s),
         label: s.title,
         node: s.title,
       });
@@ -254,10 +257,10 @@ export function SmartSearch({ label }: { label: string }) {
     setRequest({ ...next, place, wait });
   };
 
-  // After the wait come the results, or first the question if the term can mean both.
+  // The results page asks what is still open, waits and shows the results. A test can require the place here first.
   const searchNow = () => {
-    if (!trimmed) return go(SEARCH_PATH);
-    start(isUnclear(trimmed) ? { query: trimmed } : { query: trimmed, href: resultsHref(trimmed) }, false, true);
+    if (placeInForm && !requiredPlace.confirm()) return;
+    go(trimmed ? resultsHref(trimmed) : SEARCH_PATH);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -320,6 +323,7 @@ export function SmartSearch({ label }: { label: string }) {
         action={SEARCH_PATH}
         role="search"
         className="t-smart__form"
+        noValidate
         onSubmit={(event) => {
           // A search asks for the place first; an unclear one asks "Was suchen Sie?" before that.
           event.preventDefault();
@@ -396,6 +400,25 @@ export function SmartSearch({ label }: { label: string }) {
               </div>
             )}
           </div>
+          {placeInForm && (
+            <div className={requiredPlace.problem ? "t-smart__place t-smart__place--problem" : "t-smart__place"}>
+              <label htmlFor={ids.place} className="t-smart__placelabel">
+                PLZ oder Ort (Pflichtfeld)
+              </label>
+              <input
+                id={ids.place}
+                type="text"
+                className="t-smart__placeinput"
+                value={requiredPlace.value}
+                required
+                autoComplete="postal-code"
+                spellCheck={false}
+                aria-describedby={ids.placeStatus}
+                aria-invalid={requiredPlace.problem ? true : undefined}
+                onChange={(event) => requiredPlace.change(event.target.value)}
+              />
+            </div>
+          )}
           <button type="submit" className="t-btn t-btn--primary t-smart__submit" aria-disabled={searching || undefined}>
             {searching && <span className="t-spinner" aria-hidden="true" />}
             {searching ? "Suche läuft …" : "Suchen"}
@@ -407,8 +430,9 @@ export function SmartSearch({ label }: { label: string }) {
             </button>
           )}
         </div>
+        {placeInForm && <PlaceAlert id={ids.placeStatus} problem={requiredPlace.problem} tries={requiredPlace.tries} />}
         <p id={ids.hint} className="t-smart__hint">
-          In eigenen Worten, zum Beispiel „Garage bauen“.
+          In eigenen Worten, zum Beispiel „Garage bauen“.{placeInForm && " Geben Sie bitte auch Ihre PLZ oder Ihren Ort an."}
         </p>
       </Form>
 

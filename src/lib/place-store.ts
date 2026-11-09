@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { PLACES, findPlace } from "@/data/places";
 import type { Place } from "@/data/places";
+import { SITE } from "@/data/site";
 
 // The place a visitor entered is remembered in this browser, so the service pages, the search and
 // the assistant agree on "your place".
@@ -61,4 +62,17 @@ export function findPlaces(query: string, places: Place[] = PLACES): Place[] {
     });
   }
   return places.filter((p) => normalize(p.name).startsWith(q) || normalize(p.name).includes(` ${q}`));
+}
+
+// A field for postcode or place, on sending: the one place meant, or what is wrong with the entry.
+export function checkPlace(text: string): { place?: Place; matches: Place[]; problem: string } {
+  const value = text.trim();
+  const digits = /^\d+$/.test(value);
+  if (digits ? value.length !== 5 : value.length < 3) {
+    return { matches: [], problem: "Bitte geben Sie eine Postleitzahl mit fünf Ziffern oder einen Ort ein." };
+  }
+  const matches = findPlaces(value);
+  if (matches.length === 1) return { place: matches[0], matches, problem: "" };
+  if (matches.length > 1) return { matches, problem: `Zu „${value}“ passen mehrere Orte. Bitte wählen Sie Ihren Ort.` };
+  return { matches, problem: digits ? `Die Postleitzahl ${value} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${value}“ kennen wir in ${SITE.region} nicht.` };
 }

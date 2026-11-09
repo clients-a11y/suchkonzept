@@ -64,13 +64,13 @@ export function UserTestPage() {
           </h2>
           <ol className="t-scens__steps">
             <li>Bitten Sie die Person, laut zu denken. Sie kann nichts falsch machen, wir testen die Seite.</li>
-            <li>Starten Sie das Szenario, lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu.</li>
+            <li>Starten Sie das Szenario, lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu. Oder geben Sie der Person den Link zur Aufgabenseite, den Sie auf der Seite des Szenarios kopieren.</li>
             <li>Helfen Sie nicht, und sagen Sie nie „Leistung“ oder „Bereich“.</li>
             <li>Stoppen Sie, bevor die Person einen Antrag oder Termin startet. Fragen Sie dann „Wie leicht war das, von 1 sehr schwer bis 7 sehr leicht?“.</li>
             <li>Planen Sie 5 bis 8 Personen und je 30 bis 45 Minuten ein. Wechseln Sie die Reihenfolge der Szenarien.</li>
           </ol>
           <ul className="t-scens__notes">
-            <li>Später bewertet eine KI jede Suche und braucht dafür 1 bis 3 Sekunden. Der Prototyp spielt diese Zeit mit einer Ladeanimation nach.</li>
+            <li>Auf der Seite eines Szenarios stellen Sie ein, wo nach dem Ort gefragt wird, ob ein unklarer Begriff nachfragt, wie lange die Suche dauert und ob die Ergebnisse auf einer Seite oder in Tabs stehen.</li>
             <li>Getestet wird nur die Suche, nicht der Antrag.</li>
           </ul>
         </section>

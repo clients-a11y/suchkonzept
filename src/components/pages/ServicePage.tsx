@@ -9,7 +9,7 @@ import { IconArrow, IconCheck, IconPin } from "@/components/Icons";
 import { landUnitFor, localUnitFor } from "@/data/organisation";
 import { findService } from "@/data/services";
 import { CHAT_IN_PORTAL, SITE } from "@/data/site";
-import { type Office, offeredIn, responsibleOffice } from "@/lib/offices";
+import { type Office, isCentral, offeredIn, responsibleOffice } from "@/lib/offices";
 import { usePlace } from "@/lib/place-store";
 import type { Service } from "@/lib/types";
 
@@ -37,12 +37,12 @@ function OfficeLines({ office }: { office: Office }) {
   );
 }
 
-// Side box: who is in charge. Land services have one office; municipal ones need the place.
+// Side box: who is in charge. Services of the federation and the Land have one office; municipal ones need the place.
 function Responsible({ service }: { service: Service }) {
   const place = usePlace();
   const office = responsibleOffice(service, place);
-  const land = service.level === "land";
-  const local = place ? localUnitFor(place.id, service.slug) : undefined;
+  const central = isCentral(service);
+  const local = place && !central ? localUnitFor(place.id, service.slug) : undefined;
   const ministry = landUnitFor(service.slug);
   const titleId = useId();
 
@@ -54,7 +54,9 @@ function Responsible({ service }: { service: Service }) {
       {office ? (
         <>
           <OfficeLines office={office} />
-          <p className="t-box__note">{land ? "Diese Leistung bietet das Land selbst an." : `Zuständig für ${place?.name}.`}</p>
+          <p className="t-box__note">
+            {service.level === "bund" ? "Bundesweit einheitlich, Ihr Wohnort spielt keine Rolle." : central ? "Diese Leistung bietet das Land selbst an." : `Zuständig für ${place?.name}.`}
+          </p>
         </>
       ) : place && !offeredIn(service, place) ? (
         <p className="t-box__note">In {place.name} gibt es diese Leistung nicht.</p>
@@ -73,7 +75,7 @@ function Responsible({ service }: { service: Service }) {
           {ministry && (
             <li>
               <Link href={`/organisation/${ministry.id}`}>
-                {land ? "Mehr zur Stelle" : "Fachlich zuständig im Land"}: {ministry.name}
+                {central ? "Mehr zur Stelle" : "Fachlich zuständig im Land"}: {ministry.name}
               </Link>
             </li>
           )}
@@ -164,7 +166,7 @@ function ServiceView({ service }: { service: Service }) {
               { label: service.title, href: `/leistungen/${service.slug}` },
             ]}
           />
-          <p className="t-pagehead__kind">Leistung · {service.level === "land" ? "Land Musterland" : "Ihre Gemeinde"}</p>
+          <p className="t-pagehead__kind">Leistung · {{ bund: "Bundesweit", land: "Land Musterland", kommune: "Ihre Gemeinde" }[service.level]}</p>
           <h1 className="t-h1">{service.title}</h1>
           <p className="t-lead">{service.summary}</p>
         </div>

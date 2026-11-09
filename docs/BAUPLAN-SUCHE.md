@@ -163,6 +163,17 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Die Rückfrage „Was suchen Sie?“ ist zurück (auf Wunsch, 08.11.2026): Bei einem unklaren Begriff wie „Kindergeld“ kommt sie
   nach der Ladeanimation als Overlay, danach die Ergebnisseite. Sechstes Szenario. Regel: `isUnclear` in `src/lib/result-area.ts`.
 - Startseite: „Häufig gesucht“ ist entfernt (auf Wunsch, 08.11.2026), „Aktuelle Themen“ stehen an dessen Stelle direkt unter der Suche.
+- Testszenarien einstellbar (auf Wunsch, 09.11.2026, Annahmen 2 bis 4): Auf `/testszenarien/[id]` wird je Szenario festgelegt,
+  wo nach dem Ort gefragt wird (Suchformular, Overlay über dem Skeleton, Ergebnisseite), ob ein unklarer Begriff im Overlay
+  nachfragt, wie lange die Suche dauert (3, 5 oder 10 Sekunden, ab 5 Sekunden mit Hinweis nach 3 oder 5 Sekunden) und ob
+  die Ergebnisse auf einer Seite oder in Tabs stehen. Speicher: `src/lib/test-config.ts`, Klickpfad: `scenarioPath`. Die
+  Fragen kommen jetzt direkt nach der Suche über dem Skeleton der Ergebnisseite, die Wartezeit erst danach.
+- Leistungen des Bundes (auf Wunsch, 09.11.2026): `level: "bund"` für bundesweit einheitliche Leistungen, bisher der
+  Personalausweis. Kein Feld und keine Frage nach dem Ort, an der Leistung steht „Bundesweit einheitlich“. Regel: `isCentral`
+  in `src/lib/offices.ts`. Das Kindergeld bleibt in den Daten eine Leistung des Landes und fragt ebenfalls nicht nach dem Ort.
+- Aufgabenseite für Testpersonen (auf Wunsch, 09.11.2026): `/aufgabe/[id]?v=…` zeigt nur Aufgabe, Suchbegriff und Postleitzahl.
+  Die Einstellungen stecken als ein Zeichen in `v`. Während eine Testperson arbeitet, zeigt der Footer statt der internen Links
+  „Aufgabe noch einmal lesen“. Mit der PLZ im Formular fragt auch das Suchfeld der Ergebnisseite nach dem Ort.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

@@ -195,11 +195,13 @@ export function SearchSteps({
   onClose,
   onDone,
   onChat,
+  dismissLabel = "Suche abbrechen",
 }: {
   request: SearchRequest | null;
   onClose: (dismissed: boolean) => void;
   onDone: (href: string) => void;
   onChat?: (q: string) => void;
+  dismissLabel?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   // Closed by finishing the steps or the chat, or dismissed (Escape, close button, dimmed area).
@@ -302,7 +304,7 @@ export function SearchSteps({
                 {step === "pot" ? `Zu „${query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.` : placeLead}
               </p>
             </div>
-            <button type="button" className="t-potdialog__close" onClick={close} aria-label="Suche abbrechen">
+            <button type="button" className="t-potdialog__close" onClick={close} aria-label={dismissLabel}>
               <IconClose size={20} />
             </button>
           </div>

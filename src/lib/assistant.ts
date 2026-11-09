@@ -6,7 +6,7 @@ import { SITUATIONS, findSituation, type Situation } from "@/data/situations";
 import { SITE } from "@/data/site";
 import { STATUS_LABEL, type Account, type Application } from "@/lib/account-store";
 import { formatDate, pluralize } from "@/lib/format";
-import { type Office, landOffice, offeredIn, officeForPlace, responsibleOffice } from "@/lib/offices";
+import { type Office, isCentral, landOffice, offeredIn, officeForPlace, responsibleOffice } from "@/lib/offices";
 import { findPlaces } from "@/lib/place-store";
 import { normalize, searchInformation, searchServices } from "@/lib/smart-search";
 import { routeQuery } from "@/lib/search-router";
@@ -185,7 +185,7 @@ class Turn {
     this.c.service = service.slug;
     this.c.pending = { kind: "none" };
     this.c.unclear = 0;
-    if (service.level === "land") return this.landService(service);
+    if (isCentral(service)) return this.landService(service);
 
     const known = findPlace(this.c.place);
     if (known) return this.forPlace(service, known);
@@ -207,7 +207,7 @@ class Turn {
 
   landService(service: Service) {
     this.say({
-      text: [`„${service.title}“ bietet das Land selbst an. Ihr Wohnort spielt dafür keine Rolle. Zuständig ist:`],
+      text: [`„${service.title}“ ${service.level === "bund" ? "ist bundesweit einheitlich" : "bietet das Land selbst an"}. Ihr Wohnort spielt dafür keine Rolle. Zuständig ist:`],
       office: landOffice(service),
       facts: factsOf(service),
       links: serviceLinks(service),

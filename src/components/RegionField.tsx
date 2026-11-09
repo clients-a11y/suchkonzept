@@ -3,8 +3,7 @@
 import { useId, useState } from "react";
 import type { FormEvent } from "react";
 import type { Place } from "@/data/places";
-import { SITE } from "@/data/site";
-import { findPlaces } from "@/lib/place-store";
+import { checkPlace } from "@/lib/place-store";
 
 // Postcode or place on the results page of variant 2. The label carries the wording of each case.
 export function RegionField({
@@ -24,18 +23,10 @@ export function RegionField({
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const text = value.trim();
-    const digits = /^\d+$/.test(text);
-    setMatches([]);
-    setProblem("");
-    if (digits ? text.length !== 5 : text.length < 3) {
-      setProblem("Bitte geben Sie eine Postleitzahl mit fünf Ziffern oder einen Ort ein.");
-      return;
-    }
-    const found = findPlaces(text);
-    if (found.length === 1) onPlace(found[0]);
-    else if (found.length > 1) setMatches(found);
-    else setProblem(digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${text}“ kennen wir in ${SITE.region} nicht.`);
+    const check = checkPlace(value);
+    setMatches(check.matches.length > 1 ? check.matches : []);
+    setProblem(check.problem);
+    if (check.place) onPlace(check.place);
   };
 
   return (
@@ -59,7 +50,7 @@ export function RegionField({
         </button>
       </div>
       <p id={statusId} role="status" className="t-region__status">
-        {problem || (matches.length > 1 ? `Zu „${value.trim()}“ passen mehrere Orte. Bitte wählen Sie Ihren Ort.` : "")}
+        {problem}
       </p>
       {matches.length > 1 && (
         <ul className="t-homeplace__matches" aria-label="Passende Orte">

@@ -61,7 +61,7 @@ export function ServiceCard({ service, level = 3 }: { service: Service; level?: 
       <p className="t-card__text">{service.summary}</p>
       <p className="t-card__facts">
         <span className={service.online ? "t-badge t-badge--online" : "t-badge"}>{service.online ? "Online möglich" : "Termin vor Ort"}</span>
-        <span className="t-badge t-badge--quiet">{service.level === "land" ? "Land" : "Gemeinde"}</span>
+        <span className="t-badge t-badge--quiet">{{ bund: "Bund", land: "Land", kommune: "Gemeinde" }[service.level]}</span>
       </p>
     </li>
   );

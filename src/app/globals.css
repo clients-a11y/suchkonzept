@@ -965,6 +965,69 @@ main:focus {
   font-size: 0.8125rem;
 }
 
+/* The one small field next to the search term, when a test asks for the place in the form. */
+.t-smart__place {
+  position: relative;
+  flex: 0 1 13rem;
+  min-width: 11.5rem;
+}
+
+.t-smart__placelabel {
+  position: absolute;
+  top: 0.4375rem;
+  left: 0.875rem;
+  color: var(--c-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.t-smart__placeinput {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 1.375rem 0.75rem 0.25rem;
+  border: 2px solid var(--c-white);
+  border-radius: var(--radius);
+  background: var(--c-white);
+  color: var(--c-text);
+  font-size: 1.0625rem;
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.22);
+}
+
+.t-smart__place--problem .t-smart__placelabel {
+  color: var(--c-red-dark);
+}
+
+.t-smart__place--problem .t-smart__placeinput {
+  border-color: var(--c-red-dark);
+  background: #fdf3f6;
+}
+
+.t-smart__placestatus {
+  margin-top: 0.5rem;
+}
+
+.t-smart__placestatus:empty {
+  display: none;
+}
+
+/* White on the blue stage, so a missing place cannot be overlooked. */
+.t-smart__placealert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-left: 4px solid var(--c-red-dark);
+  border-radius: var(--radius);
+  background: var(--c-white);
+  color: var(--c-red-dark);
+  font-weight: 600;
+  animation: t-rise 0.25s ease-out both;
+}
+
+.t-smart__placealert .icon {
+  flex: none;
+}
+
 .t-smart__list {
   position: absolute;
   top: calc(100% + 0.375rem);
@@ -1615,13 +1678,31 @@ main:focus {
 .t-searchform__row {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
   gap: 0.5rem;
 }
 
-.t-searchform__row .t-input {
+.t-searchform__field {
   flex: 1 1 16rem;
-  width: auto;
+  min-width: 0;
+}
+
+.t-searchform__field--place {
+  flex: 0 1 14rem;
+}
+
+.t-searchform__row .t-input {
+  width: 100%;
   min-height: 3.25rem;
+}
+
+.t-searchform__field--problem .t-searchform__label {
+  color: var(--c-red-dark);
+}
+
+.t-searchform__field--problem .t-input {
+  border-color: var(--c-red-dark);
+  background: #fdf3f6;
 }
 
 .t-searchform__row .t-btn {
@@ -3568,6 +3649,27 @@ button.t-route__choice {
   margin: 0;
 }
 
+.t-sconfig {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.t-sconfig .t-fieldset {
+  gap: 0.5rem;
+}
+
+.t-sconfig legend {
+  margin-bottom: 0.5rem;
+  padding: 0;
+  font-weight: 600;
+}
+
+.t-sconfig__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+}
+
 .t-sbox__start {
   display: grid;
   gap: 0.25rem;
@@ -3718,6 +3820,18 @@ button.t-route__choice {
   box-shadow: 0 8px 28px rgb(21 41 61 / 0.18);
 }
 
+/* Stands where the line above the results comes later, so nothing jumps. */
+.t-waiting__note {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
+}
+
+.t-waiting__note .t-spinner {
+  color: var(--c-blue);
+}
+
 .t-lb__info {
   display: grid;
   gap: 1rem;
@@ -3751,6 +3865,87 @@ button.t-route__choice {
   color: var(--c-red-dark);
   font-size: 0.9375rem;
   font-weight: 600;
+}
+
+/* ---------- Instruction page for test persons ---------- */
+
+.t-task {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 2rem 1rem;
+  background: var(--c-surface);
+}
+
+.t-task__inner {
+  display: grid;
+  gap: 1.25rem;
+  width: min(42rem, 100%);
+}
+
+.t-task__portal {
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.t-task__title {
+  color: var(--c-navy);
+  font-family: var(--f-condensed);
+  font-size: clamp(2rem, 1.7rem + 1.4vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.t-task__text {
+  font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  line-height: 1.4;
+}
+
+.t-task__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+
+.t-task__facts > div {
+  padding: 1.125rem 1.25rem;
+  border: 1px solid var(--c-line-soft);
+  border-top: 4px solid var(--c-blue);
+  border-radius: var(--radius);
+  background: var(--c-white);
+}
+
+.t-task__facts dt {
+  color: var(--c-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.t-task__facts dd {
+  margin: 0.125rem 0 0;
+  color: var(--c-navy);
+  font-family: var(--f-condensed);
+  font-size: clamp(1.75rem, 1.5rem + 1.1vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.t-task__facts .t-task__town {
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.t-task__start {
+  justify-self: start;
+}
+
+.t-task__sample {
+  color: var(--c-muted);
+  font-size: 0.875rem;
 }
 
 /* ---------- Page "So entscheidet die Suche" ---------- */

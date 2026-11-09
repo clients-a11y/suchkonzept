@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DemoReset } from "@/components/DemoReset";
+import { FooterTools } from "@/components/FooterTools";
 import { Wordmark } from "@/components/Wordmark";
 import { SITE } from "@/data/site";
 
@@ -20,17 +20,7 @@ export function Footer() {
             </ul>
           </div>
         ))}
-        <div className="t-footer__col">
-          <h2 className="t-footer__title">Prototyp</h2>
-          <ul className="t-footer__links">
-            <li>
-              <Link href="/testszenarien">Testszenarien</Link>
-            </li>
-            <li>
-              <DemoReset />
-            </li>
-          </ul>
-        </div>
+        <FooterTools />
         <div className="t-footer__col">
           <h2 className="t-footer__title">Bürgerservice</h2>
           <address className="t-footer__address">
