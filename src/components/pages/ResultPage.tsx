@@ -32,7 +32,7 @@ const STILL_SEARCHING = "Das dauert noch einen Moment. Wir suchen weiter nach de
 
 function ServiceResult({ service, best }: { service: Service; best: boolean }) {
   return (
-    <li className="t-answer">
+    <li className={best ? "t-answer" : "t-answer t-answer--more"}>
       {best && (
         <p className="t-answer__eyebrow">
           <IconSparkle size={18} />
@@ -43,7 +43,8 @@ function ServiceResult({ service, best }: { service: Service; best: boolean }) {
         <Link href={`/leistungen/${service.slug}`}>{service.title}</Link>
       </h3>
       <p>{service.summary}</p>
-      <AnswerPlace service={service} />
+      {/* "Bundesweit einheitlich" once is enough. */}
+      {(best || service.level !== "bund") && <AnswerPlace service={service} />}
       <ul className="t-facts-line t-answer__facts">
         <li className={service.online ? "t-facts-line__online" : undefined}>
           {service.online && <IconCheck size={16} />}
@@ -206,26 +207,33 @@ function ResultBody({ q, chosen, tab }: { q: string; chosen?: Pot; tab?: Pot }) 
   };
 
   // Only a place entered for this search turns a search for information into a search for services.
-  const area = resultArea(q, place, placeEntered || config.place === "start", chosen);
-  const information = searchInformation(q);
+  const area = resultArea(q, place, placeEntered || config.place === "start", chosen, config.maxServices, config.topicServices);
+  const allInformation = searchInformation(q);
+  const information = config.maxInfos === "all" ? allInformation : allInformation.slice(0, config.maxInfos);
   const field = <RegionField key={placeId} label="PLZ/Ort für regionale Ergebnisse" initial={place?.name ?? ""} onPlace={choose} />;
   // Services that are the same for everyone: a place would change nothing.
   const placeMatters = area.kind !== "services" || area.services.some((s) => !isCentral(s));
   // Tabs name the area already.
   const heading = tabs ? "visually-hidden" : "t-h2";
 
+  const askNoPlace = config.place === "none";
+  const noServices = tabs ? <p>Zu „{q}“ haben wir keine Leistungen gefunden.</p> : null;
   const services =
     area.kind === "info" && !refining ? (
-      <section className="t-lb t-lb--small" aria-label="Leistungen in Ihrer Region">
-        <RegionField label="Gibt es dazu eine Leistung in Ihrer Region? PLZ/Ort eingeben" onPlace={choose} />
-      </section>
+      askNoPlace ? (
+        noServices
+      ) : (
+        <section className="t-lb t-lb--small" aria-label="Leistungen in Ihrer Region">
+          <RegionField label="Gibt es dazu eine Leistung in Ihrer Region? PLZ/Ort eingeben" onPlace={choose} />
+        </section>
+      )
     ) : (
       <section className="t-lb" aria-labelledby={titles.services}>
         <div className="t-lb__head">
           <h2 id={titles.services} className={heading}>
             Leistungen
           </h2>
-          {area.kind !== "needPlace" && placeMatters && !refining && field}
+          {area.kind !== "needPlace" && placeMatters && !refining && !askNoPlace && field}
         </div>
         {refining && (
           <Waiting wait={config.wait}>
@@ -235,7 +243,7 @@ function ResultBody({ q, chosen, tab }: { q: string; chosen?: Pot; tab?: Pot }) 
         {!refining && area.kind === "services" && (
           <ul className="t-lb__services">
             {area.services.map((service) => (
-              <ServiceResult key={service.slug} service={service} best={area.services.length === 1} />
+              <ServiceResult key={service.slug} service={service} best={!area.related && (area.services.length === 1 || service === area.direct)} />
             ))}
           </ul>
         )}
@@ -266,7 +274,8 @@ function ResultBody({ q, chosen, tab }: { q: string; chosen?: Pot; tab?: Pot }) 
     </section>
   );
 
-  const infoFirst = area.kind === "info" || (area.kind === "nothing" && (chosen ?? routeQuery(q).pot) === "informationen");
+  const related = area.kind === "services" && area.related;
+  const infoFirst = related || area.kind === "info" || (area.kind === "nothing" && (chosen ?? routeQuery(q).pot) === "informationen");
   const activeTab: Pot = tab ?? (infoFirst ? "informationen" : "leistungen");
 
   return (
@@ -292,8 +301,10 @@ function ResultBody({ q, chosen, tab }: { q: string; chosen?: Pot; tab?: Pot }) 
         </div>
       ) : (
         <>
-          {services}
+          {/* Information in focus: the services on its topic follow it. */}
+          {!related && services}
           {infos}
+          {related && services}
         </>
       )}
     </div>

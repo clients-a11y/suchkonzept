@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import { DEFAULT_CONFIG } from "@/data/test-scenarios";
-import type { TestConfig } from "@/data/test-scenarios";
+import { DEFAULT_CONFIG, STARTER_SCENARIOS } from "@/data/test-scenarios";
+import type { SavedScenario, TestConfig } from "@/data/test-scenarios";
 
-// The settings of the test scenarios, in this browser: what each scenario is set to, and the one the
-// prototype runs with since the last start.
+// The test scenarios, in this browser: the saved ones, and the settings the prototype runs with since the last start.
 const KEY = "suchkonzept.testeinstellungen.v1";
 const EVENT = "suchkonzept-testeinstellungen";
 
-// task: the instruction page, while a test person works on it.
-type Stored = { active?: TestConfig; scenarios?: Record<number, TestConfig>; task?: string };
+// saved: missing until something is saved or deleted, then the starter scenarios count.
+// task: the instruction page, while a test person works on it. team: this browser has opened a scenario page.
+type Stored = { active?: TestConfig; saved?: SavedScenario[]; task?: string; team?: boolean };
 
 function subscribe(callback: () => void) {
   window.addEventListener(EVENT, callback);
@@ -31,7 +31,14 @@ function read(): string {
 
 function parse(raw: string): Stored {
   try {
-    return raw ? (JSON.parse(raw) as Stored) : {};
+    if (!raw) return {};
+    const stored = JSON.parse(raw) as Stored;
+    // Saved before a setting existed: it counts with its default.
+    return {
+      ...stored,
+      active: stored.active && { ...DEFAULT_CONFIG, ...stored.active },
+      saved: stored.saved?.map((s) => ({ ...s, config: { ...DEFAULT_CONFIG, ...s.config } })),
+    };
   } catch {
     return {};
   }
@@ -55,17 +62,40 @@ export function useTestConfig(): TestConfig {
   return useStored().active ?? DEFAULT_CONFIG;
 }
 
-export function useScenarioConfig(id: number): TestConfig {
-  return useStored().scenarios?.[id] ?? DEFAULT_CONFIG;
+export function useSavedScenarios(): SavedScenario[] {
+  return useStored().saved ?? STARTER_SCENARIOS;
 }
 
-export function saveScenarioConfig(id: number, config: TestConfig) {
+export function saveScenario(scenario: SavedScenario) {
   const stored = parse(read());
-  write({ ...stored, scenarios: { ...stored.scenarios, [id]: config } });
+  write({ ...stored, saved: [scenario, ...(stored.saved ?? STARTER_SCENARIOS)] });
+}
+
+export function deleteScenario(id: string) {
+  const stored = parse(read());
+  write({ ...stored, saved: (stored.saved ?? STARTER_SCENARIOS).filter((s) => s.id !== id) });
+}
+
+// False while a page from the server is taken over: until then the browser's scenarios are not known yet.
+export function useStoreReady(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 }
 
 export function useTaskHref(): string | undefined {
   return useStored().task;
+}
+
+export function useIsTeam(): boolean {
+  return Boolean(useStored().team);
+}
+
+export function markTeam() {
+  const stored = parse(read());
+  if (!stored.team) write({ ...stored, team: true });
 }
 
 export function activateConfig(config: TestConfig, task?: string) {

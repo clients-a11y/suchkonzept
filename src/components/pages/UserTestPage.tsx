@@ -1,35 +1,10 @@
-import Link from "next/link";
-import { IconArrow } from "@/components/Icons";
 import { ScenarioStart } from "@/components/ScenarioStart";
-import { SCENARIOS, placeOf } from "@/data/test-scenarios";
-import type { Scenario } from "@/data/test-scenarios";
+import { SavedScenarioList, ScenarioConfigurator, TestsTabs } from "@/components/ScenarioPlanner";
+import type { TestsTab } from "@/components/ScenarioPlanner";
 
-// In front of the prototype, without the portal around it: all scenarios at a glance, one page per scenario.
+// In front of the prototype, without the portal around it: the saved scenarios, and in its own tab the configurator.
 
-function ScenarioCard({ scenario }: { scenario: Scenario }) {
-  return (
-    <li className="t-scard">
-      <div className="t-scard__top">
-        <span className="t-scard__badge">{scenario.id}</span>
-        <span className="t-scard__meta">{scenario.case}</span>
-      </div>
-      <h3 className="t-scard__title">
-        <Link href={`/testszenarien/${scenario.id}`} className="t-cardlink">
-          {scenario.title}
-        </Link>
-      </h3>
-      <p>{scenario.summary}</p>
-      <div className="t-scard__foot">
-        <p className="t-scard__entry">
-          Suchbegriff: {scenario.term} · Wohnort: {placeOf(scenario)}
-        </p>
-        <IconArrow size={20} />
-      </div>
-    </li>
-  );
-}
-
-export function UserTestPage() {
+export function UserTestPage({ tab }: { tab: TestsTab }) {
   return (
     <main id="inhalt" tabIndex={-1} className="t-main">
       <div className="t-pagehead">
@@ -46,34 +21,31 @@ export function UserTestPage() {
         </div>
       </div>
 
-      <div className="t-container t-page t-scens">
-        <section aria-labelledby="szenarien">
-          <h2 id="szenarien" className="t-h2">
-            Szenarien
-          </h2>
-          <ul className="t-scards">
-            {SCENARIOS.map((scenario) => (
-              <ScenarioCard key={scenario.id} scenario={scenario} />
-            ))}
-          </ul>
-        </section>
+      <div className="t-container t-page">
+        <TestsTabs active={tab} />
+        {tab === "konfigurator" ? (
+          <ScenarioConfigurator />
+        ) : (
+          <div className="t-scens">
+            <SavedScenarioList />
 
-        <section aria-labelledby="ablauf">
-          <h2 id="ablauf" className="t-h2">
-            So läuft der Test
-          </h2>
-          <ol className="t-scens__steps">
-            <li>Bitten Sie die Person, laut zu denken. Sie kann nichts falsch machen, wir testen die Seite.</li>
-            <li>Starten Sie das Szenario, lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu. Oder geben Sie der Person den Link zur Aufgabenseite, den Sie auf der Seite des Szenarios kopieren.</li>
-            <li>Helfen Sie nicht, und sagen Sie nie „Leistung“ oder „Bereich“.</li>
-            <li>Stoppen Sie, bevor die Person einen Antrag oder Termin startet. Fragen Sie dann „Wie leicht war das, von 1 sehr schwer bis 7 sehr leicht?“.</li>
-            <li>Planen Sie 5 bis 8 Personen und je 30 bis 45 Minuten ein. Wechseln Sie die Reihenfolge der Szenarien.</li>
-          </ol>
-          <ul className="t-scens__notes">
-            <li>Auf der Seite eines Szenarios stellen Sie ein, wo nach dem Ort gefragt wird, ob ein unklarer Begriff nachfragt, wie lange die Suche dauert und ob die Ergebnisse auf einer Seite oder in Tabs stehen.</li>
-            <li>Getestet wird nur die Suche, nicht der Antrag.</li>
-          </ul>
-        </section>
+            <section aria-labelledby="ablauf">
+              <h2 id="ablauf" className="t-h2">
+                So läuft der Test
+              </h2>
+              <ol className="t-scens__steps">
+                <li>Bitten Sie die Person, laut zu denken. Sie kann nichts falsch machen, wir testen die Seite.</li>
+                <li>Starten Sie das Szenario, lesen Sie die Aufgabe vor und geben Sie die Wohnortkarte dazu. Oder geben Sie der Person den Link zur Aufgabenseite, den Sie auf der Seite des Szenarios kopieren.</li>
+                <li>Helfen Sie nicht, und sagen Sie nie „Leistung“ oder „Bereich“.</li>
+                <li>Stoppen Sie, bevor die Person einen Antrag oder Termin startet. Fragen Sie dann „Wie leicht war das, von 1 sehr schwer bis 7 sehr leicht?“.</li>
+                <li>Planen Sie 5 bis 8 Personen und je 30 bis 45 Minuten ein. Wechseln Sie die Reihenfolge der Szenarien.</li>
+              </ol>
+              <ul className="t-scens__notes">
+                <li>Getestet wird nur die Suche, nicht der Antrag.</li>
+              </ul>
+            </section>
+          </div>
+        )}
       </div>
     </main>
   );

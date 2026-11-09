@@ -25,7 +25,7 @@ export function TaskPage({ scenario }: { scenario: Scenario }) {
             <dt>Suchen Sie nach</dt>
             <dd>{scenario.term}</dd>
           </div>
-          {home && (
+          {home && config.place !== "none" && (
             <div>
               <dt>Ihre Postleitzahl</dt>
               <dd>{home.plz}</dd>

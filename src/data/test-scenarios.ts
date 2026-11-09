@@ -1,19 +1,24 @@
-// Szenarien für Tests mit echten Nutzerinnen und Nutzern. Getestet wird die eine Ergebnisseite (/ergebnisse),
-// und nur die Suche: Jeder Test endet vor dem Antrag.
+// Fälle für Tests mit echten Nutzerinnen und Nutzern. Im Konfigurator wird aus einem Fall und einem Ablauf ein
+// Szenario. Getestet wird die eine Ergebnisseite (/ergebnisse), und nur die Suche: Jeder Test endet vor dem Antrag.
 
 export type FlowStep = { kind: "person" | "wait" | "page" | "end"; text: string };
 
-// Was sich je Szenario vor dem Start einstellen lässt.
+// Der Ablauf eines Szenarios.
 export type TestConfig = {
-  // Wo nach dem Ort gefragt wird: im Suchformular, im Overlay direkt nach der Suche oder erst auf der Ergebnisseite.
-  place: "start" | "overlay" | "results";
+  // Wo nach dem Ort gefragt wird: gar nicht, im Suchformular, im Overlay direkt nach der Suche oder erst auf der Ergebnisseite.
+  place: "none" | "start" | "overlay" | "results";
   // Ob ein unklarer Begriff im Overlay „Was suchen Sie?“ fragt. Ohne Frage zeigt die Seite gleich die Ergebnisse.
   potOverlay: boolean;
-  wait: 3 | 5 | 10;
+  wait: 2 | 3 | 5 | 10;
   results: "list" | "tabs";
+  // Wie viele Treffer die Ergebnisseite höchstens zeigt.
+  maxServices: 1 | 2 | 3 | 5;
+  maxInfos: 1 | 3 | 5 | "all";
+  // Wenn es nur um Informationen geht: wie viele Leistungen zum selben Thema dazukommen.
+  topicServices: 0 | 1 | 2 | 3;
 };
 
-export const DEFAULT_CONFIG: TestConfig = { place: "results", potOverlay: true, wait: 3, results: "list" };
+export const DEFAULT_CONFIG: TestConfig = { place: "results", potOverlay: true, wait: 3, results: "list", maxServices: 3, maxInfos: "all", topicServices: 0 };
 
 // Nach dieser Zeit kommt zum Skeleton ein Hinweis mit Ladeanimation. Bei 3 Sekunden gibt es keinen zweiten Zustand.
 export function hintAfter(wait: TestConfig["wait"]): number | undefined {
@@ -22,13 +27,16 @@ export function hintAfter(wait: TestConfig["wait"]): number | undefined {
 
 export type Scenario = {
   id: number;
-  // Der Fall, den die Aufgabe prüft.
-  case: string;
-  title: string;
-  // Für die Übersicht: worum es geht, in ein bis zwei Sätzen.
+  // Name des Falls im Konfigurator.
+  label: string;
+  // Worum es geht, in einem Satz.
   summary: string;
-  // Bestimmt zusammen mit den Einstellungen den Klickpfad, siehe scenarioPath.
+  // Vorschlag für „Was wollen wir herausfinden?“, im Konfigurator änderbar.
+  goal: string;
+  // Bestimmt zusammen mit dem Ablauf den Klickpfad, siehe scenarioPath.
   flow: "clear" | "regional" | "info" | "lead" | "unclear";
+  // Die Fragen nach dem Ort, die zu diesem Fall passen. Die erste ist die Vorgabe.
+  places: TestConfig["place"][];
   // Der letzte Stand, bevor der Test endet.
   outcome: FlowStep;
   // Die Person muss danach in den Informationen weiterlesen.
@@ -40,7 +48,6 @@ export type Scenario = {
   home: string;
   // Steht groß auf der Aufgabenseite. Im moderierten Test nur nennen, wenn die Person keinen Begriff findet.
   term: string;
-  observe: string[];
   success: string;
   ask: string;
 };
@@ -57,92 +64,92 @@ const ANSWERED: FlowStep = { kind: "end", text: "Test endet, die Frage ist beant
 export const SCENARIOS: Scenario[] = [
   {
     id: 1,
-    case: "Fall 1",
-    title: "Eine klare Leistung ohne Ort",
-    summary: "Die Suche erkennt eine bundesweit einheitliche Leistung eindeutig, eine Postleitzahl ist nicht nötig. Wir prüfen, ob die Menschen sie sofort sehen und ob ihnen die Frage nach dem Ort fehlt.",
+    label: "Leistung ohne PLZ",
+    summary: "Die Suche findet mehrere passende, bundesweit einheitliche Leistungen.",
+    goal: "Erkennen die Menschen die richtige Leistung, und fehlt ihnen die Frage nach dem Ort?",
     flow: "clear",
-    outcome: page("Leistung ohne Feld für den Ort, mit dem Hinweis „Bundesweit einheitlich“"),
+    places: ["none", "start"],
+    outcome: page("Leistungen ohne Feld für den Ort, die beste zuerst, mit dem Hinweis „Bundesweit einheitlich“"),
     end: STOP,
     task: "Ihr Personalausweis läuft in zwei Monaten ab. Was müssen Sie jetzt tun?",
     home: SEEHAUSEN,
     term: "Personalausweis",
-    observe: ["Wohin schaut die Person zuerst?", "Sucht sie nach einer Stelle oder einem Feld für ihren Wohnort?"],
-    success: "Die Person findet die Leistung und sagt, was sie mitbringen muss.",
+    success: "Die Person wählt „Personalausweis beantragen“ und sagt, was sie mitbringen muss.",
     ask: "Haben Sie erwartet, dass Sie Ihren Wohnort angeben müssen?",
   },
   {
     id: 2,
-    case: "Fall 2",
-    title: "Leistung, die vom Ort abhängt",
-    summary: "Es ist eine Leistung, aber ohne Ort gibt es kein Ergebnis. Wir prüfen, ob die Menschen die Frage nach dem Ort verstehen oder ob sie abschreckt.",
+    label: "Leistung mit PLZ, am Ort vorhanden",
+    summary: "Ohne Ort gibt es kein Ergebnis.",
+    goal: "Verstehen die Menschen die Frage nach dem Ort, oder schreckt sie ab?",
     flow: "regional",
+    places: ["results", "overlay", "start"],
     outcome: page("Leistung mit Bürgerbüro Seehausen"),
     end: STOP,
     task: "Sie haben sich einen Hund angeschafft. Müssen Sie ihn irgendwo anmelden, und wenn ja, wo?",
     home: SEEHAUSEN,
     term: "Hund anmelden",
-    observe: ["Denkt die Person, die Seite lädt noch oder ist kaputt?", "Gibt sie den Ort ein, oder übergeht sie die Frage?"],
     success: "Die Person gibt ihren Ort ein und nennt das Bürgerbüro Seehausen und die Frist von einem Monat.",
     ask: "Was haben Sie gedacht, als nach Ihrem Ort gefragt wurde?",
   },
   {
     id: 3,
-    case: "Fall 2",
-    title: "Für diesen Ort gibt es nichts",
-    summary: "Waldheim hat keine Gewässer und bietet deshalb keinen Fischereischein an. Wir prüfen, ob die Menschen das als Antwort verstehen und in den Informationen weiterlesen.",
+    label: "Leistung mit PLZ, am Ort nicht vorhanden",
+    summary: "Waldheim hat keine Gewässer und bietet keinen Fischereischein an.",
+    goal: "Verstehen die Menschen das als Antwort, und lesen sie in den Informationen weiter?",
     flow: "regional",
+    places: ["results", "overlay", "start"],
     outcome: page("Hinweis, dass es für diesen Ort nichts gibt"),
     readOn: true,
     end: ANSWERED,
     task: "Sie möchten am Wochenende angeln gehen. Was brauchen Sie dafür?",
     home: WALDHEIM,
     term: "Angelschein",
-    observe: ["Hält die Person das für einen Fehler der Suche?", "Liest sie in den Informationen weiter?"],
     success: "Die Person sagt, dass es dazu in Waldheim nichts gibt, und liest in den Informationen weiter.",
     ask: "Was hat Ihnen der Hinweis gesagt?",
   },
   {
     id: 4,
-    case: "Fall 3",
-    title: "Reine Information",
-    summary: "Die Suche findet keine klare Leistung, es geht nur um Informationen. Wir prüfen, ob die Menschen die Meldung finden und ob das Feld für den Ort sie stört.",
+    label: "Information ohne PLZ",
+    summary: "Die Suche findet keine Leistung, es geht nur um Informationen.",
+    goal: "Finden die Menschen die Meldung?",
     flow: "info",
+    places: ["none", "start"],
     outcome: person("Liest die Meldung zur Baustelle"),
     end: ANSWERED,
     task: "Am Marktplatz in Beispielstadt ist Baustelle, und Ihr Bus fährt anders als sonst. Bis wann bleibt das so?",
     home: "Sie wohnen in Beispielstadt, Postleitzahl 20100.",
     term: "Baustelle Marktplatz",
-    observe: ["Bemerkt die Person das Feld für den Ort?", "Trägt sie dort etwas ein, obwohl sie nur lesen will?"],
     success: "Die Person sagt „bis Dezember“.",
-    ask: "Was passiert Ihrer Meinung nach, wenn Sie in das kleine Feld etwas eintragen?",
+    ask: "Haben Sie auf der Seite etwas vermisst?",
   },
   {
     id: 5,
-    case: "Fall 3, dann Fall 1",
-    title: "Von der Information zur Leistung",
-    summary: "Die Suche ist erst unklar, mit dem Ort taucht eine Leistung auf. Wir prüfen, ob die Menschen verstehen, warum sich die Seite ändert.",
+    label: "Information mit PLZ, dann kommt eine Leistung",
+    summary: "Die Suche ist erst unklar, mit dem Ort taucht eine Leistung auf.",
+    goal: "Stört das Feld für den Ort, und verstehen die Menschen, warum sich die Seite ändert?",
     flow: "lead",
+    places: ["results", "start"],
     outcome: page("Leistungsbereich mit passender Leistung"),
     end: STOP,
     task: "Jemand hat Ihnen erzählt, dass Familien in Ihrer Gegend Unterstützung bekommen können. Ist für Sie etwas dabei?",
     home: SEEHAUSEN,
     term: "Unterstützung für Familien",
-    observe: ["Trägt die Person ihren Ort von selbst ein?", "Findet sie sich zurecht, wenn die Seite sich umbaut?"],
     success: "Die Person trägt ihren Ort ein und nennt mindestens eine passende Leistung.",
     ask: "Was hat sich auf der Seite verändert, nachdem Sie den Ort eingegeben haben?",
   },
   {
     id: 6,
-    case: "Unklar: Leistung oder Information",
-    title: "Die Suche fragt zuerst nach",
-    summary: "Aus dem Begriff allein geht nicht hervor, was gemeint ist. Ein Overlay fragt vor den Treffern nach. Wir prüfen, ob die Menschen die Frage verstehen oder sie als Hürde empfinden.",
+    label: "Begriff unklar",
+    summary: "Aus dem Begriff allein geht nicht hervor, was gemeint ist.",
+    goal: "Verstehen die Menschen eine Rückfrage, oder empfinden sie sie als Hürde?",
     flow: "unclear",
+    places: ["none", "start"],
     outcome: page("Kindergeld als Leistung, ohne Feld für den Ort"),
     end: STOP,
     task: "Ihr Kind ist gerade geboren, und Sie möchten jetzt Geld für Ihr Kind bekommen. Suchen Sie nach dem Wort Kindergeld.",
     home: SEEHAUSEN,
     term: "Kindergeld",
-    observe: ["Versteht die Person die Frage, oder stört sie sie?", "Wählt sie ohne Zögern?"],
     success: "Die Person findet Kindergeld auf der Ergebnisseite.",
     ask: "Hätten Sie diese Frage gebraucht?",
   },
@@ -152,34 +159,80 @@ export function findScenario(id: string): Scenario | undefined {
   return SCENARIOS.find((s) => String(s.id) === id);
 }
 
+export function defaultConfig(scenario: Scenario): TestConfig {
+  return { ...DEFAULT_CONFIG, place: scenario.places[0] };
+}
+
+// Ein im Konfigurator gespeichertes Szenario: ein Fall, sein Ablauf und was wir damit herausfinden wollen.
+export type SavedScenario = { id: string; scenarioId: number; config: TestConfig; goal: string };
+
+// Stehen beim ersten Öffnen schon da und lassen sich löschen wie alle anderen.
+export const STARTER_SCENARIOS: SavedScenario[] = SCENARIOS.map((s) => ({ id: String(s.id), scenarioId: s.id, config: defaultConfig(s), goal: s.goal }));
+
 // Ort und Postleitzahl aus dem Satz auf der Wohnortkarte.
 export function homeOf(scenario: Scenario): { town: string; plz: string } | undefined {
   const match = scenario.home.match(/in (.+), Postleitzahl (\d+)/);
   return match ? { town: match[1], plz: match[2] } : undefined;
 }
 
-export function placeOf(scenario: Scenario): string | undefined {
-  const home = homeOf(scenario);
-  return home ? `${home.town}, ${home.plz}` : undefined;
+const PLACE_SHORT: Record<TestConfig["place"], string> = {
+  none: "ohne PLZ",
+  start: "PLZ im Formular",
+  overlay: "PLZ im Overlay",
+  results: "PLZ auf der Ergebnisseite",
+};
+
+export function scenarioName(scenario: Scenario, config: TestConfig): string {
+  const parts = [scenario.term, PLACE_SHORT[config.place]];
+  if (scenario.flow === "unclear") parts.push(config.potOverlay ? "mit Rückfrage" : "ohne Rückfrage");
+  parts.push(`${config.wait} Sek.`, config.results === "tabs" ? "Tabs" : "Eine Seite", `bis ${scenario.flow === "info" ? config.topicServices : config.maxServices} Leistungen`, config.maxInfos === "all" ? "alle Informationen" : `bis ${config.maxInfos} Informationen`);
+  return parts.join(" · ");
 }
 
-// Die Einstellungen als ein Zeichen in der Adresse der Aufgabenseite: Testpersonen sollen sie nicht lesen können.
-const PLACES: TestConfig["place"][] = ["start", "overlay", "results"];
+// Der Ablauf als ein Satz.
+export function scenarioSentence(scenario: Scenario, config: TestConfig): string {
+  const plz = homeOf(scenario)?.plz ?? "";
+  const steps = [config.place === "start" ? `Sucht nach „${scenario.term}“ und gibt im Suchformular ${plz} ein` : `Sucht nach „${scenario.term}“`];
+  if (config.place === "overlay") steps.push(`gibt im Overlay ${plz} ein`);
+  if (config.place === "results") steps.push(`gibt auf der Ergebnisseite ${plz} ein`);
+  if (scenario.flow === "unclear" && config.potOverlay) steps.push("beantwortet im Overlay „Was suchen Sie?“");
+  steps.push(`wartet ${config.wait} Sekunden`);
+  return `${steps.join(", ")} und sieht ${config.results === "tabs" ? "zwei Tabs" : "die Ergebnisse auf einer Seite"}.`;
+}
+
+// Der Ablauf als ein Zeichen in der Adresse der Aufgabenseite: Testpersonen sollen ihn nicht lesen können.
+// Neue Werte kommen hinten dazu, damit verschickte Links gültig bleiben.
+const PLACES: TestConfig["place"][] = ["start", "overlay", "results", "none"];
 const WAITS: TestConfig["wait"][] = [3, 5, 10];
+const MAX_SERVICES: TestConfig["maxServices"][] = [3, 1, 2, 5];
+const MAX_INFOS: TestConfig["maxInfos"][] = ["all", 1, 3, 5];
+
+// Spätere Einstellungen stehen in eigenen Bereichen der Zahl, damit ältere Codes gültig bleiben.
+const SHORT_WAIT = 768;
+const TOPIC_STEP = SHORT_WAIT * 2;
 
 function variantCode(config: TestConfig): string {
-  const number = PLACES.indexOf(config.place) * 12 + (config.potOverlay ? 6 : 0) + WAITS.indexOf(config.wait) * 2 + (config.results === "tabs" ? 1 : 0);
-  return number.toString(36);
+  const wait = WAITS.indexOf(config.wait === 2 ? 3 : config.wait);
+  const flow = PLACES.indexOf(config.place) * 12 + (config.potOverlay ? 6 : 0) + wait * 2 + (config.results === "tabs" ? 1 : 0);
+  const limits = MAX_SERVICES.indexOf(config.maxServices) + MAX_INFOS.indexOf(config.maxInfos) * 4;
+  return (flow + limits * 48 + (config.wait === 2 ? SHORT_WAIT : 0) + config.topicServices * TOPIC_STEP).toString(36);
 }
 
 export function configOfCode(code: string | null): TestConfig {
-  const number = code ? parseInt(code, 36) : NaN;
-  if (!(number >= 0 && number < 36)) return DEFAULT_CONFIG;
+  const whole = code ? parseInt(code, 36) : NaN;
+  if (!(whole >= 0 && whole < TOPIC_STEP * 4)) return DEFAULT_CONFIG;
+  const parsed = whole % TOPIC_STEP;
+  const number = parsed % SHORT_WAIT;
+  const flow = number % 48;
+  const limits = Math.floor(number / 48);
   return {
-    place: PLACES[Math.floor(number / 12)],
-    potOverlay: number % 12 >= 6,
-    wait: WAITS[Math.floor((number % 6) / 2)],
-    results: number % 2 ? "tabs" : "list",
+    place: PLACES[Math.floor(flow / 12)],
+    potOverlay: flow % 12 >= 6,
+    wait: parsed >= SHORT_WAIT ? 2 : WAITS[Math.floor((flow % 6) / 2)],
+    results: flow % 2 ? "tabs" : "list",
+    maxServices: MAX_SERVICES[limits % 4],
+    maxInfos: MAX_INFOS[Math.floor(limits / 4)],
+    topicServices: Math.floor(whole / TOPIC_STEP) as TestConfig["topicServices"],
   };
 }
 
@@ -187,7 +240,7 @@ export function taskHref(scenario: Scenario, config: TestConfig): string {
   return `/aufgabe/${scenario.id}?v=${variantCode(config)}`;
 }
 
-// Der Klickpfad, wie ihn die eingestellte Variante tatsächlich zeigt.
+// Der Klickpfad, wie ihn der eingestellte Ablauf tatsächlich zeigt.
 export function scenarioPath(scenario: Scenario, config: TestConfig): FlowStep[] {
   const { flow, outcome, end, term } = scenario;
   const tabs = config.results === "tabs";
@@ -198,14 +251,22 @@ export function scenarioPath(scenario: Scenario, config: TestConfig): FlowStep[]
   const search = person(inForm ? `Sucht nach „${term}“ und gibt im Formular ${plz} ein` : `Sucht nach „${term}“`);
   const enter = person(`Gibt ${plz} ein`);
   const wait: FlowStep = { kind: "wait", text: `Skeleton mit Ladeanimation, ${config.wait} Sekunden${hint ? `, nach ${hint} Sekunden zusätzlich ein Hinweis` : ""}` };
-  const infoOnly = page(tabs ? "Tab Informationen offen, das Feld für den Ort liegt im Tab Leistungen" : "Zwei Zeilen zum Ort, darunter die Informationen");
   const ending = [outcome, ...(scenario.readOn ? [person(tabs ? "Wechselt zum Tab Informationen" : "Liest in den Informationen weiter")] : []), end];
 
   if (flow === "unclear") {
     return config.potOverlay ? [search, page("Overlay „Was suchen Sie?“, dahinter das Skeleton"), PICK_APPLY, wait, ...ending] : [search, wait, ...ending];
   }
   if (flow === "info") {
-    return [search, wait, inForm ? page("Hinweis, dass es am Ort keine Leistung gibt, dazu die Informationen") : infoOnly, ...ending];
+    const shown = config.topicServices
+      ? tabs
+        ? "Tab Informationen offen, im Tab Leistungen passende Leistungen"
+        : "Informationen, darunter passende Leistungen"
+      : inForm
+        ? "Hinweis, dass es am Ort keine Leistung gibt, dazu die Informationen"
+        : tabs
+          ? "Tab Informationen offen"
+          : "Nur Informationen, ohne Feld für den Ort";
+    return [search, wait, page(shown), ...ending];
   }
   // Der Ort steht schon im Formular oder spielt keine Rolle: Die erste Antwort ist auch die letzte.
   if (inForm || flow === "clear") return [search, wait, ...ending];
@@ -214,5 +275,6 @@ export function scenarioPath(scenario: Scenario, config: TestConfig): FlowStep[]
       ? [search, page("Overlay fragt nach dem Ort, dahinter das Skeleton"), enter, wait, ...ending]
       : [search, wait, page(tabs ? "Tab Leistungen fragt nach dem Ort" : "Leistungsbereich fragt nach dem Ort"), enter, wait, ...ending];
   }
+  const infoOnly = page(tabs ? "Tab Informationen offen, das Feld für den Ort liegt im Tab Leistungen" : "Zwei Zeilen zum Ort, darunter die Informationen");
   return [search, wait, infoOnly, ...(tabs ? [person("Wechselt zum Tab Leistungen")] : []), enter, wait, ...ending];
 }

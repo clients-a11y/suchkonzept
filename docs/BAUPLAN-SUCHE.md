@@ -171,9 +171,13 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Leistungen des Bundes (auf Wunsch, 09.11.2026): `level: "bund"` für bundesweit einheitliche Leistungen, bisher der
   Personalausweis. Kein Feld und keine Frage nach dem Ort, an der Leistung steht „Bundesweit einheitlich“. Regel: `isCentral`
   in `src/lib/offices.ts`. Das Kindergeld bleibt in den Daten eine Leistung des Landes und fragt ebenfalls nicht nach dem Ort.
+- Mehrere Leistungen bei einem Treffer (auf Wunsch, 09.11.2026): Die direkte Leistung steht immer zuerst, danach folgen die
+  naheliegenden Alternativen aus `nearby` im Katalog. Wie viele erscheinen, ist je Szenario einstellbar (1, 2, 3 oder 5). Neue
+  Beispielleistungen rund um Ausweis, Hund und Kindergeld. Bei einer reinen Information kommen auf Wunsch Leistungen zum Thema dazu
+  (`topics` im Katalog, Vorgabe 0). Neue Beispielmeldungen zu Ausweis und Angelschein, damit auch dort die Menge der Informationen einstellbar ist.
 - Aufgabenseite für Testpersonen (auf Wunsch, 09.11.2026): `/aufgabe/[id]?v=…` zeigt nur Aufgabe, Suchbegriff und Postleitzahl.
   Die Einstellungen stecken als ein Zeichen in `v`. Während eine Testperson arbeitet, zeigt der Footer statt der internen Links
-  „Aufgabe noch einmal lesen“. Mit der PLZ im Formular fragt auch das Suchfeld der Ergebnisseite nach dem Ort.
+  „Aufgabe noch einmal lesen“; ein Browser, der schon eine Szenarioseite geöffnet hat, behält sie. Mit der PLZ im Formular fragt auch das Suchfeld der Ergebnisseite nach dem Ort.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

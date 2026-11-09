@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
-import { IconCheck } from "@/components/Icons";
+import { useEffect, useState } from "react";
+import { PageLoading } from "@/components/pages/PageLoading";
 import { ScenarioStart } from "@/components/ScenarioStart";
-import { placeOf, scenarioPath, taskHref } from "@/data/test-scenarios";
-import type { FlowStep, Scenario, TestConfig } from "@/data/test-scenarios";
-import { saveScenarioConfig, useScenarioConfig } from "@/lib/test-config";
+import { findScenario, homeOf, scenarioName, scenarioPath, scenarioSentence, taskHref } from "@/data/test-scenarios";
+import type { FlowStep } from "@/data/test-scenarios";
+import { markTeam, useSavedScenarios, useStoreReady } from "@/lib/test-config";
 
-// One scenario: what the moderator reads out, the settings of the run, the click path, what we check, and the start.
+// One saved scenario, only what the moderator needs: what we want to find out, the task, the click path, when it
+// counts as done, and the start.
 
 const KIND_LABEL: Record<FlowStep["kind"], string> = { person: "Person", wait: "Warten", page: "Seite", end: "Ende" };
 
@@ -18,37 +19,6 @@ function Fact({ label, children }: { label: string; children: string }) {
       <dt>{label}</dt>
       <dd>{children}</dd>
     </div>
-  );
-}
-
-function Choice<T extends string | number | boolean>({
-  legend,
-  hint,
-  row = false,
-  value,
-  options,
-  onChange,
-}: {
-  legend: string;
-  hint?: string;
-  row?: boolean;
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (next: T) => void;
-}) {
-  const name = useId();
-  const radios = options.map((option) => (
-    <label key={String(option.value)} className="t-check">
-      <input type="radio" name={name} checked={option.value === value} onChange={() => onChange(option.value)} />
-      {option.label}
-    </label>
-  ));
-  return (
-    <fieldset className="t-fieldset">
-      <legend>{legend}</legend>
-      {row ? <div className="t-sconfig__row">{radios}</div> : radios}
-      {hint && <p className="t-box__note">{hint}</p>}
-    </fieldset>
   );
 }
 
@@ -80,9 +50,36 @@ function TaskLink({ href }: { href: string }) {
   );
 }
 
-export function UserTestDetailPage({ scenario }: { scenario: Scenario }) {
-  const config = useScenarioConfig(scenario.id);
-  const change = (patch: Partial<TestConfig>) => saveScenarioConfig(scenario.id, { ...config, ...patch });
+export function UserTestDetailPage({ id }: { id: string }) {
+  const ready = useStoreReady();
+  const saved = useSavedScenarios().find((s) => s.id === id);
+  const scenario = saved && findScenario(String(saved.scenarioId));
+
+  // Who sets up a test here and then tries the task keeps the links to the scenarios.
+  useEffect(() => markTeam(), []);
+
+  if (!ready) return <PageLoading />;
+  if (!saved || !scenario) {
+    return (
+      <main id="inhalt" tabIndex={-1} className="t-main">
+        <div className="t-pagehead">
+          <div className="t-container">
+            <h1 className="t-h1">Szenario nicht gefunden</h1>
+            <p className="t-lead">Es wurde gelöscht oder in einem anderen Browser angelegt.</p>
+            <p>
+              <Link href="/testszenarien" className="t-sback">
+                Alle Szenarien
+              </Link>
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const { config } = saved;
+  const name = scenarioName(scenario, config);
+  const home = homeOf(scenario);
 
   return (
     <main id="inhalt" tabIndex={-1} className="t-main">
@@ -93,69 +90,25 @@ export function UserTestDetailPage({ scenario }: { scenario: Scenario }) {
               Alle Szenarien
             </Link>
           </p>
-          <div className="t-scard__top t-sdetail__top">
-            <span className="t-scard__badge">{scenario.id}</span>
-            <span className="t-scard__meta">{scenario.case}</span>
-          </div>
-          <h1 className="t-h1">{scenario.title}</h1>
-          <p className="t-lead">{scenario.summary}</p>
+          <h1 className="t-h1">{scenario.label}</h1>
+          <p className="t-lead">{scenarioSentence(scenario, config)}</p>
         </div>
       </div>
 
       <div className="t-container t-page t-layout">
         <div className="t-layout__main t-sdetail">
           <section className="t-sdetail__card">
-            <h2 className="t-h3">Ausgangslage</h2>
-            <p className="t-scen__task">„{scenario.task}“</p>
-            <p>Wohnortkarte: {scenario.home}</p>
+            <h2 className="t-h3">Das wollen wir herausfinden</h2>
+            <p>{saved.goal}</p>
           </section>
 
           <section className="t-sdetail__card">
-            <h2 className="t-h3">Einstellungen für diesen Test</h2>
-            <div className="t-sconfig">
-              <Choice
-                legend="Frage nach Postleitzahl oder Ort"
-                value={config.place}
-                options={[
-                  { value: "start", label: "Im Suchformular auf der Startseite, als Pflichtfeld" },
-                  { value: "overlay", label: "Im Overlay direkt nach der Suche, dahinter das Skeleton" },
-                  { value: "results", label: "Erst auf der Ergebnisseite" },
-                ]}
-                onChange={(place) => change({ place })}
-              />
-              <Choice
-                legend="Frage „Leistung oder Information“ bei unklaren Begriffen"
-                row
-                value={config.potOverlay}
-                options={[
-                  { value: true, label: "Im Overlay" },
-                  { value: false, label: "Nicht fragen" },
-                ]}
-                onChange={(potOverlay) => change({ potOverlay })}
-              />
-              <Choice
-                legend="Wartezeit bis zu den Ergebnissen"
-                hint="Bei 5 und 10 Sekunden kommt nach 3 beziehungsweise 5 Sekunden ein Hinweis mit Ladeanimation dazu."
-                row
-                value={config.wait}
-                options={[
-                  { value: 3, label: "3 Sekunden" },
-                  { value: 5, label: "5 Sekunden" },
-                  { value: 10, label: "10 Sekunden" },
-                ]}
-                onChange={(wait) => change({ wait })}
-              />
-              <Choice
-                legend="Darstellung der Ergebnisse"
-                row
-                value={config.results}
-                options={[
-                  { value: "list", label: "Eine Seite" },
-                  { value: "tabs", label: "Zwei Tabs" },
-                ]}
-                onChange={(results) => change({ results })}
-              />
-            </div>
+            <h2 className="t-h3">Aufgabe</h2>
+            <p className="t-scen__task">„{scenario.task}“</p>
+            <dl className="t-sfacts">
+              <Fact label="Suchbegriff">{scenario.term}</Fact>
+              {home && config.place !== "none" && <Fact label="Postleitzahl">{`${home.plz} ${home.town}`}</Fact>}
+            </dl>
           </section>
 
           <section className="t-sdetail__card">
@@ -176,15 +129,7 @@ export function UserTestDetailPage({ scenario }: { scenario: Scenario }) {
           </section>
 
           <section className="t-sdetail__card">
-            <h2 className="t-h3">Was wir prüfen</h2>
-            <ul className="t-checks">
-              {scenario.observe.map((item) => (
-                <li key={item}>
-                  <IconCheck size={18} />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <h2 className="t-h3">Auswertung</h2>
             <dl className="t-sfacts">
               <Fact label="Geschafft, wenn">{scenario.success}</Fact>
               <Fact label="Danach fragen">{scenario.ask}</Fact>
@@ -195,17 +140,12 @@ export function UserTestDetailPage({ scenario }: { scenario: Scenario }) {
         <aside className="t-layout__side" aria-label="Szenario starten">
           <section className="t-box t-box--accent t-sbox">
             <h2 className="t-box__title">Im Prototyp starten</h2>
-            <dl className="t-sfacts">
-              <Fact label="Wohnort">{placeOf(scenario) ?? scenario.home}</Fact>
-              <Fact label="Einstieg">Startseite, Suchfeld</Fact>
-              <Fact label="Suchbegriff, falls nötig">{scenario.term}</Fact>
-            </dl>
             <div className="t-sbox__start">
-              <ScenarioStart title={scenario.title} config={config}>
+              <ScenarioStart title={name} config={config}>
                 Szenario starten
               </ScenarioStart>
             </div>
-            <p className="t-box__note">Alle Eingaben werden gelöscht, die Einstellungen bleiben. Zurück über „Testszenarien“ im Footer.</p>
+            <p className="t-box__note">Alle Eingaben werden gelöscht. Zurück über „Testszenarien“ im Footer.</p>
             <TaskLink href={taskHref(scenario, config)} />
           </section>
         </aside>

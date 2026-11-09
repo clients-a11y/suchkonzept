@@ -23,6 +23,10 @@ export type Service = {
   duration: string;
   documents: string[];
   sections: ServiceSection[];
+  // Close alternatives as slugs, most likely first: the results list them after the service itself.
+  nearby?: string[];
+  // Words of a topic in the news it belongs to: a search for information can show it alongside.
+  topics?: string[];
   // Exists only per place: without a place the one results page has nothing to show.
   regional?: boolean;
   // Places that do not offer it, as place ids.

@@ -1,25 +1,20 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { PageLoading } from "@/components/pages/PageLoading";
 import { UserTestDetailPage } from "@/components/pages/UserTestDetailPage";
-import { SCENARIOS, findScenario } from "@/data/test-scenarios";
+import { STARTER_SCENARIOS } from "@/data/test-scenarios";
+
+export const metadata: Metadata = { title: "Testszenario" };
 
 export function generateStaticParams() {
-  return SCENARIOS.map((scenario) => ({ id: String(scenario.id) }));
+  return STARTER_SCENARIOS.map((saved) => ({ id: saved.id }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/testszenarien/[id]">): Promise<Metadata> {
-  const { id } = await params;
-  return { title: findScenario(id)?.title ?? "Szenario nicht gefunden" };
-}
-
-// The address parameter is read inside Suspense, so the frame of the page shows at once.
+// The address parameter is read inside Suspense, so the frame of the page shows at once. Saved scenarios
+// live in the browser, the page looks them up there.
 async function Content({ params }: Pick<PageProps<"/testszenarien/[id]">, "params">) {
   const { id } = await params;
-  const scenario = findScenario(id);
-  if (!scenario) notFound();
-  return <UserTestDetailPage scenario={scenario} />;
+  return <UserTestDetailPage id={id} />;
 }
 
 export default function Page({ params }: PageProps<"/testszenarien/[id]">) {

@@ -19,7 +19,7 @@ export const INTENTS: Intent[] = [
     related: ["fahrzeug-zulassen", "hund-anmelden"],
   },
   {
-    phrases: ["ausweis", "perso", "ausweis abgelaufen", "ausweis laeuft ab", "ausweis verloren", "ausweis gestohlen", "identitaet"],
+    phrases: ["personalausweis", "ausweis", "perso", "ausweis abgelaufen", "ausweis laeuft ab", "ausweis verloren", "ausweis gestohlen", "identitaet"],
     services: ["personalausweis-beantragen"],
     related: ["fuehrungszeugnis-beantragen"],
   },
