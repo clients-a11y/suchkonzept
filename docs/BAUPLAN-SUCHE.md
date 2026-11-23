@@ -178,6 +178,21 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
 - Aufgabenseite für Testpersonen (auf Wunsch, 09.11.2026): `/aufgabe/[id]?v=…` zeigt nur Aufgabe, Suchbegriff und Postleitzahl.
   Die Einstellungen stecken als ein Zeichen in `v`. Während eine Testperson arbeitet, zeigt der Footer statt der internen Links
   „Aufgabe noch einmal lesen“; ein Browser, der schon eine Szenarioseite geöffnet hat, behält sie. Mit der PLZ im Formular fragt auch das Suchfeld der Ergebnisseite nach dem Ort.
+- Zwei Testcases statt Konfigurator (Feedback der Product Owner, 20.11.2026): Konfigurator, gespeicherte Szenarien, Szenarioseiten
+  und Aufgabenseiten sind entfernt. `/testszenarien` zeigt zwei Testcases, jeder mit Variante A und B (`src/data/test-cases.ts`):
+  Testcase 1 fragt die PLZ nach der Suche, Testcase 2 als Pflichtfeld im Suchformular. Die Suche braucht überall 2 Sekunden, die
+  Rückfrage „Was suchen Sie?“ ist aus. Die Bausteine des Konfigurators bleiben in `TestConfig` einzeln schaltbar.
+- Gemeinsame Liste (Variante A, 20.11.2026): Leistungen und Informationen in einer Liste, alle Treffer gleich dezent, Leistungen
+  mit Tag. Zwei Pills filtern. Die PLZ steht als drittes Element neben den Pills, als Knopf oder als gemerkter Ort. Kann die Suche
+  ohne Ort keine Leistung zeigen, steht das Feld in der ersten Zeile der Liste, als Karte über Platzhaltern wie im Leistungsbereich der getrennten Liste. Technische Grenze dahinter: Ohne Ort liefert die Suche keine
+  Leistung einer Gemeinde, die Zeile der Leistung ist deshalb bis zur Eingabe ein Hinweis. Eine gemeinsame Rangfolge gibt es im
+  Prototyp nicht: Die direkte Leistung steht zuerst, danach wechseln sich Informationen und weitere Leistungen ab.
+- Variante B bleibt die getrennte Liste: Leistungsbereich oben, Informationen darunter.
+- Overlay für die PLZ in Testcase 1 (auf Wunsch, 20.11.2026): Findet die Suche ohne Ort keine Leistung, öffnet sich in beiden
+  Varianten direkt nach der Suche dasselbe Overlay „Wie lautet Ihre Postleitzahl?“ (`SearchSteps`), dahinter das Skeleton. Es
+  schlägt beim Tippen Orte vor und nennt den erkannten Ort auf dem Knopf. „Ohne Ort suchen“ zeigt die Ergebnisse ohne Leistungen,
+  ein Hinweis mit „PLZ/Ort angeben“ führt zurück ins Overlay. Die Abfragen in der Leistungsbox und in der Listenzeile gibt es nur
+  noch mit `place: "results"`. So unterscheiden sich A und B allein in der Listenform.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

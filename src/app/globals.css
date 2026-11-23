@@ -3412,19 +3412,11 @@ button.t-route__choice {
   font-weight: 600;
 }
 
-/* ---------- Test scenarios for user tests ---------- */
+/* ---------- Test cases for user tests ---------- */
 
 .t-scens {
   display: grid;
   gap: 2.5rem;
-}
-
-.t-scens__status {
-  max-width: 52rem;
-  padding: 1rem 1.25rem;
-  border-left: 4px solid var(--c-ask);
-  border-radius: var(--radius);
-  background: var(--c-ask-bg);
 }
 
 .t-scens__steps {
@@ -3435,31 +3427,27 @@ button.t-route__choice {
   padding-left: 1.5rem;
 }
 
-.t-scen__task {
-  padding: 0.875rem 1.25rem;
-  border-radius: var(--radius);
-  background: var(--c-tint);
-  font-size: 1.125rem;
-}
-
-/* Scenario overview: cards per case. */
 .t-scens__notes {
   max-width: 52rem;
   margin: 1.25rem 0 0;
   padding-left: 1.25rem;
 }
 
-.t-scards {
+.t-tcase {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(26rem, 100%), 1fr));
+  gap: 0.75rem;
+}
+
+.t-variants {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
   gap: 1rem;
-  margin: 1rem 0 0;
+  margin: 0.25rem 0 0;
   padding: 0;
   list-style: none;
 }
 
-.t-scard {
-  position: relative;
+.t-variant {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
@@ -3470,319 +3458,62 @@ button.t-route__choice {
   background: var(--c-white);
 }
 
-.t-scard:hover {
-  border-color: var(--c-blue);
-}
-
-.t-scard__top {
+.t-variant__title {
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  color: var(--c-navy);
+  font-family: var(--f-head);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
-.t-scard__badge {
+.t-variant__letter {
   display: grid;
   flex: none;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background: var(--c-blue-dark);
   color: var(--c-white);
-  font-weight: 600;
+  font-size: 1rem;
 }
 
-.t-scard__meta {
-  color: var(--c-muted);
-  font-size: 0.875rem;
-}
-
-.t-scard__title {
-  color: var(--c-navy);
-  font-family: var(--f-condensed);
-  font-size: 1.375rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.t-scard__title a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.t-scard:hover .t-scard__title a {
-  text-decoration: underline;
-}
-
-.t-scard__entry {
-  color: var(--c-muted);
-  font-size: 0.875rem;
-}
-
-.t-scard__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: auto;
-  padding-top: 0.25rem;
-  color: var(--c-blue);
-}
-
-/* One scenario: path on the left, start on the right. */
-.t-sback::before {
-  content: "‹" / "";
-  margin-right: 0.375rem;
-}
-
-.t-sdetail__top {
-  margin-block: 0.75rem 0.5rem;
-}
-
-.t-sdetail {
-  display: grid;
-  gap: 1rem;
-}
-
-.t-sdetail__card {
-  display: grid;
-  gap: 0.875rem;
-  padding: 1.25rem 1.5rem;
-  border: 1px solid var(--c-line-soft);
-  border-radius: var(--radius);
-  background: var(--c-white);
-}
-
-.t-path {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.t-path li {
-  position: relative;
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: 0.75rem;
-  padding-bottom: 1rem;
-}
-
-.t-path li:last-child {
-  padding-bottom: 0;
-}
-
-.t-path li:not(:last-child)::before {
-  content: "";
-  position: absolute;
-  top: 2.25rem;
-  bottom: 0;
-  left: calc(1.125rem - 1px);
-  width: 2px;
-  background: var(--c-line-soft);
-}
-
-.t-path__no {
-  display: grid;
-  place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 2px solid var(--c-blue);
-  border-radius: 50%;
-  background: var(--c-white);
-  color: var(--c-blue-dark);
-  font-weight: 600;
-}
-
-.t-path__no[data-kind="wait"] {
-  border-style: dashed;
-}
-
-.t-path__no[data-kind="page"] {
-  border-color: var(--c-line);
-  color: var(--c-text);
-}
-
-.t-path__no[data-kind="end"] {
-  border-color: var(--c-navy);
-  background: var(--c-navy);
-  color: var(--c-white);
-}
-
-.t-path__kind {
-  display: block;
-  color: var(--c-muted);
-  font-size: 0.8125rem;
-}
-
-.t-checks {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.t-checks li {
-  display: grid;
-  grid-template-columns: 1.125rem minmax(0, 1fr);
-  gap: 0.625rem;
-}
-
-.t-checks .icon {
-  margin-top: 0.25rem;
-  color: var(--c-blue);
-}
-
-.t-sfacts {
-  display: grid;
-  gap: 0.625rem;
-  margin: 0;
-}
-
-.t-sfacts dt {
-  color: var(--c-muted);
-  font-size: 0.875rem;
-}
-
-.t-sfacts dd {
-  margin: 0;
-}
-
-.t-konf {
-  display: grid;
-  gap: 1.25rem;
-  padding: 1.5rem;
-  border: 1px solid var(--c-line-soft);
-  border-top: 4px solid var(--c-blue);
-  border-radius: var(--radius);
-  background: var(--c-surface);
-}
-
-.t-konf__cases {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
-  gap: 0.5rem;
-}
-
-.t-konf__case {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius);
-  background: var(--c-white);
-}
-
-.t-konf__case:has(input:checked) {
-  border-color: var(--c-blue);
-  box-shadow: inset 0 0 0 1px var(--c-blue);
-}
-
-.t-konf__example {
-  display: block;
-  color: var(--c-muted);
-  font-size: 0.875rem;
-  font-weight: 400;
-}
-
-.t-konf__goal {
-  width: 100%;
-  resize: vertical;
-}
-
-.t-konf__save {
-  display: grid;
-  gap: 0.625rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--c-line);
-}
-
-.t-konf__save .t-btn {
-  justify-self: start;
-}
-
-.t-konf__params {
-  display: grid;
-  gap: 0.25rem;
-  margin: 0;
-  font-size: 0.9375rem;
-}
-
-.t-konf__params div {
-  display: grid;
-  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-  gap: 0.75rem;
-}
-
-.t-konf__params dt {
-  color: var(--c-muted);
-}
-
-.t-konf__params dd {
-  margin: 0;
-  font-weight: 600;
-}
-
-.t-konf__foot {
+.t-variant__foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem 1rem;
   margin-top: auto;
+  padding-top: 0.375rem;
 }
 
-.t-konf__open {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: var(--c-blue);
+.t-variant__active {
+  color: var(--c-green);
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 
-/* Above the link that covers the whole card. */
-.t-konf__actions {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.t-terms {
+  width: 100%;
+  max-width: 52rem;
+  margin-top: 1rem;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.t-sconfig {
-  display: grid;
-  gap: 1.25rem;
+.t-terms th,
+.t-terms td {
+  padding: 0.5rem 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--c-line-soft);
+  vertical-align: top;
 }
 
-.t-sconfig .t-fieldset {
-  gap: 0.5rem;
-}
-
-.t-sconfig legend {
-  margin-bottom: 0.5rem;
-  padding: 0;
-  font-weight: 600;
-}
-
-.t-sconfig__row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.75rem;
-}
-
-.t-sbox__start {
-  display: grid;
-  gap: 0.25rem;
-}
-
-.t-box .t-sbox__start .t-btn {
-  justify-self: stretch;
-}
-
-@media (min-width: 64rem) {
-  .t-sbox {
-    position: sticky;
-    top: 1rem;
-  }
+.t-terms thead th {
+  color: var(--c-muted);
+  font-size: 0.875rem;
 }
 
 /* The moment in which the search judges a request. */
@@ -3901,6 +3632,15 @@ button.t-route__choice {
   font-weight: 600;
 }
 
+/* A note with the button that opens the question for the place again. */
+.t-askplace {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
 .t-lb__cover {
   position: relative;
   min-height: 19rem;
@@ -3975,85 +3715,98 @@ button.t-route__choice {
   font-weight: 600;
 }
 
-/* ---------- Instruction page for test persons ---------- */
+/* ---------- One list for services and information ---------- */
 
-.t-task {
+.t-clist {
   display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 2rem 1rem;
-  background: var(--c-surface);
+  gap: 1rem;
 }
 
-.t-task__inner {
-  display: grid;
-  gap: 1.25rem;
-  width: min(42rem, 100%);
+.t-clist__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
 }
 
-.t-task__portal {
-  color: var(--c-muted);
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-
-.t-task__title {
-  color: var(--c-navy);
-  font-family: var(--f-condensed);
-  font-size: clamp(2rem, 1.7rem + 1.4vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.t-task__text {
-  font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
-  line-height: 1.4;
-}
-
-.t-task__facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+/* Every hit looks the same here; the tag is what makes a service stand out. It is read first and stands on the right. */
+.t-hit__kind--tagged {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
-  margin: 0.5rem 0 0;
 }
 
-.t-task__facts > div {
-  padding: 1.125rem 1.25rem;
-  border: 1px solid var(--c-line-soft);
-  border-top: 4px solid var(--c-blue);
-  border-radius: var(--radius);
-  background: var(--c-white);
+.t-hit__kind--tagged .t-tag {
+  order: 1;
+  margin-left: auto;
 }
 
-.t-task__facts dt {
-  color: var(--c-muted);
-  font-size: 0.9375rem;
+.t-tag {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.1875rem 0.5rem 0.1875rem 0.4375rem;
+  border-radius: 2px;
+  background: var(--c-blue-dark);
+  color: var(--c-white);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.t-hit:hover .t-tag {
+  color: var(--c-white);
+}
+
+.t-hit--notice,
+.t-hit--notice:hover {
+  border-left-color: var(--c-ask);
+  background: var(--c-ask-bg);
+}
+
+.t-hit--notice .t-tag {
+  background: var(--c-ask);
+}
+
+/* The row that asks for the place: placeholders with the question on top, as in the area for services of the
+   separate list. Both lie in one grid cell, so the row grows with the question. */
+.t-clist__cover {
+  display: grid;
+}
+
+.t-clist__cover > * {
+  grid-area: 1 / 1;
+}
+
+/* In the flow, so it sets the height, and positioned, so it lies above the placeholders. */
+.t-clist__cover .t-lb__overlay {
+  position: relative;
+  inset: auto;
+}
+
+.t-placefilter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.t-placefilter--open {
+  flex: 1 1 20rem;
+  max-width: 26rem;
+}
+
+.t-placefilter .t-region {
+  flex: 1 1 auto;
+}
+
+.t-placefilter__known {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   font-weight: 600;
-}
-
-.t-task__facts dd {
-  margin: 0.125rem 0 0;
-  color: var(--c-navy);
-  font-family: var(--f-condensed);
-  font-size: clamp(1.75rem, 1.5rem + 1.1vw, 2.25rem);
-  font-weight: 600;
-  line-height: 1.15;
-}
-
-.t-task__facts .t-task__town {
-  color: var(--c-text);
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-.t-task__start {
-  justify-self: start;
-}
-
-.t-task__sample {
-  color: var(--c-muted);
-  font-size: 0.875rem;
 }
 
 /* ---------- Page "So entscheidet die Suche" ---------- */

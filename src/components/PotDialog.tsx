@@ -103,8 +103,11 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
   const text = value.trim();
   const digits = /^\d+$/.test(text);
   const ready = digits ? text.length === 5 : text.length >= 3;
-  const matches = ready ? findPlaces(text) : [];
-  const place = matches.length === 1 ? matches[0] : undefined;
+  // A postcode that is still being typed suggests places, it does not stand for one yet.
+  const partial = digits && text.length >= 3 && text.length < 5;
+  const matches = ready || partial ? findPlaces(text) : [];
+  const place = !partial && matches.length === 1 ? matches[0] : undefined;
+  const suggestions = place ? [] : matches;
 
   let status = "";
   let problem = false;
@@ -112,7 +115,7 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
   else if (ready && matches.length === 0) {
     problem = true;
     status = digits ? `Die Postleitzahl ${text} gehört zu keinem Ort in ${SITE.region}.` : `Einen Ort „${text}“ kennen wir in ${SITE.region} nicht.`;
-  } else if (matches.length > 1) status = `Zu „${text}“ passen mehrere Orte. Bitte wählen Sie Ihren Ort.`;
+  } else if (suggestions.length > 0) status = partial ? "Ist Ihr Ort dabei? Sonst tippen Sie weiter." : `Zu „${text}“ passen mehrere Orte. Bitte wählen Sie Ihren Ort.`;
   else if (tried) {
     problem = true;
     status = "Bitte geben Sie Ihre Postleitzahl oder Ihren Ort ein.";
@@ -147,7 +150,7 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
           }}
         />
         <button ref={submitRef} type="submit" className="t-btn t-btn--primary">
-          Weiter
+          {place ? `Weiter mit ${place.name}` : "Weiter"}
           <IconArrow size={18} />
         </button>
       </div>
@@ -166,9 +169,9 @@ function PlaceStep({ onConfirm }: { onConfirm: (place: Place) => void }) {
         {place && <IconCheck size={16} />}
         {status}
       </p>
-      {matches.length > 1 && (
+      {suggestions.length > 0 && (
         <ul className="t-homeplace__matches" aria-label="Passende Orte">
-          {matches.map((p) => (
+          {suggestions.map((p) => (
             <li key={p.id}>
               {/* Picking the place finishes the step, one click less than picking and then "Weiter". */}
               <button type="button" className="t-chip" onClick={() => onConfirm(p)}>
@@ -196,12 +199,20 @@ export function SearchSteps({
   onDone,
   onChat,
   dismissLabel = "Suche abbrechen",
+  skipLabel,
+  placeTitle = "Wo wohnen Sie?",
+  placeText,
 }: {
   request: SearchRequest | null;
   onClose: (dismissed: boolean) => void;
   onDone: (href: string) => void;
   onChat?: (q: string) => void;
   dismissLabel?: string;
+  // Shown under the question for the place: goes on without an answer.
+  skipLabel?: string;
+  // Other wording for the question for the place and the line below it.
+  placeTitle?: string;
+  placeText?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   // Closed by finishing the steps or the chat, or dismissed (Escape, close button, dimmed area).
@@ -298,10 +309,10 @@ export function SearchSteps({
             <div>
               {twoSteps && <p className="t-potdialog__step">Schritt {step === "pot" ? 1 : 2} von 2</p>}
               <h2 id={titleId} className="t-potdialog__title">
-                {step === "pot" ? "Was suchen Sie?" : "Wo wohnen Sie?"}
+                {step === "pot" ? "Was suchen Sie?" : placeTitle}
               </h2>
               <p className="t-potdialog__lead">
-                {step === "pot" ? `Zu „${query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.` : placeLead}
+                {step === "pot" ? `Zu „${query}“ gibt es Anträge und Informationen. Wählen Sie, was Sie gerade brauchen.` : (placeText ?? placeLead)}
               </p>
             </div>
             <button type="button" className="t-potdialog__close" onClick={close} aria-label={dismissLabel}>
@@ -356,6 +367,13 @@ export function SearchSteps({
                   Zurück zu Schritt 1
                 </button>
               )}
+            </div>
+          )}
+          {step === "place" && skipLabel && (
+            <div className="t-potdialog__foot">
+              <button type="button" className="t-textbutton" onClick={close}>
+                {skipLabel}
+              </button>
             </div>
           )}
         </div>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { UserTestPage } from "@/components/pages/UserTestPage";
 
-export const metadata: Metadata = { title: "Testszenarien" };
+export const metadata: Metadata = { title: "Testcases" };
 
 export default function Page() {
-  return <UserTestPage tab="szenarien" />;
+  return <UserTestPage />;
 }

@@ -41,6 +41,17 @@ export function IconAlert(props: IconProps) {
   );
 }
 
+// A form that has been filled in: stands for a service.
+export function IconForm(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z" />
+      <path d="M14 3v4h4" />
+      <path d="m9 14.5 2 2 4-4.5" />
+    </Svg>
+  );
+}
+
 export function IconMenu(props: IconProps) {
   return (
     <Svg {...props}>

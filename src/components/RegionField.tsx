@@ -1,25 +1,33 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { Place } from "@/data/places";
 import { checkPlace } from "@/lib/place-store";
 
-// Postcode or place on the results page of variant 2. The label carries the wording of each case.
+// Postcode or place on the results page. The label carries the wording of each case. focusOnMount: the field
+// opened because the person asked for it.
 export function RegionField({
   label,
   initial = "",
+  focusOnMount = false,
   onPlace,
 }: {
   label: string;
   initial?: string;
+  focusOnMount?: boolean;
   onPlace: (place: Place) => void;
 }) {
   const inputId = useId();
   const statusId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(initial);
   const [matches, setMatches] = useState<Place[]>([]);
   const [problem, setProblem] = useState("");
+
+  useEffect(() => {
+    if (focusOnMount) inputRef.current?.focus();
+  }, [focusOnMount]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -36,6 +44,7 @@ export function RegionField({
       </label>
       <div className="t-region__row">
         <input
+          ref={inputRef}
           id={inputId}
           className="t-input"
           value={value}

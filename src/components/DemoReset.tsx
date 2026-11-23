@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { TestConfig } from "@/data/test-scenarios";
+import type { TestConfig } from "@/data/test-cases";
 import { resetAccount } from "@/lib/account-store";
 import { clearChat } from "@/lib/chat-store";
 import { setPlaceId } from "@/lib/place-store";
@@ -14,11 +14,10 @@ function resetDemo() {
 }
 
 // A fresh start page: pages stay alive in the background, so only a real load also clears a search term
-// still standing in the field and the state of the results page. config: the settings of the run that starts,
-// task: its instruction page when a test person runs it.
-export function restartDemo(config?: TestConfig, task?: string) {
+// still standing in the field and the state of the results page. config: the variant of the test case that starts.
+export function restartDemo(config?: TestConfig) {
   resetDemo();
-  if (config) activateConfig(config, task);
+  if (config) activateConfig(config);
   // A client-side navigation would keep exactly the state this is meant to clear.
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination
   window.location.href = "/";
