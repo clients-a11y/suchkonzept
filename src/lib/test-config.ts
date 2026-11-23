@@ -2,13 +2,14 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 import { DEFAULT_CONFIG } from "@/data/test-cases";
-import type { TestConfig } from "@/data/test-cases";
+import type { ServiceStyle, TestConfig } from "@/data/test-cases";
 
-// The variant of a test case the prototype runs with since the last start, in this browser.
+// The variant of a test case the prototype runs with since the last start, in this browser, and the draft
+// for how the one list shows services.
 const KEY = "suchkonzept.testeinstellungen.v2";
 const EVENT = "suchkonzept-testeinstellungen";
 
-type Stored = { active?: TestConfig };
+type Stored = { active?: TestConfig; style?: ServiceStyle };
 
 function subscribe(callback: () => void) {
   window.addEventListener(EVENT, callback);
@@ -32,7 +33,7 @@ function parse(raw: string): Stored {
     if (!raw) return {};
     const stored = JSON.parse(raw) as Stored;
     // Saved before a setting existed: it counts with its default.
-    return { active: stored.active && { ...DEFAULT_CONFIG, ...stored.active } };
+    return { ...stored, active: stored.active && { ...DEFAULT_CONFIG, ...stored.active } };
   } catch {
     return {};
   }
@@ -48,11 +49,24 @@ export function useTestConfig(): TestConfig {
   return useActiveConfig() ?? DEFAULT_CONFIG;
 }
 
-export function activateConfig(config: TestConfig) {
+function write(next: Stored) {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify({ active: config } satisfies Stored));
+    window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
     // Storage blocked: the prototype runs with the default settings.
   }
   window.dispatchEvent(new Event(EVENT));
+}
+
+export function activateConfig(config: TestConfig) {
+  write({ ...parse(read()), active: config });
+}
+
+export function useServiceStyle(): ServiceStyle {
+  const raw = useSyncExternalStore(subscribe, read, () => "");
+  return useMemo(() => parse(raw).style ?? "tag", [raw]);
+}
+
+export function setServiceStyle(style: ServiceStyle) {
+  write({ ...parse(read()), style });
 }

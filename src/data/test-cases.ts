@@ -55,6 +55,16 @@ export function sameConfig(a: TestConfig, b: TestConfig): boolean {
   return (Object.keys(a) as (keyof TestConfig)[]).every((key) => a[key] === b[key]);
 }
 
+// Wie die gemeinsame Liste Leistungen hervorhebt: nur mit dem Tag oder nach einem der drei Entwürfe.
+export type ServiceStyle = "tag" | "tint" | "card" | "icon";
+
+export const SERVICE_STYLES: { style: ServiceStyle; title: string; text: string }[] = [
+  { style: "tag", title: "Stand heute: Tag", text: "Alle Treffer sehen gleich aus. Nur der Tag rechts zeigt, was eine Leistung ist." },
+  { style: "tint", title: "Entwurf 1: Farbe", text: "Leistungen sind blau hinterlegt und haben links einen dunklen Balken. Informationen stehen auf Weiß." },
+  { style: "card", title: "Entwurf 2: Karte", text: "Leistungen sind Karten mit Schatten, größerem Titel und dem Hinweis „Zur Leistung“. Informationen stehen als schlichte Zeilen dazwischen." },
+  { style: "icon", title: "Entwurf 3: Symbol", text: "Jeder Treffer beginnt mit einem Symbol: Leistungen mit einem gefüllten blauen, Informationen mit einem hellen. Das Wort „Leistung“ steht vorn, der Tag rechts entfällt." },
+];
+
 // Begriffe, mit denen sich die Fälle der Suche zeigen lassen.
 export const TEST_TERMS: { term: string; place?: string; shows: string }[] = [
   { term: "Personalausweis", shows: "Leistung ohne Ort, bundesweit einheitlich" },

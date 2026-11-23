@@ -193,6 +193,9 @@ Alle Schritte oben sind umgesetzt, gebaut und auf Desktop (1024 px) und 390 px d
   schlägt beim Tippen Orte vor und nennt den erkannten Ort auf dem Knopf. „Ohne Ort suchen“ zeigt die Ergebnisse ohne Leistungen,
   ein Hinweis mit „PLZ/Ort angeben“ führt zurück ins Overlay. Die Abfragen in der Leistungsbox und in der Listenzeile gibt es nur
   noch mit `place: "results"`. So unterscheiden sich A und B allein in der Listenform.
+- Entwürfe zur Hervorhebung (auf Wunsch, 23.11.2026): `/testszenarien/entwuerfe` zeigt drei Entwürfe, wie die gemeinsame Liste
+  Leistungen stärker hervorhebt (Farbe, Karte, Symbol), neben dem Stand mit Tag. „Im Prototyp verwenden“ schaltet einen Entwurf
+  für die gemeinsame Liste ein (`ServiceStyle`, gemerkt im Browser). Noch nicht entschieden, Vorgabe bleibt der Tag.
 
 **Gestaltung** (`src/app/globals.css`, neu geschrieben)
 - Farben als Variablen `--c-*`, Fira Sans und Fira Sans Condensed (Überschriften), Radius 4 px.

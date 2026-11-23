@@ -3809,6 +3809,136 @@ button.t-route__choice {
   font-weight: 600;
 }
 
+/* ---------- Drafts: how the one list shows services ---------- */
+
+.t-drafts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(30rem, 100%), 1fr));
+  gap: 2.5rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.t-draft {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.t-draft__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+/* Draft 1, colour: services on blue with a dark bar, information on white. */
+.t-hits--tint > .t-hit:not(.t-hit--notice) {
+  border: 1px solid var(--c-line-soft);
+  border-left-width: 4px;
+  background: var(--c-white);
+}
+
+.t-hits--tint > .t-hit.t-hit--service {
+  border-color: var(--c-tint);
+  border-left-color: var(--c-blue-dark);
+  background: var(--c-tint);
+}
+
+.t-hits--tint > .t-hit:not(.t-hit--notice):hover {
+  border-left-color: var(--c-blue);
+}
+
+.t-hits--tint > .t-hit.t-hit--service:hover {
+  border-left-color: var(--c-navy);
+}
+
+/* Draft 2, card: services as cards that say where they lead, information as plain rows. */
+.t-hits--card > .t-hit:not(.t-hit--service):not(.t-hit--notice) {
+  padding: 0.25rem 0 1rem;
+  border-bottom: 1px solid var(--c-line-soft);
+  border-left: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.t-hits--card > .t-hit--service {
+  gap: 0.375rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--c-line-soft);
+  border-left: 6px solid var(--c-blue-dark);
+  background: var(--c-white);
+  box-shadow: 0 4px 16px rgb(21 41 61 / 0.12);
+}
+
+.t-hits--card > .t-hit--service:hover {
+  border-left-color: var(--c-navy);
+  box-shadow: 0 6px 22px rgb(21 41 61 / 0.2);
+}
+
+.t-hits--card > .t-hit--service .t-hit__title {
+  font-size: 1.375rem;
+}
+
+.t-hit__action {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border: 2px solid var(--c-blue);
+  border-radius: var(--radius);
+  color: var(--c-blue);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.t-hit:hover .t-hit__action {
+  border-color: var(--c-blue-dark);
+  background: var(--c-blue-dark);
+  color: var(--c-white);
+}
+
+/* Draft 3, symbol: every hit starts with a symbol, filled for a service. */
+.t-hits--icon > .t-hit:not(.t-hit--notice) {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.t-hit__body {
+  display: grid;
+  flex: 1;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.t-hit__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  background: var(--c-white);
+  color: var(--c-muted);
+}
+
+.t-hit--service > .t-hit__icon {
+  border-color: var(--c-blue-dark);
+  background: var(--c-blue-dark);
+  color: var(--c-white);
+}
+
+.t-hit__type {
+  color: var(--c-blue-dark);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 /* ---------- Page "So entscheidet die Suche" ---------- */
 
 .t-flow {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useId, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { IconCheck, IconForm, IconPin, IconSparkle } from "@/components/Icons";
+import { IconArrow, IconCheck, IconDoc, IconForm, IconPin, IconSparkle } from "@/components/Icons";
 import { AnswerPlace, HitList, SearchHead, useArrival } from "@/components/pages/SearchPage";
 import { SearchSteps } from "@/components/PotDialog";
 import type { SearchRequest } from "@/components/PotDialog";
@@ -12,7 +12,7 @@ import { RegionField } from "@/components/RegionField";
 import { SearchPending } from "@/components/SearchPending";
 import type { Place } from "@/data/places";
 import { hintAfter } from "@/data/test-cases";
-import type { TestConfig } from "@/data/test-cases";
+import type { ServiceStyle, TestConfig } from "@/data/test-cases";
 import { isCentral, responsibleOffice } from "@/lib/offices";
 import { setPlaceId, usePlace } from "@/lib/place-store";
 import { isUnclear, resultArea } from "@/lib/result-area";
@@ -21,7 +21,7 @@ import { POT_LABEL, routeQuery } from "@/lib/search-router";
 import type { Pot } from "@/lib/search-router";
 import { searchInformation } from "@/lib/smart-search";
 import type { InfoHit } from "@/lib/smart-search";
-import { useTestConfig } from "@/lib/test-config";
+import { useServiceStyle, useTestConfig } from "@/lib/test-config";
 import type { Service } from "@/lib/types";
 
 // Services and information on one results page: in one list, one below the other, or in two tabs. Which of
@@ -153,11 +153,11 @@ function Waiting({ wait, children }: { wait: TestConfig["wait"]; children: React
   );
 }
 
-type Row = { kind: "service"; service: Service } | { kind: "info"; hit: InfoHit };
+export type Row = { kind: "service"; service: Service } | { kind: "info"; hit: InfoHit };
 
 // One ranking for services and information comes from the backend later. The prototype puts the service itself
 // first and then takes turns, so the list shows what a mixed ranking looks like.
-function mix(services: Service[], infos: InfoHit[], infoFirst: boolean): Row[] {
+export function mix(services: Service[], infos: InfoHit[], infoFirst: boolean): Row[] {
   const lead = infoFirst ? 0 : Math.min(1, services.length);
   const rest = services.slice(lead);
   const rows: Row[] = services.slice(0, lead).map((service) => ({ kind: "service", service }));
@@ -186,13 +186,33 @@ function officeLine(service: Service, place: Place | undefined): string {
   return service.level === "land" ? `Zuständig: ${office.office}` : `Zuständig für ${place?.name}: ${office.office}`;
 }
 
-// In the one list every hit looks the same. A service is told apart by its tag.
-function CombinedRow({ row, index, place }: { row: Row; index: number; place: Place | undefined }) {
+// In the one list a service is told apart by its tag. A draft can add colour, the shape of a card or a symbol
+// in front of every hit.
+export function CombinedRow({ row, index, place, variant = "tag" }: { row: Row; index: number; place: Place | undefined; variant?: ServiceStyle }) {
   const style = { "--i": index } as CSSProperties;
+  const symbol = variant === "icon";
+  // With a symbol in front, the text stands in a column of its own.
+  const frame = (className: string, icon: ReactNode, body: ReactNode) => (
+    <li className={className} style={style}>
+      {symbol ? (
+        <>
+          <span className="t-hit__icon" aria-hidden="true">
+            {icon}
+          </span>
+          <div className="t-hit__body">{body}</div>
+        </>
+      ) : (
+        body
+      )}
+    </li>
+  );
+
   if (row.kind === "info") {
     const { hit } = row;
-    return (
-      <li className="t-hit" style={style}>
+    return frame(
+      "t-hit",
+      <IconDoc size={20} />,
+      <>
         <p className="t-hit__kind">{hit.kind}</p>
         <h3 className="t-hit__title">
           <Link href={hit.href} className="t-cardlink">
@@ -200,16 +220,25 @@ function CombinedRow({ row, index, place }: { row: Row; index: number; place: Pl
           </Link>
         </h3>
         <p className="t-hit__text">{hit.text}</p>
-      </li>
+      </>,
     );
   }
+
   const { service } = row;
-  return (
-    <li className="t-hit" style={style}>
-      <p className="t-hit__kind t-hit__kind--tagged">
-        <ServiceTag />
-        <span>{officeLine(service, place)}</span>
-      </p>
+  return frame(
+    "t-hit t-hit--service",
+    <IconForm size={20} />,
+    <>
+      {symbol ? (
+        <p className="t-hit__kind">
+          <span className="t-hit__type">Leistung</span> · {officeLine(service, place)}
+        </p>
+      ) : (
+        <p className="t-hit__kind t-hit__kind--tagged">
+          <ServiceTag />
+          <span>{officeLine(service, place)}</span>
+        </p>
+      )}
       <h3 className="t-hit__title">
         <Link href={`/leistungen/${service.slug}`} className="t-cardlink">
           {service.title}
@@ -224,7 +253,14 @@ function CombinedRow({ row, index, place }: { row: Row; index: number; place: Pl
         <li>Kosten: {service.costs}</li>
         <li>Dauer: {service.duration}</li>
       </ul>
-    </li>
+      {/* The whole card is the link; this only shows where it leads. */}
+      {variant === "card" && (
+        <span className="t-hit__action" aria-hidden="true">
+          Zur Leistung
+          <IconArrow size={16} />
+        </span>
+      )}
+    </>,
   );
 }
 
@@ -287,6 +323,7 @@ function CombinedResults({
   onAskPlace?: () => void;
 }) {
   const [filter, setFilter] = useState<Pot | undefined>();
+  const variant = useServiceStyle();
   const services = area.kind === "services" ? area.services : [];
   const needPlace = area.kind === "needPlace";
   const rows = mix(services, information, area.kind === "services" && Boolean(area.related)).filter(
@@ -321,7 +358,7 @@ function CombinedResults({
           <Ghost />
         </Waiting>
       ) : note || rows.length > 0 ? (
-        <ol className="t-hits">
+        <ol className={`t-hits t-hits--${variant}`}>
           {askInRow && onAskPlace && (
             <li className="t-hit t-hit--notice">
               <p className="t-hit__kind t-hit__kind--tagged">
@@ -359,7 +396,7 @@ function CombinedResults({
             </li>
           )}
           {rows.map((row, index) => (
-            <CombinedRow key={row.kind === "service" ? row.service.slug : row.hit.key} row={row} index={index} place={place} />
+            <CombinedRow key={row.kind === "service" ? row.service.slug : row.hit.key} row={row} index={index} place={place} variant={variant} />
           ))}
         </ol>
       ) : (

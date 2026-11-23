@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { IconArrow } from "@/components/Icons";
 import { TestCases } from "@/components/TestCases";
 import { TEST_TERMS } from "@/data/test-cases";
 
@@ -19,6 +21,17 @@ export function UserTestPage() {
 
       <div className="t-container t-page t-scens">
         <TestCases />
+
+        <section aria-labelledby="entwuerfe">
+          <h2 id="entwuerfe" className="t-h2">
+            Entwürfe
+          </h2>
+          <p>
+            <Link href="/testszenarien/entwuerfe" className="t-more">
+              Leistungen in der gemeinsamen Liste hervorheben: drei Entwürfe <IconArrow size={18} />
+            </Link>
+          </p>
+        </section>
 
         <section aria-labelledby="begriffe">
           <h2 id="begriffe" className="t-h2">

@@ -52,6 +52,17 @@ export function IconForm(props: IconProps) {
   );
 }
 
+// A page of text: stands for information.
+export function IconDoc(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z" />
+      <path d="M14 3v4h4" />
+      <path d="M9 12.5h6M9 16h4" />
+    </Svg>
+  );
+}
+
 export function IconMenu(props: IconProps) {
   return (
     <Svg {...props}>
